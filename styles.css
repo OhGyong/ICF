@@ -1020,16 +1020,41 @@ button, input, select, textarea {
   box-shadow: var(--shadow-md);
 }
 
-.court-board {
+.court-board-wrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 8 / 5;
+  transition: aspect-ratio 0.3s ease;
+  overflow: hidden;
+}
+
+.court-board-wrapper.portrait-mode {
+  aspect-ratio: 5 / 8;
+  max-height: 700px;
+  max-width: 437.5px;
+  margin: 0 auto;
+}
+
+.court-board {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
   background-color: #17202d;
   background-image: 
     radial-gradient(#1e2b3c 1px, transparent 1px),
     radial-gradient(#1e2b3c 1px, transparent 1px);
   background-size: 40px 40px;
   background-position: 0 0, 20px 20px;
+  transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.court-board-wrapper.portrait-mode .court-board {
+  width: 160%;
+  height: 62.5%;
+  transform: translate(-50%, -50%) rotate(-90deg);
 }
 
 .court-svg {
@@ -1105,6 +1130,15 @@ button, input, select, textarea {
   cursor: grabbing;
   z-index: 50;
   transform: translate(-50%, -50%) scale(1.15);
+}
+
+/* Counter-rotate tokens in portrait mode */
+.court-board-wrapper.portrait-mode .board-token {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.court-board-wrapper.portrait-mode .board-token:active {
+  transform: translate(-50%, -50%) rotate(90deg) scale(1.15);
 }
 
 .board-token.token-offense {

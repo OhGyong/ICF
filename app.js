@@ -716,8 +716,16 @@ function setupDragAndDrop() {
     }
 
     // Convert pixels to relative percentages inside container
-    let xPercent = ((clientX - rect.left) / rect.width) * 100;
-    let yPercent = ((clientY - rect.top) / rect.height) * 100;
+    const isPortrait = document.getElementById('court-wrapper').classList.contains('portrait-mode');
+    let xPercent, yPercent;
+
+    if (isPortrait) {
+      xPercent = 100 - ((clientY - rect.top) / rect.height) * 100;
+      yPercent = ((clientX - rect.left) / rect.width) * 100;
+    } else {
+      xPercent = ((clientX - rect.left) / rect.width) * 100;
+      yPercent = ((clientY - rect.top) / rect.height) * 100;
+    }
 
     // Clamp coordinates [2% - 98%]
     xPercent = Math.max(2, Math.min(98, xPercent));
@@ -768,6 +776,16 @@ document.getElementById('court-full').addEventListener('click', (e) => {
 });
 
 document.getElementById('btn-reset-board-tokens').addEventListener('click', resetTokenPositions);
+
+document.getElementById('btn-toggle-rotation').addEventListener('click', (e) => {
+  const wrapper = document.getElementById('court-wrapper');
+  wrapper.classList.toggle('portrait-mode');
+  if (wrapper.classList.contains('portrait-mode')) {
+    e.target.innerText = '가로 보기 전환';
+  } else {
+    e.target.innerText = '세로 보기 전환';
+  }
+});
 
 
 // ================= TACTICS SAVE / LOAD CRUD =================
