@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HoopBoard - 농구 팀 & 대회 관리 대시보드</title>
+  <!-- Google Fonts: Outfit (headings) & Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M6.2 6.2c2.4-2.4 6.2-2.4 8.5 0"></path>
+            <path d="M17.8 17.8c-2.4 2.4-6.2 2.4-8.5 0"></path>
+            <path d="M2 12h20"></path>
+            <path d="M12 2v20"></path>
+          </svg>
+          <span class="logo-text">HoopBoard</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#" class="nav-item active" data-tab="dashboard" id="nav-dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>대시보드</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="schedule" id="nav-schedule">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>대회 일정</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="tactics" id="nav-tactics">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+            <path d="M12 6v12"></path>
+            <path d="M6 12h12"></path>
+          </svg>
+          <span>작전판 & 전술</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="skills" id="nav-skills">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <span>농구 스킬 북</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="rules" id="nav-rules">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          <span>경기 규칙</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="roster" id="nav-roster">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span>팀 로스터</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="team-profile">
+          <div class="team-logo">🏀</div>
+          <div class="team-info">
+            <h4 id="sidebar-team-name">나의 농구팀</h4>
+            <p>D-Day <span id="sidebar-dday">-</span></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="main-header">
+        <div class="header-title">
+          <h1 id="page-title">대시보드</h1>
+          <p id="page-subtitle" class="text-muted">우리 팀의 농구 대회 준비 및 활동 요약</p>
+        </div>
+        <div class="header-actions">
+          <div class="date-badge">
+            <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span id="current-date">2026. 06. 21</span>
+          </div>
+          <button class="btn btn-secondary" id="btn-reset-data">데이터 초기화</button>
+        </div>
+      </header>
+
+      <!-- Scrollable Tab Content -->
+      <div class="content-body">
+
+        <!-- ================= DASHBOARD TAB ================= -->
+        <section id="dashboard" class="tab-content active">
+          <div class="dashboard-grid">
+
+            <!-- Welcome Banner Card -->
+            <div class="card card-hero span-all-cols">
+              <div class="hero-content">
+                <span class="badge badge-accent">D-Day 카운트다운</span>
+                <h2 id="dashboard-hero-title">다음 대회 경기까지 <span id="countdown-timer" class="text-highlight">D-30</span>
+                  남았습니다!</h2>
+                <p id="dashboard-hero-subtitle">다가오는 경기 일정을 관리하고 전술판에서 작전을 세워보세요.</p>
+                <div class="hero-buttons">
+                  <button class="btn btn-primary" onclick="switchTab('tactics')">
+                    작전판 실행하기
+                  </button>
+                  <button class="btn btn-outline" onclick="switchTab('schedule')">
+                    일정 등록하기
+                  </button>
+                </div>
+              </div>
+              <div class="hero-art">
+                <!-- Decorative basketball silhouette -->
+                <svg viewBox="0 0 100 100" class="hero-svg">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255, 107, 0, 0.15)" stroke-width="1.5">
+                  </circle>
+                  <path d="M20 50 Q50 20 80 50" fill="none" stroke="rgba(255, 107, 0, 0.15)" stroke-width="1.5"></path>
+                  <path d="M20 50 Q50 80 80 50" fill="none" stroke="rgba(255, 107, 0, 0.15)" stroke-width="1.5"></path>
+                  <path d="M50 5 Q50 50 50 95" fill="none" stroke="rgba(255, 107, 0, 0.15)" stroke-width="1.5"></path>
+                  <path d="M5 50 Q50 50 95 50" fill="none" stroke="rgba(255, 107, 0, 0.15)" stroke-width="1.5"></path>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Stats Card 1: Schedule -->
+            <div class="card card-stat">
+              <div class="card-icon-container bg-orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h3>남은 경기</h3>
+                <p class="stat-value" id="stat-upcoming-games">0</p>
+                <p class="stat-desc">총 <span id="stat-total-games">0</span>개 경기 일정</p>
+              </div>
+            </div>
+
+            <!-- Stats Card 2: Roster -->
+            <div class="card card-stat">
+              <div class="card-icon-container bg-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h3>등록 선수</h3>
+                <p class="stat-value" id="stat-roster-count">0</p>
+                <p class="stat-desc">로스터 멤버 전체 수</p>
+              </div>
+            </div>
+
+            <!-- Stats Card 3: Skills -->
+            <div class="card card-stat">
+              <div class="card-icon-container bg-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h3>스킬 마스터</h3>
+                <p class="stat-value" id="stat-skills-progress">0%</p>
+                <div class="progress-bar-container">
+                  <div class="progress-bar" id="stat-skills-bar" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main Panel: Upcoming Game Details & Tactics -->
+            <div class="dashboard-double span-all-cols">
+              <!-- Upcoming Game List Panel -->
+              <div class="card card-panel">
+                <div class="panel-header">
+                  <h3>다가오는 경기 일정</h3>
+                  <a href="#" onclick="switchTab('schedule')" class="btn-text">전체보기 &rarr;</a>
+                </div>
+                <div class="panel-content" id="dashboard-schedule-list">
+                  <div class="empty-state">
+                    <p>등록된 경기 일정이 없습니다.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tactics Quick Link Panel -->
+              <div class="card card-panel">
+                <div class="panel-header">
+                  <h3>최근 등록된 전술</h3>
+                  <a href="#" onclick="switchTab('tactics')" class="btn-text">전체보기 &rarr;</a>
+                </div>
+                <div class="panel-content" id="dashboard-tactics-list">
+                  <div class="empty-state">
+                    <p>등록된 전술이 없습니다.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================= SCHEDULE TAB ================= -->
+        <section id="schedule" class="tab-content">
+          <div class="tab-header-actions">
+            <div class="filter-tabs">
+              <button class="filter-btn active" data-filter="all">전체 일정</button>
+              <button class="filter-btn" data-filter="upcoming">예정된 경기</button>
+              <button class="filter-btn" data-filter="finished">종료된 경기</button>
+            </div>
+            <button class="btn btn-primary" id="btn-open-schedule-modal">
+              <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              경기 등록
+            </button>
+          </div>
+
+          <div class="schedule-list" id="schedule-list-container">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+        <!-- ================= TACTICS BOARD TAB ================= -->
+        <section id="tactics" class="tab-content">
+          <div class="tactics-container">
+            <!-- Left Side: Controls & Info -->
+            <div class="tactics-controls">
+              <div class="card border-highlight">
+                <div class="card-header">
+                  <h3>전술 작전판</h3>
+                  <p class="text-muted">선수 및 볼 토큰을 드래그하여 배치해보세요.</p>
+                </div>
+
+                <div class="board-settings">
+                  <div class="setting-group">
+                    <label>코트 뷰 설정</label>
+                    <div class="segmented-control">
+                      <button class="control-btn active" id="court-half">하프 코트</button>
+                      <button class="control-btn" id="court-full">풀 코트</button>
+                    </div>
+                  </div>
+
+                  <div class="setting-group">
+                    <button class="btn btn-secondary w-full" id="btn-reset-board-tokens">
+                      토큰 위치 초기화
+                    </button>
+                  </div>
+                </div>
+
+                <div class="token-legend">
+                  <h4>토큰 목록</h4>
+                  <div class="legend-items">
+                    <div class="legend-item"><span class="token-dot token-offense"></span> 공격 (1 ~ 5)</div>
+                    <div class="legend-item"><span class="token-dot token-defense"></span> 수비 (1 ~ 5)</div>
+                    <div class="legend-item"><span class="token-dot token-ball">🏀</span> 볼 (Ball)</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Save / Load Tactics List -->
+              <div class="card">
+                <div class="card-header">
+                  <h3>전술 저장 및 목록</h3>
+                </div>
+                <div class="form-container">
+                  <div class="form-group">
+                    <label for="tactic-title">전술 이름</label>
+                    <input type="text" id="tactic-title" placeholder="예: 2-3 지역방어 돌파 작전">
+                  </div>
+                  <div class="form-group">
+                    <label for="tactic-desc">설명 및 지시사항</label>
+                    <textarea id="tactic-desc" rows="4" placeholder="작전 내용과 선수들의 움직임을 기록하세요..."></textarea>
+                  </div>
+                  <button class="btn btn-primary w-full" id="btn-save-tactic">전술 저장</button>
+                </div>
+                <div class="tactic-list-divider"></div>
+                <div class="saved-tactics" id="saved-tactics-list">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Side: Interactive Board -->
+            <div class="tactics-board-wrapper">
+              <div class="tactics-board-container">
+                <!-- SVG Interactive Court Board -->
+                <div class="court-board" id="court-board-container">
+                  <!-- The SVG Court Lines will be styled in CSS. SVG is used for responsive court markings -->
+                  <svg id="court-svg" class="court-svg" viewBox="0 0 800 500">
+                    <!-- Base court background is handled by CSS, lines here -->
+                    <rect x="0" y="0" width="800" height="500" fill="none" class="court-border-line" stroke="#262F40"
+                      stroke-width="4"></rect>
+
+                    <!-- Center Line (Full Court Only, default half-court) -->
+                    <line x1="400" y1="0" x2="400" y2="500" class="full-court-line" stroke="#262F40" stroke-width="2"
+                      stroke-dasharray="5,5"></line>
+                    <circle cx="400" cy="250" r="60" class="full-court-line" stroke="#262F40" stroke-width="2"
+                      fill="none"></circle>
+                    <circle cx="400" cy="250" r="20" class="full-court-line" stroke="#262F40" stroke-width="2"
+                      fill="none"></circle>
+
+                    <!-- Left Basket & Key -->
+                    <path d="M 0 135 L 180 135 L 180 365 L 0 365" class="court-key" stroke="#262F40" stroke-width="2"
+                      fill="none"></path>
+                    <path d="M 180 190 A 60 60 0 0 1 180 310" class="court-key-semi" stroke="#262F40" stroke-width="2"
+                      fill="none"></path>
+                    <path d="M 180 190 A 60 60 0 0 0 180 310" class="court-key-semi" stroke="#262F40" stroke-width="2"
+                      fill="none" stroke-dasharray="4,4"></path>
+                    <line x1="40" y1="240" x2="40" y2="260" stroke="#262F40" stroke-width="4"></line> <!-- Backboard -->
+                    <circle cx="50" cy="250" r="10" stroke="#FF6B00" stroke-width="2" fill="none"></circle> <!-- Rim -->
+                    <path d="M 0 50 L 100 50 A 200 200 0 0 1 100 450 L 0 450" class="court-three-point" stroke="#262F40"
+                      stroke-width="2" fill="none"></path> <!-- 3pt Arc (Left) -->
+
+                    <!-- Right Basket & Key -->
+                    <path d="M 800 135 L 620 135 L 620 365 L 800 365" class="court-key" stroke="#262F40"
+                      stroke-width="2" fill="none"></path>
+                    <path d="M 620 190 A 60 60 0 0 0 620 310" class="court-key-semi" stroke="#262F40" stroke-width="2"
+                      fill="none"></path>
+                    <path d="M 620 190 A 60 60 0 0 1 620 310" class="court-key-semi" stroke="#262F40" stroke-width="2"
+                      fill="none" stroke-dasharray="4,4"></path>
+                    <line x1="760" y1="240" x2="760" y2="260" stroke="#262F40" stroke-width="4"></line>
+                    <!-- Backboard -->
+                    <circle cx="750" cy="250" r="10" stroke="#FF6B00" stroke-width="2" fill="none"></circle>
+                    <!-- Rim -->
+                    <path d="M 800 50 L 700 50 A 200 200 0 0 0 700 450 L 800 450" class="court-three-point"
+                      stroke="#262F40" stroke-width="2" fill="none"></path> <!-- 3pt Arc (Right) -->
+                  </svg>
+
+                  <!-- Draggable Token elements will be placed dynamically inside here -->
+                  <div id="tokens-overlay" class="tokens-overlay"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SKILLS TAB ================= -->
+        <section id="skills" class="tab-content">
+          <div class="skills-grid">
+            <!-- Dynamically populated skill categories -->
+            <div class="card card-panel">
+              <div class="panel-header">
+                <h3>스킬 체크리스트</h3>
+                <p class="text-muted">우리 팀원들이 정복해야 할 스킬 카드를 마크하세요.</p>
+              </div>
+              <div class="skills-list" id="skills-list-container">
+                <!-- Dynamically Populated -->
+              </div>
+            </div>
+
+            <div class="skills-sidebar">
+              <div class="card border-highlight">
+                <div class="card-header">
+                  <h3>마스터리 정보</h3>
+                </div>
+                <div class="card-body">
+                  <div class="overall-progress-circle">
+                    <svg viewBox="0 0 100 100" class="progress-ring">
+                      <circle class="progress-ring__circle-bg" cx="50" cy="50" r="40" stroke="#262F40" stroke-width="8"
+                        fill="transparent"></circle>
+                      <circle class="progress-ring__circle" id="skills-circular-progress" cx="50" cy="50" r="40"
+                        stroke="#FF6B00" stroke-width="8" fill="transparent" stroke-dasharray="251.2"
+                        stroke-dashoffset="251.2"></circle>
+                    </svg>
+                    <div class="progress-ring-text">
+                      <span id="skills-ring-percent">0%</span>
+                      <p>완료율</p>
+                    </div>
+                  </div>
+
+                  <div class="progress-details">
+                    <p class="text-muted text-center">전체 <span id="skills-total-count">0</span>개 스킬 항목 중 <span
+                        id="skills-checked-count" class="text-orange font-bold">0</span>개 완료</p>
+                    <div class="divider"></div>
+                    <h4 class="margin-bottom-sm">스킬 팁 및 피드백</h4>
+                    <p class="text-sm line-height-md text-muted">체크리스트를 채워나가며 팀 전력을 높이세요. 모든 훈련은 팀 로스터에 등록된 인원을 기준으로 연습을
+                      병행하면 더욱 효율적입니다.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= RULES TAB ================= -->
+        <section id="rules" class="tab-content">
+          <div class="rules-container">
+            <!-- Basic Rules Cards -->
+            <div class="rules-main">
+              <div class="card">
+                <div class="card-header">
+                  <h3>기본 경기 규칙 요약</h3>
+                  <p class="text-muted">반드시 숙지해야 할 농구 핵심 경기 규칙</p>
+                </div>
+                <div class="rules-grid">
+                  <div class="rule-card">
+                    <h4>시간 관련 룰 (Time Rules)</h4>
+                    <ul>
+                      <li><strong>24초 룰</strong>: 볼 획득 후 24초 이내에 슛 시도 (림을 맞아야 리셋).</li>
+                      <li><strong>8초 룰</strong>: 백코트(자기 팀 수비구역)에서 8초 이내에 프론트코트로 공을 넘겨야 함.</li>
+                      <li><strong>5초 룰</strong>: 볼을 쥐고 있는 선수는 5초 이내에 패스, 슛, 혹은 드리블을 해야 함. (인바운드 패스도 5초 제한).</li>
+                      <li><strong>3초 룰</strong>: 공격수는 상대 팀 제한구역(페인트 존) 안에 연속해서 3초 이상 머무를 수 없음.</li>
+                    </ul>
+                  </div>
+
+                  <div class="rule-card">
+                    <h4>파울 및 페널티 (Fouls)</h4>
+                    <ul>
+                      <li><strong>개인 파울</strong>: 한 경기 5회 파울 시 퇴장 (대회 규정에 따라 4회 퇴장 가능).</li>
+                      <li><strong>팀 파울</strong>: 쿼터당 팀 누적 파울 4개부터(5개째부터) 상대 팀에 자유투 2개 부여.</li>
+                      <li><strong>바이얼레이션</strong>: 파울 외 규칙 위반(워킹, 더블 드리블 등). 공격권이 상대방에게 넘어감.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Local Rules / Notes -->
+              <div class="card margin-top-md">
+                <div class="card-header">
+                  <h3>우리 대회용 로컬 규칙 & 메모</h3>
+                  <p class="text-muted">참가하려는 대회 특유의 로컬 규정이나 메모를 추가해보세요.</p>
+                </div>
+
+                <div class="local-rules-wrapper">
+                  <div class="local-rules-input">
+                    <div class="form-group-row">
+                      <input type="text" id="input-local-rule-title" placeholder="예: 경기 시간 규정">
+                      <input type="text" id="input-local-rule-desc" placeholder="예: 전/후반 각 10분, 데드타임 적용 없음">
+                      <button class="btn btn-primary" id="btn-add-local-rule">추가</button>
+                    </div>
+                  </div>
+
+                  <div class="local-rules-list" id="local-rules-container">
+                    <!-- Dynamically populated -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= ROSTER TAB ================= -->
+        <section id="roster" class="tab-content">
+          <div class="card margin-bottom-md">
+            <div class="card-header">
+              <h3>쿼터별 스타팅</h3>
+              <p class="text-muted" style="font-size: 0.85rem; margin-top: 0.25rem;">각 쿼터별 출전 선수 명단입니다.</p>
+            </div>
+            <div id="quarter-lineups-container"
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; padding: 1rem;">
+              <!-- Dynamically populated from JS -->
+            </div>
+          </div>
+
+          <div class="tab-header-actions" style="margin-top: 1.5rem;">
+            <h3 class="section-title">팀 로스터 멤버 목록</h3>
+            <button class="btn btn-primary" id="btn-open-roster-modal">
+              <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              선수 등록
+            </button>
+          </div>
+
+          <div class="roster-grid" id="roster-grid-container">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Add/Edit Schedule Modal -->
+  <div class="modal-overlay" id="schedule-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="schedule-modal-title">새 경기 일정 등록</h3>
+        <button class="modal-close" id="btn-close-schedule-modal">&times;</button>
+      </div>
+      <form id="schedule-form" class="modal-form">
+        <input type="hidden" id="form-schedule-id">
+
+        <div class="form-group">
+          <label for="form-schedule-opponent">상대 팀 이름 *</label>
+          <input type="text" id="form-schedule-opponent" required placeholder="예: 스나이퍼스 BB">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="form-schedule-date">경기 일자 *</label>
+            <input type="date" id="form-schedule-date" required>
+          </div>
+          <div class="form-group">
+            <label>경기 시간 *</label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <input type="time" id="form-schedule-time-start" required style="flex: 1;">
+              <span>~</span>
+              <input type="time" id="form-schedule-time-end" required style="flex: 1;">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="form-schedule-location">경기 장소 *</label>
+          <input type="text" id="form-schedule-location" required placeholder="예: 올림픽공원 농구코트 A">
+        </div>
+
+        <div class="form-group">
+          <label for="form-schedule-participants">참가자 (쉼표로 구분)</label>
+          <input type="text" id="form-schedule-participants" placeholder="예: 오기용, 강의현, 배산하">
+        </div>
+
+        <div class="form-group-checkbox">
+          <label class="checkbox-container">
+            <input type="checkbox" id="form-schedule-finished">
+            <span class="checkmark"></span>
+            경기가 이미 종료됨 (점수 입력)
+          </label>
+        </div>
+
+        <div class="form-row score-inputs" id="score-inputs-container" style="display: none;">
+          <div class="form-group">
+            <label for="form-schedule-our-score">우리 팀 점수</label>
+            <input type="number" id="form-schedule-our-score" min="0" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label for="form-schedule-opp-score">상대 팀 점수</label>
+            <input type="number" id="form-schedule-opp-score" min="0" placeholder="0">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-schedule-modal">취소</button>
+          <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add/Edit Roster Modal -->
+  <div class="modal-overlay" id="roster-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="roster-modal-title">선수 정보 등록</h3>
+        <button class="modal-close" id="btn-close-roster-modal">&times;</button>
+      </div>
+      <form id="roster-form" class="modal-form">
+        <input type="hidden" id="form-roster-id">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="form-roster-name">이름 *</label>
+            <input type="text" id="form-roster-name" required placeholder="예: 홍길동">
+          </div>
+          <div class="form-group">
+            <label for="form-roster-number">등번호 *</label>
+            <input type="number" id="form-roster-number" min="0" max="99" required placeholder="예: 23">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="form-roster-position">포지션 *</label>
+          <select id="form-roster-position" required>
+            <option value="가드">가드 (G)</option>
+            <option value="포워드">포워드 (F)</option>
+            <option value="센터">센터 (C)</option>
+            <option value="PG">PG (포인트 가드)</option>
+            <option value="SG">SG (슈팅 가드)</option>
+            <option value="SF">SF (스몰 포워드)</option>
+            <option value="PF">PF (파워 포워드)</option>
+            <option value="C">C (센터)</option>
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-roster-modal">취소</button>
+          <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
