@@ -785,7 +785,8 @@ button, input, select, textarea {
   padding: 0.65rem;
   border-radius: 12px;
   text-align: center;
-  width: 60px;
+  min-width: 75px;
+  width: fit-content;
   flex-shrink: 0;
 }
 
@@ -1158,7 +1159,7 @@ button, input, select, textarea {
 /* ================= SKILLS TAB SPECIFIC ================= */
 .skills-grid {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr;
   gap: 1.5rem;
 }
 

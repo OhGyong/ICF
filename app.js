@@ -16,6 +16,7 @@ const DEFAULT_ROSTER = [
 
 // Default Schedule Mock Data
 const DEFAULT_SCHEDULE = [
+  { id: 's0', opponent: 'BDR 스타터스 리그', date: '2026-07-26', time: '10:20~미정', location: '스포라운드(경기 남양주시 마치로 122 스포라운드)', participants: '강의현, 최해서, 송태진, 장근하, 오기용, 이상혁, 허성준, 김민준, 김호연, 배산하', finished: false, ourScore: null, oppScore: null },
   { id: 's1', opponent: '교류전', date: '2026-07-19', time: '14:00~16:00', location: '장소 미정', participants: '오기용, 강의현, 배산하, 이상혁', finished: false, ourScore: null, oppScore: null },
   { id: 's2', opponent: '내전', date: '2026-07-11', time: '14:00~16:00', location: '장소 미정', participants: '참가자 미정', finished: false, ourScore: null, oppScore: null },
   { id: 's3', opponent: '고려대 동아리 교류전', date: '2026-06-27', time: '10:00~12:00', location: '버블짐(경기 남양주시 불암로 291 별내중앙타워 4층)', participants: '오기용, 강의현, 장근하, 김호연, 배산하, 이상혁, 최해서, 허성준, 송태진', finished: true, ourScore: 0, oppScore: 0 },
@@ -39,9 +40,9 @@ const DEFAULT_SKILLS = [
 
 // Default Local Rules
 const DEFAULT_RULES = [
-  { id: 'u1', title: '경기 시간', desc: '쿼터당 7분 정식 데드타임 (결승전만 8분)' },
-  { id: 'u2', title: '파울 누적 퇴장', desc: '개인 파울 5회 퇴장 (테크니컬 파울 2회 즉시 퇴장)' },
-  { id: 'u3', title: '연장전 규칙', desc: '3분 연장 경기 진행, 팀파울은 4쿼터 상황 유지' }
+  { id: 'u1', title: '경기 시간', desc: '7분 4Q 경기(2심) / 1~3쿼터 1분 데드 적용, 4쿼터 2분 풀데드 적용' },
+  { id: 'u2', title: '경기구', desc: '몰텐 BG4550' },
+  { id: 'u3', title: '파울 누적 퇴장', desc: '개인 파울 5회 퇴장 (테크니컬 파울 2회 즉시 퇴장)' }
 ];
 
 // Default Saved Tactics
@@ -125,7 +126,7 @@ function loadState() {
 
   if (localSchedule) {
     const parsed = JSON.parse(localSchedule);
-    if (parsed.length > 0 && parsed[0].opponent === '화이어볼즈 BB') {
+    if (parsed.length > 0 && (parsed[0].opponent === '화이어볼즈 BB' || !parsed.find(s => s.opponent === 'BDR 스타터스 리그' && s.participants.includes('강의현')))) {
       appData.schedule = DEFAULT_SCHEDULE;
       localStorage.setItem('hoop_schedule', JSON.stringify(DEFAULT_SCHEDULE));
     } else {
@@ -142,8 +143,16 @@ function loadState() {
     localStorage.setItem('hoop_skills', JSON.stringify(DEFAULT_SKILLS));
   }
 
-  if (localRules) appData.rules = JSON.parse(localRules);
-  else {
+  if (localRules) {
+    const parsed = JSON.parse(localRules);
+    if (parsed.length > 0 && parsed[0].desc.includes('결승전만 8분')) {
+      appData.rules = DEFAULT_RULES;
+      localStorage.setItem('hoop_rules', JSON.stringify(DEFAULT_RULES));
+    } else {
+      appData.rules = parsed.filter(rule => rule.title !== '연장전 규칙');
+      localStorage.setItem('hoop_rules', JSON.stringify(appData.rules));
+    }
+  } else {
     appData.rules = DEFAULT_RULES;
     localStorage.setItem('hoop_rules', JSON.stringify(DEFAULT_RULES));
   }
@@ -288,9 +297,9 @@ function renderDashboard() {
       return `
         <div class="game-card" style="margin-bottom: 0.75rem;">
           <div class="game-meta">
-            <div class="game-date-box" style="padding: 0.35rem 0.5rem; width: 50px;">
+            <div class="game-date-box" style="padding: 0.35rem 0.5rem; min-width: 65px; width: fit-content;">
               <div class="game-month" style="font-size: 0.65rem;">${gDate.getMonth() + 1}월</div>
-              <div class="game-day" style="font-size: 1.15rem;">${gDate.getDate()}</div>
+              <div class="game-day" style="font-size: 1.15rem;">${gDate.getDate()}(${days[gDate.getDay()]})</div>
             </div>
             <div class="game-details-info">
               <span class="font-bold text-sm">${game.opponent} 전</span>
@@ -346,7 +355,7 @@ function updateHeroCountdown() {
     countdownTimer.innerText = "D-?";
     heroTitle.innerHTML = `등록된 다가오는 <span class="text-highlight">경기 일정이 없습니다.</span>`;
     heroSubtitle.innerText = '대회나 연습경기가 있다면 경기 일정을 추가하여 카운트다운을 가동하세요!';
-    sidebarDDay.innerText = '-';
+    if (sidebarDDay) sidebarDDay.innerText = '-';
   } else {
     // Sort upcoming games by date
     const nextGame = [...upcomingGames].sort((a, b) => new Date(a.date) - new Date(b.date))[0];
@@ -360,12 +369,13 @@ function updateHeroCountdown() {
       countdownTimer.innerText = "D-Day";
       heroTitle.innerHTML = `오늘 바로 <span class="text-highlight">${nextGame.opponent} 전</span>이 있습니다!`;
       heroSubtitle.innerText = `장소: ${nextGame.location} | 시간: ${nextGame.time} | 참가자: ${nextGame.participants || '미정'}`;
-      sidebarDDay.innerText = 'Day';
+      if (sidebarDDay) sidebarDDay.innerText = 'Day';
     } else {
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
       countdownTimer.innerText = `D-${diffDays}`;
       heroTitle.innerHTML = `다음 경기 <span class="text-highlight">${nextGame.opponent}</span>까지 <span class="text-highlight">${countdownTimer.innerText}</span> 남았습니다!`;
-      heroSubtitle.innerText = `장소: ${nextGame.location} | 일시: ${nextGame.date} ${nextGame.time} | 참가자: ${nextGame.participants || '미정'}`;
-      sidebarDDay.innerText = `-${diffDays}`;
+      heroSubtitle.innerText = `장소: ${nextGame.location} | 일시: ${nextGame.date}(${days[gameDate.getDay()]}) ${nextGame.time} | 참가자: ${nextGame.participants || '미정'}`;
+      if (sidebarDDay) sidebarDDay.innerText = `-${diffDays}`;
     }
   }
 }
@@ -403,7 +413,8 @@ function renderScheduleList() {
   container.innerHTML = filteredList.map(game => {
     const gDate = new Date(game.date);
     const monthStr = `${gDate.getMonth() + 1}월`;
-    const dayStr = gDate.getDate();
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    const dayStr = `${gDate.getDate()}(${days[gDate.getDay()]})`;
 
     let statusBadgeHtml = '';
     let scoreDisplayHtml = '';
@@ -419,22 +430,14 @@ function renderScheduleList() {
         badgeText = 'WIN';
       } else if (isDraw) {
         badgeClass = 'badge-cyan';
-        badgeText = 'DRAW';
+        badgeText = '종료';
       }
 
       statusBadgeHtml = `<span class="badge ${badgeClass}">${badgeText}</span>`;
-      scoreDisplayHtml = `
-        <div class="score-tag-wrapper">
-          <span class="score-text text-highlight">${game.ourScore} : ${game.oppScore}</span>
-        </div>
-      `;
+      scoreDisplayHtml = ``;
     } else {
-      statusBadgeHtml = `<span class="badge badge-accent">예정됨</span>`;
-      scoreDisplayHtml = `
-        <div class="score-tag-wrapper">
-          <span class="score-text text-muted" style="font-size: 0.95rem;">VS</span>
-        </div>
-      `;
+      statusBadgeHtml = `<span class="badge badge-accent">예정</span>`;
+      scoreDisplayHtml = ``;
     }
 
     const participantsList = game.participants ? game.participants.split(',').map(p => p.trim()).filter(p => p).sort((a, b) => a.localeCompare(b, 'ko')) : [];
@@ -901,8 +904,6 @@ function renderSkillsList() {
       </div>
     `;
   }).join('');
-
-  updateSkillsProgress();
 }
 
 function toggleSkillCheckbox(id) {
@@ -910,29 +911,9 @@ function toggleSkillCheckbox(id) {
   if (skill) {
     skill.checked = !skill.checked;
     saveKey('skills');
-    updateSkillsProgress();
   }
 }
 
-function updateSkillsProgress() {
-  const total = appData.skills.length;
-  const checked = appData.skills.filter(s => s.checked).length;
-  const percent = total > 0 ? Math.round((checked / total) * 100) : 0;
-
-  // Text values
-  document.getElementById('skills-total-count').innerText = total;
-  document.getElementById('skills-checked-count').innerText = checked;
-  document.getElementById('skills-ring-percent').innerText = `${percent}%`;
-
-  // Draw circular indicator
-  const circle = document.getElementById('skills-circular-progress');
-  const radius = circle.r.baseVal.value;
-  const circumference = 2 * Math.PI * radius; // 2 * 3.1415 * 40 ~ 251.2
-
-  circle.style.strokeDasharray = `${circumference} ${circumference}`;
-  const offset = circumference - (percent / 100) * circumference;
-  circle.style.strokeDashoffset = offset;
-}
 
 
 // ================= LOCAL TOURNAMENT RULES =================
