@@ -45,9 +45,7 @@ const DEFAULT_RULES = [
 ];
 
 // Default Saved Tactics
-const DEFAULT_TACTICS = [
-  { id: 't1', title: '2-3 지역방어 하이포스트 공략', desc: 'PG가 볼을 몰고 하프라인을 넘으면, C가 하이포스트로 올라와 스크린을 서고, SG/SF는 윙과 코너로 벌려 패스 길을 열어줍니다. C가 하이에서 볼을 잡으면 돌파 또는 외곽 킥아웃 패스로 공략합니다.' }
-];
+const DEFAULT_TACTICS = [];
 
 // Default Lineups
 const DEFAULT_LINEUPS = [
@@ -150,8 +148,15 @@ function loadState() {
     localStorage.setItem('hoop_rules', JSON.stringify(DEFAULT_RULES));
   }
 
-  if (localTactics) appData.tactics = JSON.parse(localTactics);
-  else {
+  if (localTactics) {
+    const parsed = JSON.parse(localTactics);
+    if (parsed.length > 0 && parsed[0].title === '2-3 지역방어 하이포스트 공략') {
+      appData.tactics = DEFAULT_TACTICS;
+      localStorage.setItem('hoop_tactics', JSON.stringify(DEFAULT_TACTICS));
+    } else {
+      appData.tactics = parsed;
+    }
+  } else {
     appData.tactics = DEFAULT_TACTICS;
     localStorage.setItem('hoop_tactics', JSON.stringify(DEFAULT_TACTICS));
   }
@@ -354,12 +359,12 @@ function updateHeroCountdown() {
     if (diffDays === 0) {
       countdownTimer.innerText = "D-Day";
       heroTitle.innerHTML = `오늘 바로 <span class="text-highlight">${nextGame.opponent} 전</span>이 있습니다!`;
-      heroSubtitle.innerText = `장소: ${nextGame.location} | 시간: ${nextGame.time}. 부상 조심하고 우승합시다!`;
+      heroSubtitle.innerText = `장소: ${nextGame.location} | 시간: ${nextGame.time} | 참가자: ${nextGame.participants || '미정'}`;
       sidebarDDay.innerText = 'Day';
     } else {
       countdownTimer.innerText = `D-${diffDays}`;
       heroTitle.innerHTML = `다음 경기 <span class="text-highlight">${nextGame.opponent} 전</span>까지 <span class="text-highlight">${countdownTimer.innerText}</span> 남았습니다!`;
-      heroSubtitle.innerText = `경기 장소: ${nextGame.location} | 일시: ${nextGame.date} ${nextGame.time}. 준비를 철저히 합시다!`;
+      heroSubtitle.innerText = `장소: ${nextGame.location} | 일시: ${nextGame.date} ${nextGame.time} | 참가자: ${nextGame.participants || '미정'}`;
       sidebarDDay.innerText = `-${diffDays}`;
     }
   }
