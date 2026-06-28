@@ -70,34 +70,34 @@ let appData = {
 // Initial Token Positions (Percentages)
 const defaultTokenPositions = {
   half: [
-    { id: 'token-off-pg', label: '1', role: 'PG (포인트 가드)', type: 'offense', x: 80, y: 50 },
-    { id: 'token-off-sg', label: '2', role: 'SG (슈팅 가드)', type: 'offense', x: 65, y: 20 },
-    { id: 'token-off-sf', label: '3', role: 'SF (스몰 포워드)', type: 'offense', x: 65, y: 80 },
-    { id: 'token-off-pf', label: '4', role: 'PF (파워 포워드)', type: 'offense', x: 45, y: 30 },
-    { id: 'token-off-c', label: '5', role: 'C (센터)', type: 'offense', x: 30, y: 50 },
+    { id: 'token-off-pg', label: '1', role: 'PG (포인트 가드)', type: 'offense', x: 60, y: 38 },
+    { id: 'token-off-sg', label: '2', role: 'SG (슈팅 가드)', type: 'offense', x: 48, y: 77 },
+    { id: 'token-off-sf', label: '3', role: 'SF (스몰 포워드)', type: 'offense', x: 43, y: 12 },
+    { id: 'token-off-pf', label: '4', role: 'PF (파워 포워드)', type: 'offense', x: 35, y: 58 },
+    { id: 'token-off-c', label: '5', role: 'C (센터)', type: 'offense', x: 35, y: 92 },
     
-    { id: 'token-def-d1', label: '1', role: '수비 1', type: 'defense', x: 60, y: 50 },
-    { id: 'token-def-d2', label: '2', role: '수비 2', type: 'defense', x: 50, y: 25 },
-    { id: 'token-def-d3', label: '3', role: '수비 3', type: 'defense', x: 50, y: 75 },
-    { id: 'token-def-d4', label: '4', role: '수비 4', type: 'defense', x: 30, y: 35 },
-    { id: 'token-def-d5', label: '5', role: '수비 5', type: 'defense', x: 25, y: 55 },
+    { id: 'token-def-d1', label: '1', role: '수비 1', type: 'defense', x: 52, y: 39 },
+    { id: 'token-def-d2', label: '2', role: '수비 2', type: 'defense', x: 48, y: 69 },
+    { id: 'token-def-d3', label: '3', role: '수비 3', type: 'defense', x: 28, y: 13 },
+    { id: 'token-def-d4', label: '4', role: '수비 4', type: 'defense', x: 32, y: 50 },
+    { id: 'token-def-d5', label: '5', role: '수비 5', type: 'defense', x: 32, y: 85 },
     
-    { id: 'token-ball', label: '🏀', role: '볼', type: 'ball', x: 80, y: 45 }
+    { id: 'token-ball', label: '🏀', role: '볼', type: 'ball', x: 63, y: 34 }
   ],
   full: [
-    { id: 'token-off-pg', label: '1', role: 'PG (포인트 가드)', type: 'offense', x: 45, y: 50 },
-    { id: 'token-off-sg', label: '2', role: 'SG (슈팅 가드)', type: 'offense', x: 60, y: 20 },
-    { id: 'token-off-sf', label: '3', role: 'SF (스몰 포워드)', type: 'offense', x: 60, y: 80 },
-    { id: 'token-off-pf', label: '4', role: 'PF (파워 포워드)', type: 'offense', x: 70, y: 30 },
-    { id: 'token-off-c', label: '5', role: 'C (센터)', type: 'offense', x: 80, y: 50 },
+    { id: 'token-off-pg', label: '1', role: 'PG (포인트 가드)', type: 'offense', x: 30, y: 38 },
+    { id: 'token-off-sg', label: '2', role: 'SG (슈팅 가드)', type: 'offense', x: 24, y: 77 },
+    { id: 'token-off-sf', label: '3', role: 'SF (스몰 포워드)', type: 'offense', x: 22, y: 12 },
+    { id: 'token-off-pf', label: '4', role: 'PF (파워 포워드)', type: 'offense', x: 18, y: 58 },
+    { id: 'token-off-c', label: '5', role: 'C (센터)', type: 'offense', x: 18, y: 92 },
     
-    { id: 'token-def-d1', label: '1', role: '수비 1', type: 'defense', x: 55, y: 50 },
-    { id: 'token-def-d2', label: '2', role: '수비 2', type: 'defense', x: 65, y: 25 },
-    { id: 'token-def-d3', label: '3', role: '수비 3', type: 'defense', x: 65, y: 75 },
-    { id: 'token-def-d4', label: '4', role: '수비 4', type: 'defense', x: 75, y: 35 },
-    { id: 'token-def-d5', label: '5', role: '수비 5', type: 'defense', x: 80, y: 55 },
+    { id: 'token-def-d1', label: '1', role: '수비 1', type: 'defense', x: 26, y: 39 },
+    { id: 'token-def-d2', label: '2', role: '수비 2', type: 'defense', x: 24, y: 69 },
+    { id: 'token-def-d3', label: '3', role: '수비 3', type: 'defense', x: 14, y: 13 },
+    { id: 'token-def-d4', label: '4', role: '수비 4', type: 'defense', x: 16, y: 50 },
+    { id: 'token-def-d5', label: '5', role: '수비 5', type: 'defense', x: 16, y: 85 },
     
-    { id: 'token-ball', label: '🏀', role: '볼', type: 'ball', x: 45, y: 46 }
+    { id: 'token-ball', label: '🏀', role: '볼', type: 'ball', x: 32, y: 34 }
   ]
 };
 
