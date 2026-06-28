@@ -73,13 +73,13 @@ const defaultTokenPositions = {
     { id: 'token-off-sf', label: '3', role: 'SF (스몰 포워드)', type: 'offense', x: 43, y: 12 },
     { id: 'token-off-pf', label: '4', role: 'PF (파워 포워드)', type: 'offense', x: 35, y: 58 },
     { id: 'token-off-c', label: '5', role: 'C (센터)', type: 'offense', x: 35, y: 92 },
-    
+
     { id: 'token-def-d1', label: '1', role: '수비 1', type: 'defense', x: 52, y: 39 },
     { id: 'token-def-d2', label: '2', role: '수비 2', type: 'defense', x: 48, y: 69 },
     { id: 'token-def-d3', label: '3', role: '수비 3', type: 'defense', x: 28, y: 13 },
     { id: 'token-def-d4', label: '4', role: '수비 4', type: 'defense', x: 32, y: 50 },
     { id: 'token-def-d5', label: '5', role: '수비 5', type: 'defense', x: 32, y: 85 },
-    
+
     { id: 'token-ball', label: '🏀', role: '볼', type: 'ball', x: 63, y: 34 }
   ],
   full: [
@@ -88,13 +88,13 @@ const defaultTokenPositions = {
     { id: 'token-off-sf', label: '3', role: 'SF (스몰 포워드)', type: 'offense', x: 22, y: 12 },
     { id: 'token-off-pf', label: '4', role: 'PF (파워 포워드)', type: 'offense', x: 18, y: 58 },
     { id: 'token-off-c', label: '5', role: 'C (센터)', type: 'offense', x: 18, y: 92 },
-    
+
     { id: 'token-def-d1', label: '1', role: '수비 1', type: 'defense', x: 26, y: 39 },
     { id: 'token-def-d2', label: '2', role: '수비 2', type: 'defense', x: 24, y: 69 },
     { id: 'token-def-d3', label: '3', role: '수비 3', type: 'defense', x: 14, y: 13 },
     { id: 'token-def-d4', label: '4', role: '수비 4', type: 'defense', x: 16, y: 50 },
     { id: 'token-def-d5', label: '5', role: '수비 5', type: 'defense', x: 16, y: 85 },
-    
+
     { id: 'token-ball', label: '🏀', role: '볼', type: 'ball', x: 32, y: 34 }
   ]
 };
@@ -187,7 +187,7 @@ function resetAllData() {
 
 // ================= NAVIGATION SYSTEM =================
 const pageTitles = {
-  dashboard: { title: '대시보드', subtitle: '우리 팀의 농구 대회 준비 및 활동 요약' },
+  dashboard: { title: '대시보드', subtitle: 'ICF 농구 대회 준비 및 활동 요약' },
   schedule: { title: '대회 일정 관리', subtitle: '다가오는 경기 시간, 장소 및 결과 기록' },
   tactics: { title: '작전판 & 전술', subtitle: '포지션 배치와 상세 공격/수비 작전 수립' },
   skills: { title: '농구 스킬 북', subtitle: '훈련 목록을 점검하고 팀 숙련도를 높여보세요' },
@@ -261,7 +261,7 @@ function renderDashboard() {
     const gameDate = new Date(`${game.date}T${game.time || '00:00'}`);
     return !game.finished && gameDate >= now;
   });
-  
+
   document.getElementById('stat-upcoming-games').innerText = upcomingGames.length;
   document.getElementById('stat-total-games').innerText = appData.schedule.length;
 
@@ -351,7 +351,7 @@ function updateHeroCountdown() {
     // Sort upcoming games by date
     const nextGame = [...upcomingGames].sort((a, b) => new Date(a.date) - new Date(b.date))[0];
     const gameDate = new Date(nextGame.date);
-    gameDate.setHours(0,0,0,0);
+    gameDate.setHours(0, 0, 0, 0);
 
     const diffTime = gameDate - now;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -363,7 +363,7 @@ function updateHeroCountdown() {
       sidebarDDay.innerText = 'Day';
     } else {
       countdownTimer.innerText = `D-${diffDays}`;
-      heroTitle.innerHTML = `다음 경기 <span class="text-highlight">${nextGame.opponent} 전</span>까지 <span class="text-highlight">${countdownTimer.innerText}</span> 남았습니다!`;
+      heroTitle.innerHTML = `다음 경기 <span class="text-highlight">${nextGame.opponent}</span>까지 <span class="text-highlight">${countdownTimer.innerText}</span> 남았습니다!`;
       heroSubtitle.innerText = `장소: ${nextGame.location} | 일시: ${nextGame.date} ${nextGame.time} | 참가자: ${nextGame.participants || '미정'}`;
       sidebarDDay.innerText = `-${diffDays}`;
     }
@@ -380,14 +380,14 @@ function renderScheduleList() {
 
   // Apply filters
   const now = new Date();
-  now.setHours(0,0,0,0);
-  
+  now.setHours(0, 0, 0, 0);
+
   if (activeScheduleFilter === 'upcoming') {
     filteredList = filteredList.filter(game => !game.finished);
   } else if (activeScheduleFilter === 'finished') {
     filteredList = filteredList.filter(game => game.finished);
   }
-  
+
   // 모든 일정 날짜 내림차순 정렬
   filteredList.sort((a, b) => new Date(b.date) - new Date(a.date));
 
@@ -411,7 +411,7 @@ function renderScheduleList() {
     if (game.finished) {
       const isWin = game.ourScore > game.oppScore;
       const isDraw = game.ourScore === game.oppScore;
-      
+
       let badgeClass = 'badge-danger';
       let badgeText = 'LOSE';
       if (isWin) {
@@ -540,7 +540,7 @@ finishedCheckbox.addEventListener('change', (e) => {
 
 scheduleForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  
+
   const id = document.getElementById('form-schedule-id').value;
   const opponent = document.getElementById('form-schedule-opponent').value;
   const date = document.getElementById('form-schedule-date').value;
@@ -582,7 +582,7 @@ function openEditScheduleModal(id) {
   document.getElementById('form-schedule-id').value = game.id;
   document.getElementById('form-schedule-opponent').value = game.opponent;
   document.getElementById('form-schedule-date').value = game.date;
-  
+
   if (game.time && game.time.includes('~')) {
     const [start, end] = game.time.split('~');
     document.getElementById('form-schedule-time-start').value = start.trim();
@@ -591,10 +591,10 @@ function openEditScheduleModal(id) {
     document.getElementById('form-schedule-time-start').value = game.time || '';
     document.getElementById('form-schedule-time-end').value = '';
   }
-  
+
   document.getElementById('form-schedule-location').value = game.location;
   document.getElementById('form-schedule-participants').value = game.participants || '';
-  
+
   finishedCheckbox.checked = game.finished;
   if (game.finished) {
     scoreInputsContainer.style.display = 'grid';
@@ -636,7 +636,7 @@ let currentTokenPositionsState = [];
 function initTacticsBoard() {
   const courtContainer = document.getElementById('court-board-container');
   const tokensOverlay = document.getElementById('tokens-overlay');
-  
+
   // Set ViewBox based on View settings (half vs full)
   const courtSvg = document.getElementById('court-svg');
   if (currentCourtView === 'half') {
@@ -653,7 +653,7 @@ function initTacticsBoard() {
   } else {
     renderTokens();
   }
-  
+
   if (!isBoardInitialized) {
     setupDragAndDrop();
     isBoardInitialized = true;
@@ -676,7 +676,7 @@ function renderTokens() {
     el.style.left = `${token.x}%`;
     el.style.top = `${token.y}%`;
     el.innerText = token.label;
-    
+
     // Set descriptive tooltip
     if (token.type === 'offense') {
       el.title = `공격 ${token.label} (${token.role})`;
@@ -685,7 +685,7 @@ function renderTokens() {
     } else {
       el.title = '농구공';
     }
-    
+
     // Store index
     el.dataset.id = token.id;
     tokensOverlay.appendChild(el);
@@ -837,10 +837,10 @@ document.getElementById('btn-save-tactic').addEventListener('click', () => {
 
   appData.tactics.push(newTactic);
   saveKey('tactics');
-  
+
   titleInput.value = '';
   descInput.value = '';
-  
+
   renderTacticsList();
   alert('작전이 저장되었습니다.');
 });
@@ -866,7 +866,7 @@ function deleteTactic(event, id) {
 // ================= SKILLS CHECKLIST CONTROL =================
 function renderSkillsList() {
   const container = document.getElementById('skills-list-container');
-  
+
   // Group skills by category
   const categories = {};
   appData.skills.forEach(skill => {
@@ -928,7 +928,7 @@ function updateSkillsProgress() {
   const circle = document.getElementById('skills-circular-progress');
   const radius = circle.r.baseVal.value;
   const circumference = 2 * Math.PI * radius; // 2 * 3.1415 * 40 ~ 251.2
-  
+
   circle.style.strokeDasharray = `${circumference} ${circumference}`;
   const offset = circumference - (percent / 100) * circumference;
   circle.style.strokeDashoffset = offset;
@@ -1000,7 +1000,7 @@ function deleteLocalRule(id) {
 function renderRosterList() {
   const container = document.getElementById('roster-grid-container');
   const lineupsContainer = document.getElementById('quarter-lineups-container');
-  
+
   if (lineupsContainer) {
     if (!appData.lineups || appData.lineups.length === 0) {
       lineupsContainer.innerHTML = '<p class="text-muted" style="grid-column: 1 / -1;">등록된 쿼터별 라인업이 없습니다.</p>';
@@ -1077,7 +1077,7 @@ function setTodayDate() {
   const month = String(today.getMonth() + 1).padStart(2, '0');
   const date = String(today.getDate()).padStart(2, '0');
   const dayStr = ['일', '월', '화', '수', '목', '금', '토'][today.getDay()];
-  
+
   document.getElementById('current-date').innerText = `${year}. ${month}. ${date} (${dayStr})`;
 }
 
@@ -1096,13 +1096,13 @@ function connectTabEvents() {
 function initApp() {
   setTodayDate();
   connectTabEvents();
-  
+
   // Set default active tab
   switchTab('dashboard');
 
   // Trigger default data count checks
   updateHeroCountdown();
-  
+
   // Reset Data bind
   document.getElementById('btn-reset-data').addEventListener('click', resetAllData);
 }

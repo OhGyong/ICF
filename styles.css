@@ -138,12 +138,6 @@ button, input, select, textarea {
   width: 32px;
   height: 32px;
   color: var(--color-primary);
-  animation: logo-spin 20s linear infinite;
-}
-
-@keyframes logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 .logo-text {
