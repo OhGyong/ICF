@@ -260,13 +260,7 @@ function renderDashboard() {
   document.getElementById('stat-upcoming-games').innerText = upcomingGames.length;
   document.getElementById('stat-total-games').innerText = appData.schedule.length;
 
-  // Skills progress calculation
-  const totalSkills = appData.skills.length;
-  const checkedSkills = appData.skills.filter(s => s.checked).length;
-  const skillPercent = totalSkills > 0 ? Math.round((checkedSkills / totalSkills) * 100) : 0;
-  
-  document.getElementById('stat-skills-progress').innerText = `${skillPercent}%`;
-  document.getElementById('stat-skills-bar').style.width = `${skillPercent}%`;
+
 
   // Hero Countdown D-Day
   updateHeroCountdown();
