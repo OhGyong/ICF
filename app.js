@@ -278,7 +278,8 @@ function renderDashboard() {
   // Upcoming games calculation
   const now = new Date();
   const upcomingGames = appData.schedule.filter(game => {
-    const gameDate = new Date(`${game.date}T${game.time || '00:00'}`);
+    const gameDate = new Date(game.date);
+    gameDate.setHours(23, 59, 59, 999);
     return !game.finished && gameDate >= now;
   });
 
@@ -362,6 +363,7 @@ function updateHeroCountdown() {
 
   const upcomingGames = appData.schedule.filter(game => {
     const gameDate = new Date(game.date);
+    gameDate.setHours(23, 59, 59, 999);
     return !game.finished && gameDate >= now;
   });
 
