@@ -314,7 +314,7 @@ function renderDashboard() {
               <div class="game-day" style="font-size: 1.15rem;">${gDate.getDate()}(${days[gDate.getDay()]})</div>
             </div>
             <div class="game-details-info">
-              <span class="font-bold text-sm">${game.opponent} 전</span>
+              <span class="font-bold text-sm">${game.opponent}</span>
               <span class="game-venue-time" style="font-size: 0.75rem;">
                 🏀 ${game.location} | ⏰ ${game.time}
               </span>
