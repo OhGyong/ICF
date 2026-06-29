@@ -900,12 +900,20 @@ function renderSkillsList() {
           <span class="skill-name">${skill.name}</span>
           <span class="skill-desc">${skill.desc}</span>
         </div>
-        <button class="game-btn-icon delete-btn skill-delete-btn" onclick="deleteSkill('${skill.id}')" title="항목 삭제">
-          <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-        </button>
+        <div class="skill-item-actions">
+          <button class="game-btn-icon skill-edit-btn" onclick="editSkill('${skill.id}')" title="항목 수정">
+            <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
+          <button class="game-btn-icon delete-btn skill-delete-btn" onclick="deleteSkill('${skill.id}')" title="항목 삭제">
+            <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     `).join('');
 
@@ -938,11 +946,26 @@ function deleteSkill(id) {
   }
 }
 
+function editSkill(id) {
+  const skill = appData.skills.find(s => s.id === id);
+  if (!skill) return;
+
+  document.getElementById('skill-modal-title').innerText = '스킬 항목 수정';
+  document.getElementById('form-skill-id').value = skill.id;
+  document.getElementById('form-skill-category').value = skill.category;
+  document.getElementById('form-skill-name').value = skill.name;
+  document.getElementById('form-skill-desc').value = skill.desc || '';
+
+  skillModal.classList.add('active');
+}
+
 // Modal handling for Skills
 const skillModal = document.getElementById('skill-modal');
 const skillForm = document.getElementById('skill-form');
 
 document.getElementById('btn-open-skill-modal').addEventListener('click', () => {
+  document.getElementById('skill-modal-title').innerText = '새로운 스킬 추가';
+  document.getElementById('form-skill-id').value = '';
   skillForm.reset();
   skillModal.classList.add('active');
 });
@@ -956,6 +979,7 @@ document.getElementById('btn-cancel-skill-modal').addEventListener('click', clos
 skillForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
+  const id = document.getElementById('form-skill-id').value;
   const categoryInput = document.getElementById('form-skill-category');
   const nameInput = document.getElementById('form-skill-name');
   const descInput = document.getElementById('form-skill-desc');
@@ -964,15 +988,22 @@ skillForm.addEventListener('submit', (e) => {
   const name = nameInput.value.trim();
   const desc = descInput.value.trim();
 
-  const newSkill = {
-    id: 'k_' + Date.now(),
-    category,
-    name,
-    desc,
-    checked: false
-  };
+  if (id) {
+    const index = appData.skills.findIndex(s => s.id === id);
+    if (index !== -1) {
+      appData.skills[index] = { ...appData.skills[index], category, name, desc };
+    }
+  } else {
+    const newSkill = {
+      id: 'k_' + Date.now(),
+      category,
+      name,
+      desc,
+      checked: false
+    };
+    appData.skills.push(newSkill);
+  }
 
-  appData.skills.push(newSkill);
   saveKey('skills');
 
   closeSkillModal();

@@ -1286,11 +1286,13 @@ textarea {
   flex-shrink: 0;
 }
 
+.skill-edit-btn,
 .skill-delete-btn {
   opacity: 0;
   transition: opacity var(--transition-fast), color var(--transition-fast);
 }
 
+.skill-item:hover .skill-edit-btn,
 .skill-item:hover .skill-delete-btn {
   opacity: 1;
 }
