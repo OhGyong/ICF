@@ -118,7 +118,7 @@
                 <p id="dashboard-hero-subtitle">다가오는 경기 일정을 관리하고 전술판에서 작전을 세워보세요.</p>
                 <div class="hero-buttons">
                   <button class="btn btn-primary" onclick="switchTab('tactics')">
-                    작전판 실행하기
+                    작전판 확인하기
                   </button>
                   <button class="btn btn-outline" onclick="switchTab('schedule')">
                     일정 등록하기
@@ -273,7 +273,10 @@
                     <label for="tactic-desc">설명 및 지시사항</label>
                     <textarea id="tactic-desc" rows="4" placeholder="작전 내용과 선수들의 움직임을 기록하세요..."></textarea>
                   </div>
-                  <button class="btn btn-primary w-full" id="btn-save-tactic">전술 저장</button>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-primary" id="btn-save-tactic" style="flex: 1;">전술 저장</button>
+                    <button class="btn btn-secondary" id="btn-cancel-tactic-edit" style="display: none;">선택 해제</button>
+                  </div>
                 </div>
                 <div class="tactic-list-divider"></div>
                 <div class="saved-tactics" id="saved-tactics-list">

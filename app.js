@@ -216,6 +216,10 @@ const pageTitles = {
 };
 
 function switchTab(tabId) {
+  if (tabId !== 'tactics') {
+    resetTacticsSelection();
+  }
+
   // Update nav menu active states
   document.querySelectorAll('.nav-item').forEach(item => {
     if (item.getAttribute('data-tab') === tabId) {
@@ -338,7 +342,7 @@ function renderDashboard() {
   } else {
     const recentTactics = [...appData.tactics].reverse().slice(0, 3);
     panelTacticsContainer.innerHTML = recentTactics.map(tactic => `
-      <div class="tactic-item-card" onclick="switchTab('tactics')" style="margin-bottom: 0.5rem; padding: 0.6rem 0.85rem;">
+      <div class="tactic-item-card" onclick="switchTab('tactics'); loadTacticToForm('${tactic.id}');" style="margin-bottom: 0.5rem; padding: 0.6rem 0.85rem;">
         <div class="tactic-item-info">
           <h4 style="font-size: 0.85rem;">${tactic.title}</h4>
           <p style="font-size: 0.75rem; max-width: 250px;">${tactic.desc}</p>
@@ -784,18 +788,28 @@ function setupDragAndDrop() {
 
 // View toggle buttons
 document.getElementById('court-half').addEventListener('click', (e) => {
+  if (currentCourtView === 'half') return;
   document.getElementById('court-half').classList.add('active');
   document.getElementById('court-full').classList.remove('active');
   currentCourtView = 'half';
-  currentTokenPositionsState = []; // Reset coordinates for layout change
+  if (currentTokenPositionsState.length > 0) {
+    currentTokenPositionsState.forEach(token => {
+      token.x = Math.min(98, Math.max(2, Math.round(token.x * 2)));
+    });
+  }
   initTacticsBoard();
 });
 
 document.getElementById('court-full').addEventListener('click', (e) => {
+  if (currentCourtView === 'full') return;
   document.getElementById('court-full').classList.add('active');
   document.getElementById('court-half').classList.remove('active');
   currentCourtView = 'full';
-  currentTokenPositionsState = []; // Reset coordinates for layout change
+  if (currentTokenPositionsState.length > 0) {
+    currentTokenPositionsState.forEach(token => {
+      token.x = Math.round(token.x / 2);
+    });
+  }
   initTacticsBoard();
 });
 
@@ -813,6 +827,23 @@ document.getElementById('btn-toggle-rotation').addEventListener('click', (e) => 
 
 
 // ================= TACTICS SAVE / LOAD CRUD =================
+let currentEditingTacticId = null;
+
+function resetTacticsSelection() {
+  currentEditingTacticId = null;
+  const titleInput = document.getElementById('tactic-title');
+  const descInput = document.getElementById('tactic-desc');
+  const saveBtn = document.getElementById('btn-save-tactic');
+  const cancelBtn = document.getElementById('btn-cancel-tactic-edit');
+  if (titleInput) titleInput.value = '';
+  if (descInput) descInput.value = '';
+  if (saveBtn) saveBtn.innerText = '전술 저장';
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  if (document.getElementById('saved-tactics-list')) {
+    renderTacticsList();
+  }
+}
+
 function renderTacticsList() {
   const tacticsList = document.getElementById('saved-tactics-list');
   if (appData.tactics.length === 0) {
@@ -822,17 +853,20 @@ function renderTacticsList() {
     return;
   }
 
-  tacticsList.innerHTML = appData.tactics.map(t => `
-    <div class="tactic-item-card" onclick="loadTacticToForm('${t.id}')">
-      <div class="tactic-item-info">
-        <h4>${t.title}</h4>
-        <p>${t.desc}</p>
+  tacticsList.innerHTML = appData.tactics.map(t => {
+    const isActive = t.id === currentEditingTacticId;
+    return `
+      <div class="tactic-item-card ${isActive ? 'active' : ''}" onclick="loadTacticToForm('${t.id}')">
+        <div class="tactic-item-info">
+          <h4>${t.title} ${isActive ? '<span style="font-size:0.7rem; color:var(--color-primary); font-weight:normal;">(선택됨)</span>' : ''}</h4>
+          <p>${t.desc}</p>
+        </div>
+        <button class="game-btn-icon delete-btn" onclick="deleteTactic(event, '${t.id}')" title="삭제" style="width: 28px; height: 28px;">
+          &times;
+        </button>
       </div>
-      <button class="game-btn-icon delete-btn" onclick="deleteTactic(event, '${t.id}')" title="삭제" style="width: 28px; height: 28px;">
-        &times;
-      </button>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 document.getElementById('btn-save-tactic').addEventListener('click', () => {
@@ -847,34 +881,89 @@ document.getElementById('btn-save-tactic').addEventListener('click', () => {
     return;
   }
 
-  // Create tactic object
-  const newTactic = {
-    id: 't_' + Date.now(),
-    title,
-    desc
-  };
+  // Ensure currentTokenPositionsState is populated
+  if (currentTokenPositionsState.length === 0) {
+    resetTokenPositions();
+  }
 
-  appData.tactics.push(newTactic);
+  // Check if updating an existing tactic (by ID or exact title match)
+  let existingIndex = -1;
+  if (currentEditingTacticId) {
+    existingIndex = appData.tactics.findIndex(t => t.id === currentEditingTacticId);
+  }
+  if (existingIndex === -1) {
+    existingIndex = appData.tactics.findIndex(t => t.title.toLowerCase() === title.toLowerCase());
+  }
+
+  if (existingIndex !== -1) {
+    // Update existing tactic
+    appData.tactics[existingIndex].title = title;
+    appData.tactics[existingIndex].desc = desc;
+    appData.tactics[existingIndex].courtView = currentCourtView;
+    appData.tactics[existingIndex].tokens = JSON.parse(JSON.stringify(currentTokenPositionsState));
+    alert(`'${title}' 전술 정보와 토큰 위치가 업데이트되었습니다.`);
+  } else {
+    // Create new tactic
+    const newTactic = {
+      id: 't_' + Date.now(),
+      title,
+      desc,
+      courtView: currentCourtView,
+      tokens: JSON.parse(JSON.stringify(currentTokenPositionsState))
+    };
+    appData.tactics.push(newTactic);
+    alert(`'${title}' 새로운 전술이 저장되었습니다.`);
+  }
+
   saveKey('tactics');
-
-  titleInput.value = '';
-  descInput.value = '';
-
-  renderTacticsList();
-  alert('작전이 저장되었습니다.');
+  resetTacticsSelection();
 });
 
+const cancelTacticBtn = document.getElementById('btn-cancel-tactic-edit');
+if (cancelTacticBtn) {
+  cancelTacticBtn.addEventListener('click', resetTacticsSelection);
+}
+
 function loadTacticToForm(id) {
+  // Toggle unselect if clicking the currently selected tactic
+  if (currentEditingTacticId === id) {
+    resetTacticsSelection();
+    return;
+  }
+
   const tactic = appData.tactics.find(t => t.id === id);
   if (!tactic) return;
 
+  currentEditingTacticId = id;
   document.getElementById('tactic-title').value = tactic.title;
   document.getElementById('tactic-desc').value = tactic.desc;
+  document.getElementById('btn-save-tactic').innerText = '전술 업데이트';
+
+  const cancelBtn = document.getElementById('btn-cancel-tactic-edit');
+  if (cancelBtn) cancelBtn.style.display = 'inline-block';
+
+  if (tactic.courtView && tactic.tokens) {
+    currentCourtView = tactic.courtView;
+    if (currentCourtView === 'half') {
+      document.getElementById('court-half').classList.add('active');
+      document.getElementById('court-full').classList.remove('active');
+    } else {
+      document.getElementById('court-full').classList.add('active');
+      document.getElementById('court-half').classList.remove('active');
+    }
+    currentTokenPositionsState = JSON.parse(JSON.stringify(tactic.tokens));
+    initTacticsBoard();
+  }
+
+  renderTacticsList();
 }
 
 function deleteTactic(event, id) {
   event.stopPropagation(); // Avoid triggering loading click
   if (confirm('이 전술을 리스트에서 삭제하시겠습니까?')) {
+    if (currentEditingTacticId === id) {
+      resetTacticsSelection();
+    }
     appData.tactics = appData.tactics.filter(t => t.id !== id);
     saveKey('tactics');
     renderTacticsList();
