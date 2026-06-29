@@ -224,7 +224,7 @@ function readFileAsDataURL(file) {
       reader.onerror = reject;
       reader.readAsDataURL(file);
     } else {
-      // 이미지 자동 스마트 압축 & 리사이징 (Max 800px, JPEG 0.75)
+      // 이미지 고화질 선명도 유지 & 리사이징 (Max 1920px, JPEG 0.90)
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
@@ -232,7 +232,7 @@ function readFileAsDataURL(file) {
           const canvas = document.createElement('canvas');
           let width = img.width;
           let height = img.height;
-          const maxDim = 800;
+          const maxDim = 1920;
 
           if (width > maxDim || height > maxDim) {
             if (width > height) {
@@ -247,9 +247,11 @@ function readFileAsDataURL(file) {
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, width, height);
 
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.90);
           resolve({ type: 'image', dataUrl: compressedDataUrl, name: file.name });
         };
         img.onerror = () => {
