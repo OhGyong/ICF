@@ -1279,6 +1279,22 @@ textarea {
   color: var(--color-text-secondary);
 }
 
+.skill-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.skill-delete-btn {
+  opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+
+.skill-item:hover .skill-delete-btn {
+  opacity: 1;
+}
+
 /* Overall progress circle */
 .overall-progress-circle {
   position: relative;

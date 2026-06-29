@@ -900,10 +900,12 @@ function renderSkillsList() {
           <span class="skill-name">${skill.name}</span>
           <span class="skill-desc">${skill.desc}</span>
         </div>
-        <label class="checkbox-container" style="padding-left: 1.5rem;">
-          <input type="checkbox" ${skill.checked ? 'checked' : ''} onchange="toggleSkillCheckbox('${skill.id}')">
-          <span class="checkmark"></span>
-        </label>
+        <button class="game-btn-icon delete-btn skill-delete-btn" onclick="deleteSkill('${skill.id}')" title="항목 삭제">
+          <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
       </div>
     `).join('');
 
@@ -925,6 +927,14 @@ function toggleSkillCheckbox(id) {
   if (skill) {
     skill.checked = !skill.checked;
     saveKey('skills');
+  }
+}
+
+function deleteSkill(id) {
+  if (confirm('이 스킬 항목을 삭제하시겠습니까?')) {
+    appData.skills = appData.skills.filter(s => s.id !== id);
+    saveKey('skills');
+    renderSkillsList();
   }
 }
 
