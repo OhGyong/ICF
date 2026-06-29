@@ -354,6 +354,9 @@ function updateHeroCountdown() {
   const heroSubtitle = document.getElementById('dashboard-hero-subtitle');
   const sidebarDDay = document.getElementById('sidebar-dday');
 
+  // 요소가 없으면 (다른 탭 활성 등) 안전하게 종료
+  if (!countdownTimer || !heroTitle || !heroSubtitle) return;
+
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
@@ -1102,7 +1105,11 @@ function initApp() {
 // Start
 window.addEventListener('DOMContentLoaded', async () => {
   loadCache();   // 캐시로 즉시 화면 표시
-  initApp();     // UI 이벤트 연결
+  try {
+    initApp();   // UI 이벤트 연결
+  } catch (e) {
+    console.error('initApp 오류:', e);
+  }
   try {
     await waitForFirebase();
     await loadState();   // 공유 데이터 로드 + 실시간 구독
