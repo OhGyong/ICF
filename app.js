@@ -938,6 +938,47 @@ function deleteSkill(id) {
   }
 }
 
+// Modal handling for Skills
+const skillModal = document.getElementById('skill-modal');
+const skillForm = document.getElementById('skill-form');
+
+document.getElementById('btn-open-skill-modal').addEventListener('click', () => {
+  skillForm.reset();
+  skillModal.classList.add('active');
+});
+
+const closeSkillModal = () => {
+  skillModal.classList.remove('active');
+};
+document.getElementById('btn-close-skill-modal').addEventListener('click', closeSkillModal);
+document.getElementById('btn-cancel-skill-modal').addEventListener('click', closeSkillModal);
+
+skillForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const categoryInput = document.getElementById('form-skill-category');
+  const nameInput = document.getElementById('form-skill-name');
+  const descInput = document.getElementById('form-skill-desc');
+
+  const category = categoryInput.value.trim() || '기타';
+  const name = nameInput.value.trim();
+  const desc = descInput.value.trim();
+
+  const newSkill = {
+    id: 'k_' + Date.now(),
+    category,
+    name,
+    desc,
+    checked: false
+  };
+
+  appData.skills.push(newSkill);
+  saveKey('skills');
+
+  closeSkillModal();
+  renderSkillsList();
+});
+
 
 
 // ================= LOCAL TOURNAMENT RULES =================

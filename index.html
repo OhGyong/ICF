@@ -346,13 +346,18 @@
             <div class="card card-panel">
               <div class="panel-header">
                 <h3>스킬 체크리스트</h3>
+                <button class="btn btn-primary" id="btn-open-skill-modal">
+                  <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  스킬 추가
+                </button>
               </div>
               <div class="skills-list" id="skills-list-container">
                 <!-- Dynamically Populated -->
               </div>
             </div>
-
-
           </div>
         </section>
 
@@ -552,6 +557,34 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" id="btn-cancel-roster-modal">취소</button>
           <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Skill Modal -->
+  <div class="modal-overlay" id="skill-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="skill-modal-title">새로운 스킬 추가</h3>
+        <button class="modal-close" id="btn-close-skill-modal">&times;</button>
+      </div>
+      <form id="skill-form" class="modal-form">
+        <div class="form-group">
+          <label for="form-skill-category">카테고리</label>
+          <input type="text" id="form-skill-category" placeholder="예: 슈팅, 드리블, 팀 전술">
+        </div>
+        <div class="form-group">
+          <label for="form-skill-name">스킬 이름 *</label>
+          <input type="text" id="form-skill-name" required placeholder="예: 풀업 점퍼">
+        </div>
+        <div class="form-group">
+          <label for="form-skill-desc">상세 설명</label>
+          <input type="text" id="form-skill-desc" placeholder="예: 드리블 돌파 중 멈춰서 빠르고 안정적인 점퍼 쏘기">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-skill-modal">취소</button>
+          <button type="submit" class="btn btn-primary">스킬 항목 추가</button>
         </div>
       </form>
     </div>
