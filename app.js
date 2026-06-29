@@ -504,7 +504,7 @@ function renderScheduleList() {
         
         <div class="game-score-display">
           ${scoreDisplayHtml}
-          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
+          <div style="display: flex; flex-direction: row; align-items: center; gap: 0.75rem; margin-left: auto;">
             ${statusBadgeHtml}
             <div class="game-actions">
               <button class="game-btn-icon" onclick="openEditScheduleModal('${game.id}')" title="수정">
