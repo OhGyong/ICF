@@ -165,6 +165,7 @@ async function loadState() {
         await setDoc(ref, { items: DATA_DEFAULTS[key] });
       }
       localStorage.setItem(`hoop_${key}`, JSON.stringify(appData[key]));
+      refreshActiveTab(); // ← Firestore 데이터 수신 후 즉시 화면 갱신
     } catch (e) {
       console.error(`'${key}' 불러오기 실패:`, e);
     }
