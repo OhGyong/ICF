@@ -210,9 +210,9 @@ const pageTitles = {
   dashboard: { title: '대시보드', subtitle: 'ICF 농구 대회 준비 및 활동 요약' },
   schedule: { title: '대회 일정 관리', subtitle: '다가오는 경기 시간, 장소 및 결과 기록' },
   tactics: { title: '작전판 & 전술', subtitle: '포지션 배치와 상세 공격/수비 작전 수립' },
-  skills: { title: '농구 스킬 북', subtitle: '훈련 목록을 점검하고 팀 숙련도를 높여보세요' },
+  skills: { title: '스킬 & 트레이닝', subtitle: '농구 스킬관련 정리' },
   rules: { title: '경기 규칙', subtitle: '기본적인 농구 규정과 대회용 로컬 룰 요약' },
-  roster: { title: '팀 로스터', subtitle: '우리 팀원 목록 및 주요 포지션 관리' }
+  roster: { title: '팀 로스터', subtitle: '목록 및 주요 포지션 관리' }
 };
 
 function switchTab(tabId) {
