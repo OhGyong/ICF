@@ -51,7 +51,7 @@
             <path d="M12 6v12"></path>
             <path d="M6 12h12"></path>
           </svg>
-          <span>작전판 & 전술</span>
+          <span>전술</span>
         </a>
         <a href="#" class="nav-item" data-tab="skills" id="nav-skills">
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -219,69 +219,67 @@
         <!-- ================= TACTICS BOARD TAB ================= -->
         <section id="tactics" class="tab-content">
           <div class="tactics-container">
-            <!-- Left Side: Controls & Info -->
-            <div class="tactics-controls">
-              <div class="card border-highlight">
-                <div class="card-header">
-                  <h3>전술 작전판</h3>
-                  <p class="text-muted">선수 및 볼 토큰을 드래그하여 배치해보세요.</p>
-                </div>
+            <!-- Board Controls & Legend -->
+            <div class="card border-highlight tactics-settings-card">
+              <div class="card-header">
+                <h3>전술 작전판</h3>
+                <p class="text-muted">선수 및 볼 토큰을 드래그하여 배치해보세요.</p>
+              </div>
 
-                <div class="board-settings">
-                  <div class="setting-group">
-                    <label>코트 뷰 설정</label>
-                    <div class="segmented-control">
-                      <button class="control-btn active" id="court-half">하프 코트</button>
-                      <button class="control-btn" id="court-full">풀 코트</button>
-                    </div>
-                  </div>
-
-                  <div class="setting-group" style="margin-top: 10px;">
-                    <button class="btn btn-secondary w-full" id="btn-reset-board-tokens">
-                      토큰 위치 초기화
-                    </button>
-                  </div>
-
-                  <div class="setting-group" style="margin-top: 10px;">
-                    <button class="btn btn-primary w-full" id="btn-toggle-rotation">
-                      세로 보기 전환
-                    </button>
+              <div class="board-settings">
+                <div class="setting-group">
+                  <label>코트 뷰 설정</label>
+                  <div class="segmented-control">
+                    <button class="control-btn active" id="court-half">하프 코트</button>
+                    <button class="control-btn" id="court-full">풀 코트</button>
                   </div>
                 </div>
 
-                <div class="token-legend">
-                  <h4>토큰 목록</h4>
-                  <div class="legend-items">
-                    <div class="legend-item"><span class="token-dot token-offense"></span> 공격 (1 ~ 5)</div>
-                    <div class="legend-item"><span class="token-dot token-defense"></span> 수비 (1 ~ 5)</div>
-                    <div class="legend-item"><span class="token-dot token-ball">🏀</span> 볼</div>
-                  </div>
+                <div class="setting-group" style="margin-top: 10px;">
+                  <button class="btn btn-secondary w-full" id="btn-reset-board-tokens">
+                    토큰 위치 초기화
+                  </button>
+                </div>
+
+                <div class="setting-group" style="margin-top: 10px;">
+                  <button class="btn btn-primary w-full" id="btn-toggle-rotation">
+                    세로 보기 전환
+                  </button>
                 </div>
               </div>
 
-              <!-- Save / Load Tactics List -->
-              <div class="card">
-                <div class="card-header">
-                  <h3>전술 저장 및 목록</h3>
+              <div class="token-legend">
+                <h4>토큰 목록</h4>
+                <div class="legend-items">
+                  <div class="legend-item"><span class="token-dot token-offense"></span> 공격 (1 ~ 5)</div>
+                  <div class="legend-item"><span class="token-dot token-defense"></span> 수비 (1 ~ 5)</div>
+                  <div class="legend-item"><span class="token-dot token-ball">🏀</span> 볼</div>
                 </div>
-                <div class="form-container">
-                  <div class="form-group">
-                    <label for="tactic-title">전술 이름</label>
-                    <input type="text" id="tactic-title" placeholder="예: 2-3 지역방어 돌파 작전">
-                  </div>
-                  <div class="form-group">
-                    <label for="tactic-desc">설명 및 지시사항</label>
-                    <textarea id="tactic-desc" rows="4" placeholder="작전 내용과 선수들의 움직임을 기록하세요..."></textarea>
-                  </div>
-                  <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn btn-primary" id="btn-save-tactic" style="flex: 1;">전술 저장</button>
-                    <button class="btn btn-secondary" id="btn-cancel-tactic-edit" style="display: none;">선택 해제</button>
-                  </div>
+              </div>
+            </div>
+
+            <!-- Save / Load Tactics List -->
+            <div class="card tactics-list-card">
+              <div class="card-header">
+                <h3>전술 저장 및 목록</h3>
+              </div>
+              <div class="form-container">
+                <div class="form-group">
+                  <label for="tactic-title">전술 이름</label>
+                  <input type="text" id="tactic-title" placeholder="예: 2-3 지역방어 돌파 작전">
                 </div>
-                <div class="tactic-list-divider"></div>
-                <div class="saved-tactics" id="saved-tactics-list">
-                  <!-- Dynamically populated -->
+                <div class="form-group">
+                  <label for="tactic-desc">설명 및 지시사항</label>
+                  <textarea id="tactic-desc" rows="4" placeholder="작전 내용과 선수들의 움직임을 기록하세요..."></textarea>
                 </div>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button class="btn btn-primary" id="btn-save-tactic" style="flex: 1;">전술 저장</button>
+                  <button class="btn btn-secondary" id="btn-cancel-tactic-edit" style="display: none;">선택 해제</button>
+                </div>
+              </div>
+              <div class="tactic-list-divider"></div>
+              <div class="saved-tactics" id="saved-tactics-list">
+                <!-- Dynamically populated -->
               </div>
             </div>
 

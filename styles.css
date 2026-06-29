@@ -923,10 +923,26 @@ textarea {
   align-items: start;
 }
 
-.tactics-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+.tactics-settings-card {
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tactics-list-card {
+  grid-column: 1;
+  grid-row: 2;
+  margin-top: 1.25rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tactics-board-wrapper {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .segmented-control {
@@ -1616,7 +1632,35 @@ textarea {
 
 @media (max-width: 992px) {
   .tactics-container {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .tactics-settings-card,
+  .tactics-board-wrapper,
+  .tactics-list-card {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .tactics-settings-card {
+    order: 1;
+  }
+
+  .tactics-board-wrapper {
+    order: 2;
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .tactics-list-card {
+    order: 3;
+    grid-column: auto;
+    grid-row: auto;
+    margin-top: 0;
   }
 
   .skills-grid {
