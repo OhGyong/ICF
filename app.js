@@ -102,93 +102,101 @@ const defaultTokenPositions = {
 
 let currentCourtView = 'half'; // 'half' or 'full'
 
-// Load Data from LocalStorage
-function loadState() {
-  const localRoster = localStorage.getItem('hoop_roster');
-  const localSchedule = localStorage.getItem('hoop_schedule');
-  const localSkills = localStorage.getItem('hoop_skills');
-  const localRules = localStorage.getItem('hoop_rules');
-  const localTactics = localStorage.getItem('hoop_tactics');
+// ================= FIREBASE SHARED DATA LAYER =================
 
-  if (localRoster) {
-    const parsed = JSON.parse(localRoster);
-    // If the roster is the old mock roster (first player is 김민준, number 11), overwrite it
-    if (parsed.length > 0 && parsed[0].name === '김민준' && parsed[0].number === '11') {
-      appData.roster = DEFAULT_ROSTER;
-      localStorage.setItem('hoop_roster', JSON.stringify(DEFAULT_ROSTER));
-    } else {
-      appData.roster = parsed;
+const DATA_KEYS = ['roster', 'schedule', 'skills', 'rules', 'tactics', 'lineups'];
+const DATA_DEFAULTS = {
+  roster: DEFAULT_ROSTER,
+  schedule: DEFAULT_SCHEDULE,
+  skills: DEFAULT_SKILLS,
+  rules: DEFAULT_RULES,
+  tactics: DEFAULT_TACTICS,
+  lineups: DEFAULT_LINEUPS
+};
+
+// Firebase 모듈 스크립트(index.html)가 window.fb 를 설정할 때까지 대기
+function waitForFirebase() {
+  return new Promise((resolve, reject) => {
+    if (window.fb) return resolve();
+    let waited = 0;
+    const timer = setInterval(() => {
+      if (window.fb) {
+        clearInterval(timer);
+        resolve();
+      } else if ((waited += 50) >= 10000) {
+        clearInterval(timer);
+        reject(new Error('Firebase 로드 실패'));
+      }
+    }, 50);
+  });
+}
+
+// 로컬 캐시에서 즉시 화면 표시 (Firestore 응답 전 빈 화면 방지)
+function loadCache() {
+  DATA_KEYS.forEach(key => {
+    const cached = localStorage.getItem(`hoop_${key}`);
+    if (cached) {
+      try { appData[key] = JSON.parse(cached); } catch (e) { /* 무시 */ }
     }
-  } else {
-    appData.roster = DEFAULT_ROSTER;
-    localStorage.setItem('hoop_roster', JSON.stringify(DEFAULT_ROSTER));
-  }
+  });
+}
 
-  if (localSchedule) {
-    const parsed = JSON.parse(localSchedule);
-    if (parsed.length > 0 && (parsed[0].opponent === '화이어볼즈 BB' || !parsed.find(s => s.opponent === 'BDR 스타터스 리그' && s.participants.includes('강의현')))) {
-      appData.schedule = DEFAULT_SCHEDULE;
-      localStorage.setItem('hoop_schedule', JSON.stringify(DEFAULT_SCHEDULE));
-    } else {
-      appData.schedule = parsed;
+// 현재 활성 탭만 다시 렌더링
+function refreshActiveTab() {
+  const activeTab = document.querySelector('.tab-content.active');
+  if (activeTab) renderTabContent(activeTab.id);
+  updateHeroCountdown();
+}
+
+// Firestore 에서 공유 데이터를 불러오고 실시간 구독
+async function loadState() {
+  const { db, doc, getDoc, setDoc, onSnapshot } = window.fb;
+
+  for (const key of DATA_KEYS) {
+    const ref = doc(db, 'icf-data', key);
+
+    try {
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        appData[key] = snap.data().items || [];
+      } else {
+        // 최초 1회: 공유 DB에 기본 데이터를 심어둠
+        appData[key] = DATA_DEFAULTS[key];
+        await setDoc(ref, { items: DATA_DEFAULTS[key] });
+      }
+      localStorage.setItem(`hoop_${key}`, JSON.stringify(appData[key]));
+    } catch (e) {
+      console.error(`'${key}' 불러오기 실패:`, e);
     }
-  } else {
-    appData.schedule = DEFAULT_SCHEDULE;
-    localStorage.setItem('hoop_schedule', JSON.stringify(DEFAULT_SCHEDULE));
-  }
 
-  if (localSkills) appData.skills = JSON.parse(localSkills);
-  else {
-    appData.skills = DEFAULT_SKILLS;
-    localStorage.setItem('hoop_skills', JSON.stringify(DEFAULT_SKILLS));
-  }
-
-  if (localRules) {
-    const parsed = JSON.parse(localRules);
-    if (parsed.length > 0 && parsed[0].desc.includes('결승전만 8분')) {
-      appData.rules = DEFAULT_RULES;
-      localStorage.setItem('hoop_rules', JSON.stringify(DEFAULT_RULES));
-    } else {
-      appData.rules = parsed.filter(rule => rule.title !== '연장전 규칙');
-      localStorage.setItem('hoop_rules', JSON.stringify(appData.rules));
-    }
-  } else {
-    appData.rules = DEFAULT_RULES;
-    localStorage.setItem('hoop_rules', JSON.stringify(DEFAULT_RULES));
-  }
-
-  if (localTactics) {
-    const parsed = JSON.parse(localTactics);
-    if (parsed.length > 0 && parsed[0].title === '2-3 지역방어 하이포스트 공략') {
-      appData.tactics = DEFAULT_TACTICS;
-      localStorage.setItem('hoop_tactics', JSON.stringify(DEFAULT_TACTICS));
-    } else {
-      appData.tactics = parsed;
-    }
-  } else {
-    appData.tactics = DEFAULT_TACTICS;
-    localStorage.setItem('hoop_tactics', JSON.stringify(DEFAULT_TACTICS));
-  }
-
-  const localLineups = localStorage.getItem('hoop_lineups');
-  if (localLineups) appData.lineups = JSON.parse(localLineups);
-  else {
-    appData.lineups = DEFAULT_LINEUPS;
-    localStorage.setItem('hoop_lineups', JSON.stringify(DEFAULT_LINEUPS));
+    // 실시간: 누군가 데이터를 바꾸면 내 화면도 자동 갱신
+    onSnapshot(ref, (d) => {
+      if (!d.exists()) return;
+      appData[key] = d.data().items || [];
+      localStorage.setItem(`hoop_${key}`, JSON.stringify(appData[key]));
+      refreshActiveTab();
+    });
   }
 }
 
-// Save specific key to LocalStorage
+// 특정 key 를 공유 Firestore 에 저장 (모든 사용자에게 반영)
 function saveKey(key) {
-  localStorage.setItem(`hoop_${key}`, JSON.stringify(appData[key]));
+  appData[key] = appData[key] || [];
+  localStorage.setItem(`hoop_${key}`, JSON.stringify(appData[key])); // 오프라인 캐시
+  if (!window.fb) return;
+  const { db, doc, setDoc } = window.fb;
+  setDoc(doc(db, 'icf-data', key), { items: appData[key] })
+    .catch(e => console.error(`'${key}' 저장 실패:`, e));
 }
 
-// Reset ALL Data
+// 모든 공유 데이터를 기본값으로 초기화
 function resetAllData() {
-  if (confirm('모든 기록(일정, 로스터, 작전 등)을 초기값으로 리셋하시겠습니까?')) {
-    localStorage.clear();
-    loadState();
-    initApp();
+  if (confirm('모든 기록(일정, 로스터, 작전 등)을 초기값으로 리셋하시겠습니까? 모든 사용자에게 적용됩니다.')) {
+    DATA_KEYS.forEach(key => {
+      appData[key] = JSON.parse(JSON.stringify(DATA_DEFAULTS[key]));
+      saveKey(key);
+    });
+    refreshActiveTab();
     alert('데이터가 성공적으로 초기화되었습니다.');
   }
 }
@@ -1089,7 +1097,13 @@ function initApp() {
 }
 
 // Start
-window.addEventListener('DOMContentLoaded', () => {
-  loadState();
-  initApp();
+window.addEventListener('DOMContentLoaded', async () => {
+  loadCache();   // 캐시로 즉시 화면 표시
+  initApp();     // UI 이벤트 연결
+  try {
+    await waitForFirebase();
+    await loadState();   // 공유 데이터 로드 + 실시간 구독
+  } catch (e) {
+    console.error('Firebase 연결 실패 — 로컬 캐시로만 동작합니다.', e);
+  }
 });

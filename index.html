@@ -557,6 +557,30 @@
     </div>
   </div>
 
+  <!-- Firebase (공유 데이터) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import {
+      getFirestore, doc, getDoc, setDoc, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBGqADhFYbr_7KI590WHmt1MHGXexOa79E",
+      authDomain: "icf-inchangfriend.firebaseapp.com",
+      databaseURL: "https://icf-inchangfriend-default-rtdb.firebaseio.com",
+      projectId: "icf-inchangfriend",
+      storageBucket: "icf-inchangfriend.firebasestorage.app",
+      messagingSenderId: "680680923499",
+      appId: "1:680680923499:web:84f36425015960c9ff2c2e",
+      measurementId: "G-QFS6X2EF5X"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // app.js(일반 스크립트)에서 쓸 수 있도록 전역에 노출
+    window.fb = { db, doc, getDoc, setDoc, onSnapshot };
+  </script>
   <script src="app.js"></script>
 </body>
 
