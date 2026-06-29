@@ -189,7 +189,10 @@ function saveKey(key) {
   if (!window.fb) return;
   const { db, doc, setDoc } = window.fb;
   setDoc(doc(db, 'icf-data', key), { items: appData[key] })
-    .catch(e => console.error(`'${key}' 저장 실패:`, e));
+    .catch(e => {
+      console.error(`'${key}' 저장 실패:`, e);
+      alert(`'${key}' 데이터 공유 저장에 실패했습니다. (첨부된 이미지/동영상 용량이 데이터베이스 제한을 초과했을 수 있습니다.)`);
+    });
 }
 
 // 모든 공유 데이터를 기본값으로 초기화
@@ -203,6 +206,107 @@ function resetAllData() {
     alert('데이터가 성공적으로 초기화되었습니다.');
   }
 }
+
+// ================= MEDIA ATTACHMENTS HELPER & LIGHTBOX =================
+let tempTacticMedia = [];
+let tempSkillMedia = [];
+let tempRosterMedia = [];
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    if (file.type.startsWith('video/')) {
+      if (file.size > 800 * 1024) {
+        alert(`'${file.name}' 동영상 파일 크기(${Math.round(file.size / 1024)}KB)가 800KB를 초과하여 동기화할 수 없습니다. 짤막한 영상 클립을 이용해 주세요.`);
+        return resolve(null);
+      }
+      const reader = new FileReader();
+      reader.onload = () => resolve({ type: 'video', dataUrl: reader.result, name: file.name });
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    } else {
+      // 이미지 자동 스마트 압축 & 리사이징 (Max 800px, JPEG 0.75)
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 800;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+          resolve({ type: 'image', dataUrl: compressedDataUrl, name: file.name });
+        };
+        img.onerror = () => {
+          resolve({ type: 'image', dataUrl: e.target.result, name: file.name });
+        };
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+function renderMediaPreviewGrid(containerId, mediaArray, onRemove) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  if (!mediaArray || mediaArray.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = mediaArray.map((item, index) => `
+    <div class="preview-item">
+      ${item.type === 'video'
+      ? `<video src="${item.dataUrl}"></video><div class="video-badge">▶</div>`
+      : `<img src="${item.dataUrl}" alt="미리보기">`}
+      <button type="button" class="preview-remove-btn" onclick="${onRemove}(${index})">&times;</button>
+    </div>
+  `).join('');
+}
+
+function openMediaViewModal(mediaObj) {
+  const modal = document.getElementById('media-view-modal');
+  const body = document.getElementById('media-view-body');
+  const title = document.getElementById('media-view-title');
+  if (!modal || !body) return;
+
+  title.innerText = mediaObj.type === 'video' ? '동영상 보기' : '사진 보기';
+  body.innerHTML = mediaObj.type === 'video'
+    ? `<video src="${mediaObj.dataUrl}" controls autoplay style="max-width:100%; max-height:65vh;"></video>`
+    : `<img src="${mediaObj.dataUrl}" style="max-width:100%; max-height:65vh; object-fit:contain;">`;
+
+  modal.classList.add('active');
+}
+
+window.removeTempTacticMedia = function (index) {
+  tempTacticMedia.splice(index, 1);
+  renderMediaPreviewGrid('tactic-media-preview', tempTacticMedia, 'removeTempTacticMedia');
+};
+window.removeTempSkillMedia = function (index) {
+  tempSkillMedia.splice(index, 1);
+  renderMediaPreviewGrid('skill-media-preview', tempSkillMedia, 'removeTempSkillMedia');
+};
+window.removeTempRosterMedia = function (index) {
+  tempRosterMedia.splice(index, 1);
+  renderMediaPreviewGrid('roster-media-preview', tempRosterMedia, 'removeTempRosterMedia');
+};
+window.openMediaViewModal = openMediaViewModal;
 
 
 // ================= NAVIGATION SYSTEM =================
@@ -829,8 +933,41 @@ document.getElementById('btn-toggle-rotation').addEventListener('click', (e) => 
 // ================= TACTICS SAVE / LOAD CRUD =================
 let currentEditingTacticId = null;
 
+function renderBoardTacticMedia(tactic) {
+  const container = document.getElementById('tactic-board-media-container');
+  const grid = document.getElementById('tactic-large-media-grid');
+  const title = document.getElementById('tactic-board-media-title');
+  if (!container || !grid) return;
+
+  if (!tactic || !tactic.media || tactic.media.length === 0) {
+    container.style.display = 'none';
+    grid.innerHTML = '';
+    return;
+  }
+
+  if (title) title.innerText = `📺 '${tactic.title}' 참고`;
+  const globalTacticIdx = appData.tactics.findIndex(t => t.id === tactic.id);
+
+  grid.innerHTML = tactic.media.map((m, idx) => `
+    <div class="tactic-large-media-card" onclick="openMediaViewModal(appData.tactics[${globalTacticIdx}].media[${idx}])">
+      ${m.type === 'video'
+      ? `<video src="${m.dataUrl}"></video><div class="large-video-badge">▶</div>`
+      : `<img src="${m.dataUrl}">`}
+    </div>
+  `).join('');
+
+  container.style.display = 'block';
+}
+
 function resetTacticsSelection() {
   currentEditingTacticId = null;
+  tempTacticMedia = [];
+  renderMediaPreviewGrid('tactic-media-preview', tempTacticMedia, 'removeTempTacticMedia');
+  renderBoardTacticMedia(null);
+
+  const mediaInput = document.getElementById('tactic-media-input');
+  if (mediaInput) mediaInput.value = '';
+
   const titleInput = document.getElementById('tactic-title');
   const descInput = document.getElementById('tactic-desc');
   const saveBtn = document.getElementById('btn-save-tactic');
@@ -853,15 +990,26 @@ function renderTacticsList() {
     return;
   }
 
-  tacticsList.innerHTML = appData.tactics.map(t => {
+  tacticsList.innerHTML = appData.tactics.map((t, tIndex) => {
     const isActive = t.id === currentEditingTacticId;
+    const mediaGalleryHtml = (t.media && t.media.length > 0) ? `
+      <div class="card-media-gallery" onclick="event.stopPropagation();">
+        ${t.media.map((m, mIdx) => `
+          <div class="card-media-item" onclick="openMediaViewModal(appData.tactics[${tIndex}].media[${mIdx}])">
+            ${m.type === 'video' ? `<video src="${m.dataUrl}"></video><div class="video-badge">▶</div>` : `<img src="${m.dataUrl}">`}
+          </div>
+        `).join('')}
+      </div>
+    ` : '';
+
     return `
       <div class="tactic-item-card ${isActive ? 'active' : ''}" onclick="loadTacticToForm('${t.id}')">
-        <div class="tactic-item-info">
+        <div class="tactic-item-info" style="flex:1;">
           <h4>${t.title} ${isActive ? '<span style="font-size:0.7rem; color:var(--color-primary); font-weight:normal;">(선택됨)</span>' : ''}</h4>
-          <p>${t.desc}</p>
+          <p style="max-width: 100%; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${t.desc}</p>
+          ${mediaGalleryHtml}
         </div>
-        <button class="game-btn-icon delete-btn" onclick="deleteTactic(event, '${t.id}')" title="삭제" style="width: 28px; height: 28px;">
+        <button class="game-btn-icon delete-btn" onclick="deleteTactic(event, '${t.id}')" title="삭제" style="width: 28px; height: 28px; flex-shrink: 0; align-self: flex-start; margin-left: 0.5rem;">
           &times;
         </button>
       </div>
@@ -901,6 +1049,7 @@ document.getElementById('btn-save-tactic').addEventListener('click', () => {
     appData.tactics[existingIndex].desc = desc;
     appData.tactics[existingIndex].courtView = currentCourtView;
     appData.tactics[existingIndex].tokens = JSON.parse(JSON.stringify(currentTokenPositionsState));
+    appData.tactics[existingIndex].media = JSON.parse(JSON.stringify(tempTacticMedia));
     alert(`'${title}' 전술 정보와 토큰 위치가 업데이트되었습니다.`);
   } else {
     // Create new tactic
@@ -909,7 +1058,8 @@ document.getElementById('btn-save-tactic').addEventListener('click', () => {
       title,
       desc,
       courtView: currentCourtView,
-      tokens: JSON.parse(JSON.stringify(currentTokenPositionsState))
+      tokens: JSON.parse(JSON.stringify(currentTokenPositionsState)),
+      media: JSON.parse(JSON.stringify(tempTacticMedia))
     };
     appData.tactics.push(newTactic);
     alert(`'${title}' 새로운 전술이 저장되었습니다.`);
@@ -938,6 +1088,10 @@ function loadTacticToForm(id) {
   document.getElementById('tactic-title').value = tactic.title;
   document.getElementById('tactic-desc').value = tactic.desc;
   document.getElementById('btn-save-tactic').innerText = '전술 업데이트';
+
+  tempTacticMedia = tactic.media ? JSON.parse(JSON.stringify(tactic.media)) : [];
+  renderMediaPreviewGrid('tactic-media-preview', tempTacticMedia, 'removeTempTacticMedia');
+  renderBoardTacticMedia(tactic);
 
   const cancelBtn = document.getElementById('btn-cancel-tactic-edit');
   if (cancelBtn) cancelBtn.style.display = 'inline-block';
@@ -985,28 +1139,44 @@ function renderSkillsList() {
   });
 
   container.innerHTML = Object.keys(categories).map(catName => {
-    const skillsHtml = categories[catName].map(skill => `
-      <div class="skill-item">
-        <div class="skill-details">
-          <span class="skill-name">${skill.name}</span>
-          <span class="skill-desc">${skill.desc}</span>
+    const skillsHtml = categories[catName].map(skill => {
+      const globalSkillIdx = appData.skills.findIndex(s => s.id === skill.id);
+      const mediaGalleryHtml = (skill.media && skill.media.length > 0) ? `
+        <div class="card-media-gallery" style="margin-top: 0.5rem;">
+          ${skill.media.map((m, mIdx) => `
+            <div class="card-media-item" onclick="openMediaViewModal(appData.skills[${globalSkillIdx}].media[${mIdx}])">
+              ${m.type === 'video' ? `<video src="${m.dataUrl}"></video><div class="video-badge">▶</div>` : `<img src="${m.dataUrl}">`}
+            </div>
+          `).join('')}
         </div>
-        <div class="skill-item-actions">
-          <button class="game-btn-icon skill-edit-btn" onclick="editSkill('${skill.id}')" title="항목 수정">
-            <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-              <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-            </svg>
-          </button>
-          <button class="game-btn-icon delete-btn skill-delete-btn" onclick="deleteSkill('${skill.id}')" title="항목 삭제">
-            <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-          </button>
+      ` : '';
+
+      return `
+        <div class="skill-item" style="flex-direction: column; align-items: stretch; gap: 0.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="skill-details">
+              <span class="skill-name">${skill.name}</span>
+              <span class="skill-desc">${skill.desc || ''}</span>
+            </div>
+            <div class="skill-item-actions">
+              <button class="game-btn-icon skill-edit-btn" onclick="editSkill('${skill.id}')" title="항목 수정">
+                <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
+              <button class="game-btn-icon delete-btn skill-delete-btn" onclick="deleteSkill('${skill.id}')" title="항목 삭제">
+                <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          ${mediaGalleryHtml}
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     return `
       <div class="skill-category-card">
@@ -1047,6 +1217,9 @@ function editSkill(id) {
   document.getElementById('form-skill-name').value = skill.name;
   document.getElementById('form-skill-desc').value = skill.desc || '';
 
+  tempSkillMedia = skill.media ? JSON.parse(JSON.stringify(skill.media)) : [];
+  renderMediaPreviewGrid('skill-media-preview', tempSkillMedia, 'removeTempSkillMedia');
+
   skillModal.classList.add('active');
 }
 
@@ -1057,6 +1230,10 @@ const skillForm = document.getElementById('skill-form');
 document.getElementById('btn-open-skill-modal').addEventListener('click', () => {
   document.getElementById('skill-modal-title').innerText = '새로운 스킬 추가';
   document.getElementById('form-skill-id').value = '';
+  tempSkillMedia = [];
+  renderMediaPreviewGrid('skill-media-preview', tempSkillMedia, 'removeTempSkillMedia');
+  const mediaInput = document.getElementById('form-skill-media');
+  if (mediaInput) mediaInput.value = '';
   skillForm.reset();
   skillModal.classList.add('active');
 });
@@ -1082,7 +1259,11 @@ skillForm.addEventListener('submit', (e) => {
   if (id) {
     const index = appData.skills.findIndex(s => s.id === id);
     if (index !== -1) {
-      appData.skills[index] = { ...appData.skills[index], category, name, desc };
+      appData.skills[index] = {
+        ...appData.skills[index],
+        category, name, desc,
+        media: JSON.parse(JSON.stringify(tempSkillMedia))
+      };
     }
   } else {
     const newSkill = {
@@ -1090,7 +1271,8 @@ skillForm.addEventListener('submit', (e) => {
       category,
       name,
       desc,
-      checked: false
+      checked: false,
+      media: JSON.parse(JSON.stringify(tempSkillMedia))
     };
     appData.skills.push(newSkill);
   }
@@ -1191,14 +1373,32 @@ function renderRosterList() {
     return;
   }
 
-  container.innerHTML = appData.roster.map(player => `
-    <div class="roster-card">
-      <div class="roster-jersey-num">#${player.number}</div>
-      <div class="roster-avatar">🏀</div>
-      <h3 class="roster-name">${player.name}</h3>
-      <span class="roster-pos-badge">${player.position}</span>
-    </div>
-  `).join('');
+  container.innerHTML = appData.roster.map((player, pIdx) => {
+    const firstImg = player.media && player.media.find(m => m.type === 'image');
+    const avatarHtml = firstImg
+      ? `<div class="roster-avatar-container" onclick="openMediaViewModal(appData.roster[${pIdx}].media[0])" style="cursor:pointer;"><img src="${firstImg.dataUrl}" class="roster-avatar-img"></div>`
+      : `<div class="roster-avatar">🏀</div>`;
+
+    const mediaGalleryHtml = (player.media && player.media.length > 0) ? `
+      <div class="card-media-gallery" style="margin-top: 0.5rem; justify-content: center;">
+        ${player.media.map((m, mIdx) => `
+          <div class="card-media-item" style="width:40px; height:40px;" onclick="openMediaViewModal(appData.roster[${pIdx}].media[${mIdx}])">
+            ${m.type === 'video' ? `<video src="${m.dataUrl}"></video><div class="video-badge" style="width:16px; height:16px; font-size:8px;">▶</div>` : `<img src="${m.dataUrl}">`}
+          </div>
+        `).join('')}
+      </div>
+    ` : '';
+
+    return `
+      <div class="roster-card" style="display:flex; flex-direction:column; align-items:center;">
+        <div class="roster-jersey-num">#${player.number}</div>
+        ${avatarHtml}
+        <h3 class="roster-name" style="margin-top:0.35rem;">${player.name}</h3>
+        <span class="roster-pos-badge">${player.position}</span>
+        ${mediaGalleryHtml}
+      </div>
+    `;
+  }).join('');
 }
 
 // Modal handling for Roster
@@ -1209,6 +1409,10 @@ document.getElementById('btn-open-roster-modal').addEventListener('click', () =>
   document.getElementById('roster-modal-title').innerText = '선수 정보 등록';
   rosterForm.reset();
   document.getElementById('form-roster-id').value = '';
+  tempRosterMedia = [];
+  renderMediaPreviewGrid('roster-media-preview', tempRosterMedia, 'removeTempRosterMedia');
+  const mediaInput = document.getElementById('form-roster-media');
+  if (mediaInput) mediaInput.value = '';
   rosterModal.classList.add('active');
 });
 
@@ -1227,7 +1431,8 @@ rosterForm.addEventListener('submit', (e) => {
 
   const newPlayer = {
     id: 'r_' + Date.now(),
-    name, number, position, height: '', strengths: ''
+    name, number, position, height: '', strengths: '',
+    media: JSON.parse(JSON.stringify(tempRosterMedia))
   };
   appData.roster.push(newPlayer);
 
@@ -1261,9 +1466,61 @@ function connectTabEvents() {
   });
 }
 
+function initMediaInputs() {
+  const tacticInput = document.getElementById('tactic-media-input');
+  if (tacticInput) {
+    tacticInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      for (const f of files) {
+        const item = await readFileAsDataURL(f);
+        if (item) tempTacticMedia.push(item);
+      }
+      renderMediaPreviewGrid('tactic-media-preview', tempTacticMedia, 'removeTempTacticMedia');
+      tacticInput.value = '';
+    });
+  }
+
+  const skillInput = document.getElementById('form-skill-media');
+  if (skillInput) {
+    skillInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      for (const f of files) {
+        const item = await readFileAsDataURL(f);
+        if (item) tempSkillMedia.push(item);
+      }
+      renderMediaPreviewGrid('skill-media-preview', tempSkillMedia, 'removeTempSkillMedia');
+      skillInput.value = '';
+    });
+  }
+
+  const rosterInput = document.getElementById('form-roster-media');
+  if (rosterInput) {
+    rosterInput.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      for (const f of files) {
+        const item = await readFileAsDataURL(f);
+        if (item) tempRosterMedia.push(item);
+      }
+      renderMediaPreviewGrid('roster-media-preview', tempRosterMedia, 'removeTempRosterMedia');
+      rosterInput.value = '';
+    });
+  }
+
+  const mediaModal = document.getElementById('media-view-modal');
+  const closeMediaBtn = document.getElementById('btn-close-media-view');
+  if (closeMediaBtn && mediaModal) {
+    closeMediaBtn.addEventListener('click', () => {
+      mediaModal.classList.remove('active');
+      const body = document.getElementById('media-view-body');
+      if (body) body.innerHTML = '';
+    });
+  }
+}
+
 function initApp() {
   setTodayDate();
   connectTabEvents();
+  initMediaInputs();
 
   // Set default active tab
   switchTab('dashboard');

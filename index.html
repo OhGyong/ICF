@@ -272,6 +272,15 @@
                   <label for="tactic-desc">설명 및 지시사항</label>
                   <textarea id="tactic-desc" rows="4" placeholder="작전 내용과 선수들의 움직임을 기록하세요..."></textarea>
                 </div>
+                <div class="form-group">
+                  <label>사진/동영상 첨부</label>
+                  <input type="file" id="tactic-media-input" accept="image/*,video/*" multiple style="display: none;">
+                  <button type="button" class="btn btn-outline w-full"
+                    onclick="document.getElementById('tactic-media-input').click()">
+                    📁 파일 선택 (사진/동영상)
+                  </button>
+                  <div id="tactic-media-preview" class="media-preview-grid"></div>
+                </div>
                 <div style="display: flex; gap: 0.5rem;">
                   <button class="btn btn-primary" id="btn-save-tactic" style="flex: 1;">전술 저장</button>
                   <button class="btn btn-secondary" id="btn-cancel-tactic-edit" style="display: none;">선택 해제</button>
@@ -334,6 +343,19 @@
                     <!-- Draggable Token elements will be placed dynamically inside here -->
                     <div id="tokens-overlay" class="tokens-overlay"></div>
                   </div>
+                </div>
+              </div>
+
+              <!-- Large Tactic Media Display Board (Below Court) -->
+              <div class="card margin-top-md" id="tactic-board-media-container" style="display: none;">
+                <div class="card-header"
+                  style="padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <h3 id="tactic-board-media-title">📺 참고</h3>
+                  </div>
+                </div>
+                <div class="tactic-large-media-grid" id="tactic-large-media-grid">
+                  <!-- Dynamically Populated -->
                 </div>
               </div>
             </div>
@@ -555,6 +577,16 @@
           </select>
         </div>
 
+        <div class="form-group">
+          <label>프로필 사진/동영상 첨부</label>
+          <input type="file" id="form-roster-media" accept="image/*,video/*" multiple style="display: none;">
+          <button type="button" class="btn btn-outline w-full"
+            onclick="document.getElementById('form-roster-media').click()">
+            📷 프로필 사진/영상 첨부
+          </button>
+          <div id="roster-media-preview" class="media-preview-grid"></div>
+        </div>
+
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" id="btn-cancel-roster-modal">취소</button>
           <button type="submit" class="btn btn-primary">저장</button>
@@ -584,11 +616,33 @@
           <label for="form-skill-desc">상세 설명</label>
           <input type="text" id="form-skill-desc" placeholder="예: 드리블 돌파 중 멈춰서 빠르고 안정적인 점퍼 쏘기">
         </div>
+        <div class="form-group">
+          <label>참고 사진/훈련 동영상 첨부</label>
+          <input type="file" id="form-skill-media" accept="image/*,video/*" multiple style="display: none;">
+          <button type="button" class="btn btn-outline w-full"
+            onclick="document.getElementById('form-skill-media').click()">
+            🎬 참고 사진/동영상 첨부
+          </button>
+          <div id="skill-media-preview" class="media-preview-grid"></div>
+        </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" id="btn-cancel-skill-modal">취소</button>
           <button type="submit" class="btn btn-primary">스킬 항목 추가</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Global Media View Modal (Lightbox) -->
+  <div class="modal-overlay" id="media-view-modal">
+    <div class="modal-container media-view-container">
+      <div class="modal-header">
+        <h3 id="media-view-title">미디어 보기</h3>
+        <button class="modal-close" id="btn-close-media-view">&times;</button>
+      </div>
+      <div class="media-view-body" id="media-view-body">
+        <!-- Content inserted dynamically -->
+      </div>
     </div>
   </div>
 
