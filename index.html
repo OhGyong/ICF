@@ -118,7 +118,7 @@
                 <p id="dashboard-hero-subtitle">다가오는 경기 일정을 관리하고 전술판에서 작전을 세워보세요.</p>
                 <div class="hero-buttons">
                   <button class="btn btn-primary" onclick="switchTab('tactics')">
-                    작전판 확인하기
+                    전술 확인하기
                   </button>
                   <button class="btn btn-outline" onclick="switchTab('schedule')">
                     일정 등록하기
@@ -222,7 +222,7 @@
             <!-- Board Controls & Legend -->
             <div class="card border-highlight tactics-settings-card">
               <div class="card-header">
-                <h3>전술 작전판</h3>
+                <h3>전술보드</h3>
                 <p class="text-muted">선수 및 볼 토큰을 드래그하여 배치해보세요.</p>
               </div>
 
@@ -248,7 +248,7 @@
                     토큰 위치 초기화
                   </button>
                 </div>
-                
+
                 <div class="setting-group" style="margin-top: 10px;">
                   <button class="btn btn-secondary w-full" id="btn-reset-routes">
                     경로 모두 지우기
@@ -318,8 +318,10 @@
                       <rect x="0" y="0" width="800" height="500" fill="none" class="court-border-line" stroke="#262F40"
                         stroke-width="4"></rect>
 
-                      <line x1="400" y1="0" x2="400" y2="190" class="full-court-line" stroke="#262F40" stroke-width="2"></line>
-                      <line x1="400" y1="310" x2="400" y2="500" class="full-court-line" stroke="#262F40" stroke-width="2"></line>
+                      <line x1="400" y1="0" x2="400" y2="190" class="full-court-line" stroke="#262F40" stroke-width="2">
+                      </line>
+                      <line x1="400" y1="310" x2="400" y2="500" class="full-court-line" stroke="#262F40"
+                        stroke-width="2"></line>
                       <circle cx="400" cy="250" r="60" class="full-court-line" stroke="#262F40" stroke-width="2"
                         fill="none"></circle>
 
@@ -352,7 +354,8 @@
                     </svg>
 
                     <!-- Overlay for drawn routes (arrows) -->
-                    <svg id="routes-svg" class="routes-svg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;">
+                    <svg id="routes-svg" class="routes-svg"
+                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;">
                       <defs>
                         <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="2.5" refY="2" orient="auto">
                           <polygon points="0 0, 4 2, 0 4" fill="#08541c" />

@@ -266,15 +266,15 @@ function processMediaFile(file) {
 async function uploadMediaFiles(tempMediaArray, folderName) {
   if (!window.fb || !window.fb.storage) return tempMediaArray;
   const { storage, ref, uploadBytes, getDownloadURL } = window.fb;
-  
+
   const uploadedMedia = [];
   for (const item of tempMediaArray) {
     if (item.file) {
       try {
         const fileExt = item.name.split('.').pop() || 'tmp';
-        const fileName = `${Date.now()}_${Math.floor(Math.random()*1000)}.${fileExt}`;
+        const fileName = `${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
         const storageRef = ref(storage, `image/${fileName}`);
-        
+
         await uploadBytes(storageRef, item.file);
         const url = await getDownloadURL(storageRef);
         uploadedMedia.push({ type: item.type, url: url, name: item.name });
@@ -302,8 +302,8 @@ function renderMediaPreviewGrid(containerId, mediaArray, onRemove) {
     return `
     <div class="preview-item">
       ${item.type === 'video'
-      ? `<video src="${src}"></video><div class="video-badge">▶</div>`
-      : `<img src="${src}" alt="미리보기">`}
+        ? `<video src="${src}"></video><div class="video-badge">▶</div>`
+        : `<img src="${src}" alt="미리보기">`}
       <button type="button" class="preview-remove-btn" onclick="${onRemove}(${index})">&times;</button>
     </div>
     `;
@@ -471,7 +471,7 @@ function renderDashboard() {
     panelTacticsContainer.innerHTML = `
       <div class="empty-state">
         <p>등록된 전술이 없습니다.</p>
-        <button class="btn btn-secondary btn-sm margin-top-md" onclick="switchTab('tactics')">전술 작전판 짜기</button>
+        <button class="btn btn-secondary btn-sm margin-top-md" onclick="switchTab('tactics')">전술보드 짜기</button>
       </div>
     `;
   } else {
@@ -482,7 +482,7 @@ function renderDashboard() {
           <h4 style="font-size: 0.85rem;">${tactic.title}</h4>
           <p style="font-size: 0.75rem; max-width: 250px;">${tactic.desc}</p>
         </div>
-        <span class="btn-text" style="font-size: 0.75rem;">작전판 &rarr;</span>
+        <span class="btn-text" style="font-size: 0.75rem;">전술보드 &rarr;</span>
       </div>
     `).join('');
   }
@@ -819,7 +819,7 @@ function initTacticsBoard() {
   } else {
     renderTokens();
   }
-  
+
   renderRoutes();
 
   if (!isBoardInitialized) {
@@ -868,7 +868,7 @@ function renderRoutes() {
   const isHalf = currentCourtView === 'half';
   const vbW = isHalf ? 400 : 800;
   const vbH = 500;
-  
+
   const routesSvg = document.getElementById('routes-svg');
   if (routesSvg) {
     routesSvg.setAttribute('viewBox', `0 0 ${vbW} ${vbH}`);
@@ -879,18 +879,18 @@ function renderRoutes() {
     // If it's old format (startX/endX), convert it for backward compatibility
     let points = route.points;
     if (!points && route.startX !== undefined) {
-      points = [{x: route.startX, y: route.startY}, {x: route.endX, y: route.endY}];
+      points = [{ x: route.startX, y: route.startY }, { x: route.endX, y: route.endY }];
     }
-    
+
     if (!points || points.length < 2) return;
-    
+
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     const d = points.map((p, i) => {
       const sx = (p.x * vbW) / 100;
       const sy = (p.y * vbH) / 100;
       return `${i === 0 ? 'M' : 'L'} ${sx} ${sy}`;
     }).join(' ');
-    
+
     path.setAttribute('d', d);
     path.setAttribute('fill', 'none');
     path.setAttribute('stroke', '#08541c');
@@ -936,7 +936,7 @@ function setupDragAndDrop() {
 
   const startDrag = (e) => {
     const target = e.target;
-    
+
     if (isDrawMode) {
       e.preventDefault();
       const rect = container.getBoundingClientRect();
@@ -972,7 +972,7 @@ function setupDragAndDrop() {
 
     const rect = container.getBoundingClientRect();
     const pos = getRelativePos(e, rect);
-    
+
     // Clamp coordinates [2% - 98%] for tokens
     let xPercent = Math.max(2, Math.min(98, pos.x));
     let yPercent = Math.max(2, Math.min(98, pos.y));
@@ -993,7 +993,7 @@ function setupDragAndDrop() {
   const endDrag = (e) => {
     if (activeDrawRoute && isDrawMode) {
       if (activeDrawRoute.points.length > 2) {
-        currentRoutesState.push({...activeDrawRoute});
+        currentRoutesState.push({ ...activeDrawRoute });
       }
       activeDrawRoute = null;
       renderRoutes();
@@ -1114,8 +1114,8 @@ function renderBoardTacticMedia(tactic) {
     return `
     <div class="tactic-large-media-card" onclick="openMediaViewModal(appData.tactics[${globalTacticIdx}].media[${idx}])">
       ${m.type === 'video'
-      ? `<video src="${src}"></video><div class="large-video-badge">▶</div>`
-      : `<img src="${src}">`}
+        ? `<video src="${src}"></video><div class="large-video-badge">▶</div>`
+        : `<img src="${src}">`}
     </div>
     `;
   }).join('');
@@ -1159,13 +1159,13 @@ function renderTacticsList() {
     const mediaGalleryHtml = (t.media && t.media.length > 0) ? `
       <div class="card-media-gallery" onclick="event.stopPropagation();">
         ${t.media.map((m, mIdx) => {
-          const src = m.previewUrl || m.url || m.dataUrl;
-          return `
+      const src = m.previewUrl || m.url || m.dataUrl;
+      return `
           <div class="card-media-item" onclick="openMediaViewModal(appData.tactics[${tIndex}].media[${mIdx}])">
             ${m.type === 'video' ? `<video src="${src}"></video><div class="video-badge">▶</div>` : `<img src="${src}">`}
           </div>
           `;
-        }).join('')}
+    }).join('')}
       </div>
     ` : '';
 
@@ -1206,11 +1206,11 @@ document.getElementById('btn-save-tactic').addEventListener('click', async () =>
   saveBtn.innerText = '업로드 중...';
   saveBtn.disabled = true;
   document.body.style.cursor = 'wait';
-  
+
   let finalMedia = [];
   try {
     finalMedia = await uploadMediaFiles(tempTacticMedia, 'tactics');
-  } catch(e) {
+  } catch (e) {
     console.error(e);
   } finally {
     saveBtn.innerText = originalBtnText;
@@ -1331,13 +1331,13 @@ function renderSkillsList() {
       const mediaGalleryHtml = (skill.media && skill.media.length > 0) ? `
         <div class="card-media-gallery" style="margin-top: 0.5rem;">
           ${skill.media.map((m, mIdx) => {
-            const src = m.previewUrl || m.url || m.dataUrl;
-            return `
+        const src = m.previewUrl || m.url || m.dataUrl;
+        return `
             <div class="card-media-item" onclick="openMediaViewModal(appData.skills[${globalSkillIdx}].media[${mIdx}])">
               ${m.type === 'video' ? `<video src="${src}"></video><div class="video-badge">▶</div>` : `<img src="${src}">`}
             </div>
             `;
-          }).join('')}
+      }).join('')}
         </div>
       ` : '';
 
@@ -1445,13 +1445,13 @@ skillForm.addEventListener('submit', async (e) => {
   const category = categoryInput.value.trim() || '기타';
   const name = nameInput.value.trim();
   const desc = descInput.value.trim();
-  
+
   const submitBtn = skillForm.querySelector('button[type="submit"]');
   const originalBtnText = submitBtn.innerText;
   submitBtn.innerText = '업로드 중...';
   submitBtn.disabled = true;
   document.body.style.cursor = 'wait';
-  
+
   let finalMedia = [];
   try {
     finalMedia = await uploadMediaFiles(tempSkillMedia, 'skills');
@@ -1590,13 +1590,13 @@ function renderRosterList() {
     const mediaGalleryHtml = (player.media && player.media.length > 0) ? `
       <div class="card-media-gallery" style="margin-top: 0.5rem; justify-content: center;">
         ${player.media.map((m, mIdx) => {
-          const src = m.previewUrl || m.url || m.dataUrl;
-          return `
+      const src = m.previewUrl || m.url || m.dataUrl;
+      return `
           <div class="card-media-item" style="width:40px; height:40px;" onclick="openMediaViewModal(appData.roster[${pIdx}].media[${mIdx}])">
             ${m.type === 'video' ? `<video src="${src}"></video><div class="video-badge" style="width:16px; height:16px; font-size:8px;">▶</div>` : `<img src="${src}">`}
           </div>
           `;
-        }).join('')}
+    }).join('')}
       </div>
     ` : '';
 
@@ -1639,13 +1639,13 @@ rosterForm.addEventListener('submit', async (e) => {
   const name = document.getElementById('form-roster-name').value;
   const number = document.getElementById('form-roster-number').value;
   const position = document.getElementById('form-roster-position').value;
-  
+
   const submitBtn = rosterForm.querySelector('button[type="submit"]');
   const originalBtnText = submitBtn.innerText;
   submitBtn.innerText = '업로드 중...';
   submitBtn.disabled = true;
   document.body.style.cursor = 'wait';
-  
+
   let finalMedia = [];
   try {
     finalMedia = await uploadMediaFiles(tempRosterMedia, 'roster');
