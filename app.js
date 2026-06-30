@@ -212,17 +212,14 @@ let tempTacticMedia = [];
 let tempSkillMedia = [];
 let tempRosterMedia = [];
 
-function readFileAsDataURL(file) {
+function processMediaFile(file) {
   return new Promise((resolve, reject) => {
     if (file.type.startsWith('video/')) {
-      if (file.size > 800 * 1024) {
-        alert(`'${file.name}' 동영상 파일 크기(${Math.round(file.size / 1024)}KB)가 800KB를 초과하여 동기화할 수 없습니다. 짤막한 영상 클립을 이용해 주세요.`);
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`'${file.name}' 동영상 파일 크기(${Math.round(file.size / 1024 / 1024)}MB)가 5MB를 초과합니다.`);
         return resolve(null);
       }
-      const reader = new FileReader();
-      reader.onload = () => resolve({ type: 'video', dataUrl: reader.result, name: file.name });
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+      resolve({ type: 'video', file: file, previewUrl: URL.createObjectURL(file), name: file.name });
     } else {
       // 이미지 고화질 선명도 유지 & 리사이징 (Max 1920px, JPEG 0.90)
       const reader = new FileReader();
@@ -251,11 +248,12 @@ function readFileAsDataURL(file) {
           ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, width, height);
 
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.90);
-          resolve({ type: 'image', dataUrl: compressedDataUrl, name: file.name });
+          canvas.toBlob((blob) => {
+            resolve({ type: 'image', file: blob, previewUrl: URL.createObjectURL(blob), name: file.name });
+          }, 'image/jpeg', 0.90);
         };
         img.onerror = () => {
-          resolve({ type: 'image', dataUrl: e.target.result, name: file.name });
+          resolve({ type: 'image', file: file, previewUrl: URL.createObjectURL(file), name: file.name });
         };
         img.src = e.target.result;
       };
@@ -265,6 +263,33 @@ function readFileAsDataURL(file) {
   });
 }
 
+async function uploadMediaFiles(tempMediaArray, folderName) {
+  if (!window.fb || !window.fb.storage) return tempMediaArray;
+  const { storage, ref, uploadBytes, getDownloadURL } = window.fb;
+  
+  const uploadedMedia = [];
+  for (const item of tempMediaArray) {
+    if (item.file) {
+      try {
+        const fileExt = item.name.split('.').pop() || 'tmp';
+        const fileName = `${Date.now()}_${Math.floor(Math.random()*1000)}.${fileExt}`;
+        const storageRef = ref(storage, `app/image/${fileName}`);
+        
+        await uploadBytes(storageRef, item.file);
+        const url = await getDownloadURL(storageRef);
+        uploadedMedia.push({ type: item.type, url: url, name: item.name });
+      } catch (err) {
+        console.error("Upload error:", err);
+        alert(`'${item.name}' 파일 업로드 중 오류가 발생했습니다.`);
+      }
+    } else {
+      // 기존 업로드된 파일들 (url 또는 과거 Base64 dataUrl)
+      uploadedMedia.push({ type: item.type, url: item.url, dataUrl: item.dataUrl, name: item.name });
+    }
+  }
+  return uploadedMedia;
+}
+
 function renderMediaPreviewGrid(containerId, mediaArray, onRemove) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -272,14 +297,17 @@ function renderMediaPreviewGrid(containerId, mediaArray, onRemove) {
     container.innerHTML = '';
     return;
   }
-  container.innerHTML = mediaArray.map((item, index) => `
+  container.innerHTML = mediaArray.map((item, index) => {
+    const src = item.previewUrl || item.url || item.dataUrl;
+    return `
     <div class="preview-item">
       ${item.type === 'video'
-      ? `<video src="${item.dataUrl}"></video><div class="video-badge">▶</div>`
-      : `<img src="${item.dataUrl}" alt="미리보기">`}
+      ? `<video src="${src}"></video><div class="video-badge">▶</div>`
+      : `<img src="${src}" alt="미리보기">`}
       <button type="button" class="preview-remove-btn" onclick="${onRemove}(${index})">&times;</button>
     </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function openMediaViewModal(mediaObj) {
@@ -288,10 +316,11 @@ function openMediaViewModal(mediaObj) {
   const title = document.getElementById('media-view-title');
   if (!modal || !body) return;
 
+  const src = mediaObj.previewUrl || mediaObj.url || mediaObj.dataUrl;
   title.innerText = mediaObj.type === 'video' ? '동영상 보기' : '사진 보기';
   body.innerHTML = mediaObj.type === 'video'
-    ? `<video src="${mediaObj.dataUrl}" controls autoplay style="max-width:100%; max-height:65vh;"></video>`
-    : `<img src="${mediaObj.dataUrl}" style="max-width:100%; max-height:65vh; object-fit:contain;">`;
+    ? `<video src="${src}" controls autoplay style="max-width:100%; max-height:65vh;"></video>`
+    : `<img src="${src}" style="max-width:100%; max-height:65vh; object-fit:contain;">`;
 
   modal.classList.add('active');
 }
@@ -996,11 +1025,14 @@ function renderTacticsList() {
     const isActive = t.id === currentEditingTacticId;
     const mediaGalleryHtml = (t.media && t.media.length > 0) ? `
       <div class="card-media-gallery" onclick="event.stopPropagation();">
-        ${t.media.map((m, mIdx) => `
+        ${t.media.map((m, mIdx) => {
+          const src = m.previewUrl || m.url || m.dataUrl;
+          return `
           <div class="card-media-item" onclick="openMediaViewModal(appData.tactics[${tIndex}].media[${mIdx}])">
-            ${m.type === 'video' ? `<video src="${m.dataUrl}"></video><div class="video-badge">▶</div>` : `<img src="${m.dataUrl}">`}
+            ${m.type === 'video' ? `<video src="${src}"></video><div class="video-badge">▶</div>` : `<img src="${src}">`}
           </div>
-        `).join('')}
+          `;
+        }).join('')}
       </div>
     ` : '';
 
@@ -1019,7 +1051,7 @@ function renderTacticsList() {
   }).join('');
 }
 
-document.getElementById('btn-save-tactic').addEventListener('click', () => {
+document.getElementById('btn-save-tactic').addEventListener('click', async () => {
   const titleInput = document.getElementById('tactic-title');
   const descInput = document.getElementById('tactic-desc');
 
@@ -1034,6 +1066,23 @@ document.getElementById('btn-save-tactic').addEventListener('click', () => {
   // Ensure currentTokenPositionsState is populated
   if (currentTokenPositionsState.length === 0) {
     resetTokenPositions();
+  }
+
+  const saveBtn = document.getElementById('btn-save-tactic');
+  const originalBtnText = saveBtn.innerText;
+  saveBtn.innerText = '업로드 중...';
+  saveBtn.disabled = true;
+  document.body.style.cursor = 'wait';
+  
+  let finalMedia = [];
+  try {
+    finalMedia = await uploadMediaFiles(tempTacticMedia, 'tactics');
+  } catch(e) {
+    console.error(e);
+  } finally {
+    saveBtn.innerText = originalBtnText;
+    saveBtn.disabled = false;
+    document.body.style.cursor = 'default';
   }
 
   // Check if updating an existing tactic (by ID or exact title match)
@@ -1051,7 +1100,7 @@ document.getElementById('btn-save-tactic').addEventListener('click', () => {
     appData.tactics[existingIndex].desc = desc;
     appData.tactics[existingIndex].courtView = currentCourtView;
     appData.tactics[existingIndex].tokens = JSON.parse(JSON.stringify(currentTokenPositionsState));
-    appData.tactics[existingIndex].media = JSON.parse(JSON.stringify(tempTacticMedia));
+    appData.tactics[existingIndex].media = finalMedia;
     alert(`'${title}' 전술 정보와 토큰 위치가 업데이트되었습니다.`);
   } else {
     // Create new tactic
@@ -1061,7 +1110,7 @@ document.getElementById('btn-save-tactic').addEventListener('click', () => {
       desc,
       courtView: currentCourtView,
       tokens: JSON.parse(JSON.stringify(currentTokenPositionsState)),
-      media: JSON.parse(JSON.stringify(tempTacticMedia))
+      media: finalMedia
     };
     appData.tactics.push(newTactic);
     alert(`'${title}' 새로운 전술이 저장되었습니다.`);
@@ -1145,11 +1194,14 @@ function renderSkillsList() {
       const globalSkillIdx = appData.skills.findIndex(s => s.id === skill.id);
       const mediaGalleryHtml = (skill.media && skill.media.length > 0) ? `
         <div class="card-media-gallery" style="margin-top: 0.5rem;">
-          ${skill.media.map((m, mIdx) => `
+          ${skill.media.map((m, mIdx) => {
+            const src = m.previewUrl || m.url || m.dataUrl;
+            return `
             <div class="card-media-item" onclick="openMediaViewModal(appData.skills[${globalSkillIdx}].media[${mIdx}])">
-              ${m.type === 'video' ? `<video src="${m.dataUrl}"></video><div class="video-badge">▶</div>` : `<img src="${m.dataUrl}">`}
+              ${m.type === 'video' ? `<video src="${src}"></video><div class="video-badge">▶</div>` : `<img src="${src}">`}
             </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
       ` : '';
 
@@ -1246,7 +1298,7 @@ const closeSkillModal = () => {
 document.getElementById('btn-close-skill-modal').addEventListener('click', closeSkillModal);
 document.getElementById('btn-cancel-skill-modal').addEventListener('click', closeSkillModal);
 
-skillForm.addEventListener('submit', (e) => {
+skillForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const id = document.getElementById('form-skill-id').value;
@@ -1257,6 +1309,23 @@ skillForm.addEventListener('submit', (e) => {
   const category = categoryInput.value.trim() || '기타';
   const name = nameInput.value.trim();
   const desc = descInput.value.trim();
+  
+  const submitBtn = skillForm.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.innerText;
+  submitBtn.innerText = '업로드 중...';
+  submitBtn.disabled = true;
+  document.body.style.cursor = 'wait';
+  
+  let finalMedia = [];
+  try {
+    finalMedia = await uploadMediaFiles(tempSkillMedia, 'skills');
+  } catch (err) {
+    console.error(err);
+  } finally {
+    submitBtn.innerText = originalBtnText;
+    submitBtn.disabled = false;
+    document.body.style.cursor = 'default';
+  }
 
   if (id) {
     const index = appData.skills.findIndex(s => s.id === id);
@@ -1264,7 +1333,7 @@ skillForm.addEventListener('submit', (e) => {
       appData.skills[index] = {
         ...appData.skills[index],
         category, name, desc,
-        media: JSON.parse(JSON.stringify(tempSkillMedia))
+        media: finalMedia
       };
     }
   } else {
@@ -1274,7 +1343,7 @@ skillForm.addEventListener('submit', (e) => {
       name,
       desc,
       checked: false,
-      media: JSON.parse(JSON.stringify(tempSkillMedia))
+      media: finalMedia
     };
     appData.skills.push(newSkill);
   }
@@ -1377,17 +1446,21 @@ function renderRosterList() {
 
   container.innerHTML = appData.roster.map((player, pIdx) => {
     const firstImg = player.media && player.media.find(m => m.type === 'image');
+    const avatarSrc = firstImg ? (firstImg.previewUrl || firstImg.url || firstImg.dataUrl) : '';
     const avatarHtml = firstImg
-      ? `<div class="roster-avatar-container" onclick="openMediaViewModal(appData.roster[${pIdx}].media[0])" style="cursor:pointer;"><img src="${firstImg.dataUrl}" class="roster-avatar-img"></div>`
+      ? `<div class="roster-avatar-container" onclick="openMediaViewModal(appData.roster[${pIdx}].media[0])" style="cursor:pointer;"><img src="${avatarSrc}" class="roster-avatar-img"></div>`
       : `<div class="roster-avatar">🏀</div>`;
 
     const mediaGalleryHtml = (player.media && player.media.length > 0) ? `
       <div class="card-media-gallery" style="margin-top: 0.5rem; justify-content: center;">
-        ${player.media.map((m, mIdx) => `
+        ${player.media.map((m, mIdx) => {
+          const src = m.previewUrl || m.url || m.dataUrl;
+          return `
           <div class="card-media-item" style="width:40px; height:40px;" onclick="openMediaViewModal(appData.roster[${pIdx}].media[${mIdx}])">
-            ${m.type === 'video' ? `<video src="${m.dataUrl}"></video><div class="video-badge" style="width:16px; height:16px; font-size:8px;">▶</div>` : `<img src="${m.dataUrl}">`}
+            ${m.type === 'video' ? `<video src="${src}"></video><div class="video-badge" style="width:16px; height:16px; font-size:8px;">▶</div>` : `<img src="${src}">`}
           </div>
-        `).join('')}
+          `;
+        }).join('')}
       </div>
     ` : '';
 
@@ -1424,17 +1497,34 @@ const closeRosterModal = () => {
 document.getElementById('btn-close-roster-modal').addEventListener('click', closeRosterModal);
 document.getElementById('btn-cancel-roster-modal').addEventListener('click', closeRosterModal);
 
-rosterForm.addEventListener('submit', (e) => {
+rosterForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const name = document.getElementById('form-roster-name').value;
   const number = document.getElementById('form-roster-number').value;
   const position = document.getElementById('form-roster-position').value;
+  
+  const submitBtn = rosterForm.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.innerText;
+  submitBtn.innerText = '업로드 중...';
+  submitBtn.disabled = true;
+  document.body.style.cursor = 'wait';
+  
+  let finalMedia = [];
+  try {
+    finalMedia = await uploadMediaFiles(tempRosterMedia, 'roster');
+  } catch (err) {
+    console.error(err);
+  } finally {
+    submitBtn.innerText = originalBtnText;
+    submitBtn.disabled = false;
+    document.body.style.cursor = 'default';
+  }
 
   const newPlayer = {
     id: 'r_' + Date.now(),
     name, number, position, height: '', strengths: '',
-    media: JSON.parse(JSON.stringify(tempRosterMedia))
+    media: finalMedia
   };
   appData.roster.push(newPlayer);
 
@@ -1474,7 +1564,7 @@ function initMediaInputs() {
     tacticInput.addEventListener('change', async (e) => {
       const files = Array.from(e.target.files);
       for (const f of files) {
-        const item = await readFileAsDataURL(f);
+        const item = await processMediaFile(f);
         if (item) tempTacticMedia.push(item);
       }
       renderMediaPreviewGrid('tactic-media-preview', tempTacticMedia, 'removeTempTacticMedia');
@@ -1487,7 +1577,7 @@ function initMediaInputs() {
     skillInput.addEventListener('change', async (e) => {
       const files = Array.from(e.target.files);
       for (const f of files) {
-        const item = await readFileAsDataURL(f);
+        const item = await processMediaFile(f);
         if (item) tempSkillMedia.push(item);
       }
       renderMediaPreviewGrid('skill-media-preview', tempSkillMedia, 'removeTempSkillMedia');
@@ -1500,7 +1590,7 @@ function initMediaInputs() {
     rosterInput.addEventListener('change', async (e) => {
       const files = Array.from(e.target.files);
       for (const f of files) {
-        const item = await readFileAsDataURL(f);
+        const item = await processMediaFile(f);
         if (item) tempRosterMedia.push(item);
       }
       renderMediaPreviewGrid('roster-media-preview', tempRosterMedia, 'removeTempRosterMedia');
