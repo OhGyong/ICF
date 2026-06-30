@@ -1707,8 +1707,13 @@ function initMediaInputs() {
     tacticInput.addEventListener('change', async (e) => {
       const files = Array.from(e.target.files);
       for (const f of files) {
-        const item = await processMediaFile(f);
-        if (item) tempTacticMedia.push(item);
+        try {
+          const item = await processMediaFile(f);
+          if (item) tempTacticMedia.push(item);
+        } catch (err) {
+          console.error(err);
+          alert(`'${f.name}' 파일을 읽는 중 오류가 발생했습니다.`);
+        }
       }
       renderMediaPreviewGrid('tactic-media-preview', tempTacticMedia, 'removeTempTacticMedia');
       tacticInput.value = '';
@@ -1720,8 +1725,13 @@ function initMediaInputs() {
     skillInput.addEventListener('change', async (e) => {
       const files = Array.from(e.target.files);
       for (const f of files) {
-        const item = await processMediaFile(f);
-        if (item) tempSkillMedia.push(item);
+        try {
+          const item = await processMediaFile(f);
+          if (item) tempSkillMedia.push(item);
+        } catch (err) {
+          console.error(err);
+          alert(`'${f.name}' 파일을 읽는 중 오류가 발생했습니다.`);
+        }
       }
       renderMediaPreviewGrid('skill-media-preview', tempSkillMedia, 'removeTempSkillMedia');
       skillInput.value = '';
@@ -1733,8 +1743,13 @@ function initMediaInputs() {
     rosterInput.addEventListener('change', async (e) => {
       const files = Array.from(e.target.files);
       for (const f of files) {
-        const item = await processMediaFile(f);
-        if (item) tempRosterMedia.push(item);
+        try {
+          const item = await processMediaFile(f);
+          if (item) tempRosterMedia.push(item);
+        } catch (err) {
+          console.error(err);
+          alert(`'${f.name}' 파일을 읽는 중 오류가 발생했습니다.`);
+        }
       }
       renderMediaPreviewGrid('roster-media-preview', tempRosterMedia, 'removeTempRosterMedia');
       rosterInput.value = '';
