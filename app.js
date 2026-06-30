@@ -273,7 +273,7 @@ async function uploadMediaFiles(tempMediaArray, folderName) {
       try {
         const fileExt = item.name.split('.').pop() || 'tmp';
         const fileName = `${Date.now()}_${Math.floor(Math.random()*1000)}.${fileExt}`;
-        const storageRef = ref(storage, `app/image/${fileName}`);
+        const storageRef = ref(storage, `image/${fileName}`);
         
         await uploadBytes(storageRef, item.file);
         const url = await getDownloadURL(storageRef);
@@ -979,13 +979,16 @@ function renderBoardTacticMedia(tactic) {
   if (title) title.innerText = `📺 '${tactic.title}' 참고`;
   const globalTacticIdx = appData.tactics.findIndex(t => t.id === tactic.id);
 
-  grid.innerHTML = tactic.media.map((m, idx) => `
+  grid.innerHTML = tactic.media.map((m, idx) => {
+    const src = m.previewUrl || m.url || m.dataUrl;
+    return `
     <div class="tactic-large-media-card" onclick="openMediaViewModal(appData.tactics[${globalTacticIdx}].media[${idx}])">
       ${m.type === 'video'
-      ? `<video src="${m.dataUrl}"></video><div class="large-video-badge">▶</div>`
-      : `<img src="${m.dataUrl}">`}
+      ? `<video src="${src}"></video><div class="large-video-badge">▶</div>`
+      : `<img src="${src}">`}
     </div>
-  `).join('');
+    `;
+  }).join('');
 
   container.style.display = 'block';
 }
