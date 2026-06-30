@@ -1006,11 +1006,13 @@ textarea {
 }
 
 .token-offense {
-  background-color: var(--color-primary);
+  background-color: #c52127;
+  color: #fff;
 }
 
 .token-defense {
-  background-color: var(--color-secondary);
+  background-color: #1d2c6c;
+  color: #fff;
 }
 
 .token-ball {
@@ -1094,10 +1096,23 @@ textarea {
   overflow: hidden;
 }
 
+.court-board-wrapper.half-court {
+  aspect-ratio: 4 / 5;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
 .court-board-wrapper.portrait-mode {
   aspect-ratio: 5 / 8;
   max-height: 700px;
   max-width: 437.5px;
+  margin: 0 auto;
+}
+
+.court-board-wrapper.portrait-mode.half-court {
+  aspect-ratio: 5 / 4;
+  max-height: 500px;
+  max-width: 625px;
   margin: 0 auto;
 }
 
@@ -1108,12 +1123,10 @@ textarea {
   width: 100%;
   height: 100%;
   transform: translate(-50%, -50%);
-  background-color: #17202d;
-  background-image:
-    radial-gradient(#1e2b3c 1px, transparent 1px),
-    radial-gradient(#1e2b3c 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-position: 0 0, 20px 20px;
+  background-color: #d6a87c;
+  background-image: 
+    repeating-linear-gradient(90deg, transparent 0px, transparent 20px, rgba(0,0,0,0.04) 20px, rgba(0,0,0,0.04) 40px);
+  border-radius: 4px;
   transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
 }
 
@@ -1133,17 +1146,21 @@ textarea {
 .court-svg circle,
 .court-svg line,
 .court-svg rect {
-  stroke: rgba(255, 255, 255, 0.3);
+  stroke: #000000 !important;
   stroke-width: 2.5;
 }
 
 .court-svg .court-three-point {
-  stroke: rgba(255, 255, 255, 0.45);
+  stroke: #000000 !important;
   stroke-width: 3;
 }
 
 .court-svg .court-border-line {
-  stroke: rgba(255, 255, 255, 0.4);
+  stroke: #000000 !important;
+}
+
+.court-svg .court-key {
+  fill: #e87b46 !important;
 }
 
 .court-svg .full-court-line {
@@ -1210,14 +1227,15 @@ textarea {
 }
 
 .board-token.token-offense {
-  background-color: var(--color-primary);
-  border: 2px solid #fff;
+  background-color: #c52127;
+  border: 2px solid #000;
+  color: #fff;
 }
 
 .board-token.token-defense {
-  background-color: var(--color-secondary);
-  border: 2px solid #fff;
-  color: #0b0e14;
+  background-color: #1d2c6c;
+  border: 2px solid #000;
+  color: #fff;
 }
 
 .board-token.token-ball {

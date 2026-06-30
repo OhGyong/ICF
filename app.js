@@ -797,12 +797,17 @@ function initTacticsBoard() {
 
   // Set ViewBox based on View settings (half vs full)
   const courtSvg = document.getElementById('court-svg');
+  const courtWrapper = document.getElementById('court-wrapper');
   if (currentCourtView === 'half') {
     courtSvg.setAttribute('viewBox', '0 0 400 500');
     courtContainer.classList.remove('full-court');
+    courtWrapper.classList.remove('full-court');
+    courtWrapper.classList.add('half-court');
   } else {
     courtSvg.setAttribute('viewBox', '0 0 800 500');
     courtContainer.classList.add('full-court');
+    courtWrapper.classList.remove('half-court');
+    courtWrapper.classList.add('full-court');
   }
 
   // Populate tokens if state is empty
