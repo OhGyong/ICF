@@ -1086,6 +1086,7 @@ textarea {
   border-radius: 20px;
   overflow: hidden;
   box-shadow: var(--shadow-md);
+  touch-action: none;
 }
 
 .court-board-wrapper {

@@ -102,6 +102,19 @@ const defaultTokenPositions = {
 
 let currentCourtView = 'half'; // 'half' or 'full'
 
+// ================= SECURITY HELPER =================
+// 사용자 입력을 innerHTML 로 렌더링하기 전에 HTML 특수문자를 무력화한다.
+// 공유 DB 특성상 한 명이 심은 <img onerror=...> 등이 모든 사용자에게
+// 실행되는 저장형 XSS를 막기 위함. 텍스트/속성(src 등) 컨텍스트 모두에 안전.
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // ================= FIREBASE SHARED DATA LAYER =================
 
 const DATA_KEYS = ['roster', 'schedule', 'skills', 'rules', 'tactics', 'lineups'];
@@ -298,7 +311,7 @@ function renderMediaPreviewGrid(containerId, mediaArray, onRemove) {
     return;
   }
   container.innerHTML = mediaArray.map((item, index) => {
-    const src = item.previewUrl || item.url || item.dataUrl;
+    const src = escapeHtml(item.previewUrl || item.url || item.dataUrl);
     return `
     <div class="preview-item">
       ${item.type === 'video'
@@ -316,7 +329,7 @@ function openMediaViewModal(mediaObj) {
   const title = document.getElementById('media-view-title');
   if (!modal || !body) return;
 
-  const src = mediaObj.previewUrl || mediaObj.url || mediaObj.dataUrl;
+  const src = escapeHtml(mediaObj.previewUrl || mediaObj.url || mediaObj.dataUrl);
   title.innerText = mediaObj.type === 'video' ? '동영상 보기' : '사진 보기';
   body.innerHTML = mediaObj.type === 'video'
     ? `<video src="${src}" controls autoplay style="max-width:100%; max-height:65vh;"></video>`
@@ -453,9 +466,9 @@ function renderDashboard() {
               <div class="game-day" style="font-size: 1.15rem;">${gDate.getDate()}(${days[gDate.getDay()]})</div>
             </div>
             <div class="game-details-info">
-              <span class="font-bold text-sm">${game.opponent}</span>
+              <span class="font-bold text-sm">${escapeHtml(game.opponent)}</span>
               <span class="game-venue-time" style="font-size: 0.75rem;">
-                🏀 ${game.location} | ⏰ ${game.time}
+                🏀 ${escapeHtml(game.location)} | ⏰ ${escapeHtml(game.time)}
               </span>
             </div>
           </div>
@@ -479,8 +492,8 @@ function renderDashboard() {
     panelTacticsContainer.innerHTML = recentTactics.map(tactic => `
       <div class="tactic-item-card" onclick="switchTab('tactics'); loadTacticToForm('${tactic.id}');" style="margin-bottom: 0.5rem; padding: 0.6rem 0.85rem;">
         <div class="tactic-item-info">
-          <h4 style="font-size: 0.85rem;">${tactic.title}</h4>
-          <p style="font-size: 0.75rem; max-width: 250px;">${tactic.desc}</p>
+          <h4 style="font-size: 0.85rem;">${escapeHtml(tactic.title)}</h4>
+          <p style="font-size: 0.75rem; max-width: 250px;">${escapeHtml(tactic.desc)}</p>
         </div>
         <span class="btn-text" style="font-size: 0.75rem;">전술보드 &rarr;</span>
       </div>
@@ -522,13 +535,13 @@ function updateHeroCountdown() {
 
     if (diffDays === 0) {
       countdownTimer.innerText = "D-Day";
-      heroTitle.innerHTML = `오늘 바로 <span class="text-highlight">${nextGame.opponent} 전</span>이 있습니다!`;
+      heroTitle.innerHTML = `오늘 바로 <span class="text-highlight">${escapeHtml(nextGame.opponent)} 전</span>이 있습니다!`;
       heroSubtitle.innerText = `장소: ${nextGame.location} | 시간: ${nextGame.time} | 참가자: ${nextGame.participants || '미정'}`;
       if (sidebarDDay) sidebarDDay.innerText = 'Day';
     } else {
       const days = ['일', '월', '화', '수', '목', '금', '토'];
       countdownTimer.innerText = `D-${diffDays}`;
-      heroTitle.innerHTML = `다음 경기 <span class="text-highlight">${nextGame.opponent}</span>까지 <span class="text-highlight">${countdownTimer.innerText}</span> 남았습니다!`;
+      heroTitle.innerHTML = `다음 경기 <span class="text-highlight">${escapeHtml(nextGame.opponent)}</span>까지 <span class="text-highlight">${escapeHtml(countdownTimer.innerText)}</span> 남았습니다!`;
       heroSubtitle.innerText = `장소: ${nextGame.location} | 일시: ${nextGame.date}(${days[gameDate.getDay()]}) ${nextGame.time} | 참가자: ${nextGame.participants || '미정'}`;
       if (sidebarDDay) sidebarDDay.innerText = `-${diffDays}`;
     }
@@ -572,7 +585,6 @@ function renderScheduleList() {
     const dayStr = `${gDate.getDate()}(${days[gDate.getDay()]})`;
 
     let statusBadgeHtml = '';
-    let scoreDisplayHtml = '';
 
     if (game.finished) {
       const isWin = game.ourScore > game.oppScore;
@@ -589,16 +601,14 @@ function renderScheduleList() {
       }
 
       statusBadgeHtml = `<span class="badge ${badgeClass}">${badgeText}</span>`;
-      scoreDisplayHtml = ``;
     } else {
       statusBadgeHtml = `<span class="badge badge-accent">예정</span>`;
-      scoreDisplayHtml = ``;
     }
 
     const participantsList = game.participants ? game.participants.split(',').map(p => p.trim()).filter(p => p).sort((a, b) => a.localeCompare(b, 'ko')) : [];
     const participantsCount = participantsList.length;
     const participantsHtml = participantsCount > 0 && game.participants !== '참가자 미정'
-      ? `<div style="display: flex; align-items: flex-start; gap: 0.35rem; margin-top: 0.5rem; color: var(--color-primary);"><svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.15rem; flex-shrink: 0;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg><div style="flex: 1; font-size: 0.85rem; line-height: 1.4;"><strong class="font-bold">${participantsCount}명</strong> 참가<div style="color: var(--color-text-secondary); font-size: 0.8rem; margin-top: 0.1rem;">${participantsList.join(', ')}</div></div></div>`
+      ? `<div style="display: flex; align-items: flex-start; gap: 0.35rem; margin-top: 0.5rem; color: var(--color-primary);"><svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-top: 0.15rem; flex-shrink: 0;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg><div style="flex: 1; font-size: 0.85rem; line-height: 1.4;"><strong class="font-bold">${participantsCount}명</strong> 참가<div style="color: var(--color-text-secondary); font-size: 0.8rem; margin-top: 0.1rem;">${escapeHtml(participantsList.join(', '))}</div></div></div>`
       : `<div style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.5rem; color: var(--color-text-muted); font-size: 0.85rem;"><svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>참가자 미정</div>`;
 
     let locationName = game.location;
@@ -613,8 +623,8 @@ function renderScheduleList() {
     }
 
     const locationHtml = locationAddress
-      ? `<div style="display: flex; flex-direction: column; line-height: 1.3;"><span>${locationName}</span><span style="font-size: 0.75rem; color: var(--color-text-secondary); margin-top: 0.1rem;">${locationAddress}</span></div>`
-      : `<span>${locationName}</span>`;
+      ? `<div style="display: flex; flex-direction: column; line-height: 1.3;"><span>${escapeHtml(locationName)}</span><span style="font-size: 0.75rem; color: var(--color-text-secondary); margin-top: 0.1rem;">${escapeHtml(locationAddress)}</span></div>`
+      : `<span>${escapeHtml(locationName)}</span>`;
 
     return `
       <div class="game-card">
@@ -624,7 +634,7 @@ function renderScheduleList() {
             <div class="game-day">${dayStr}</div>
           </div>
           <div class="game-details-info">
-            <h3 class="game-opponent">${game.opponent}</h3>
+            <h3 class="game-opponent">${escapeHtml(game.opponent)}</h3>
             <a href="https://map.naver.com/v5/search/${encodeURIComponent(mapQuery)}" target="_blank" class="game-venue-time" style="text-decoration: none; align-items: flex-start;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" title="네이버 지도로 보기">
               <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="${locationAddress ? 'margin-top: 0.1rem;' : ''}">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -637,14 +647,13 @@ function renderScheduleList() {
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
-              ${game.time}
+              ${escapeHtml(game.time)}
             </span>
             ${participantsHtml}
           </div>
         </div>
         
         <div class="game-score-display">
-          ${scoreDisplayHtml}
           <div style="display: flex; flex-direction: row; align-items: center; gap: 0.75rem; margin-left: auto;">
             ${statusBadgeHtml}
             <div class="game-actions">
@@ -796,7 +805,6 @@ let activeDrawRoute = null;
 
 function initTacticsBoard() {
   const courtContainer = document.getElementById('court-board-container');
-  const tokensOverlay = document.getElementById('tokens-overlay');
 
   // Set ViewBox based on View settings (half vs full)
   const courtSvg = document.getElementById('court-svg');
@@ -935,10 +943,13 @@ function setupDragAndDrop() {
   };
 
   const startDrag = (e) => {
+    // Prevent default scrolling, text selection, or long-press behaviors
+    // universally whenever the user presses anywhere on the tactics board.
+    e.preventDefault();
+    
     const target = e.target;
-
+    
     if (isDrawMode) {
-      e.preventDefault();
       const rect = container.getBoundingClientRect();
       const pos = getRelativePos(e, rect);
       activeDrawRoute = { points: [pos] };
@@ -948,7 +959,6 @@ function setupDragAndDrop() {
 
     if (target.classList.contains('board-token')) {
       activeDragToken = target;
-      e.preventDefault(); // Prevents touch scrolling
     }
   };
 
@@ -1110,7 +1120,7 @@ function renderBoardTacticMedia(tactic) {
   const globalTacticIdx = appData.tactics.findIndex(t => t.id === tactic.id);
 
   grid.innerHTML = tactic.media.map((m, idx) => {
-    const src = m.previewUrl || m.url || m.dataUrl;
+    const src = escapeHtml(m.previewUrl || m.url || m.dataUrl);
     return `
     <div class="tactic-large-media-card" onclick="openMediaViewModal(appData.tactics[${globalTacticIdx}].media[${idx}])">
       ${m.type === 'video'
@@ -1159,7 +1169,7 @@ function renderTacticsList() {
     const mediaGalleryHtml = (t.media && t.media.length > 0) ? `
       <div class="card-media-gallery" onclick="event.stopPropagation();">
         ${t.media.map((m, mIdx) => {
-      const src = m.previewUrl || m.url || m.dataUrl;
+      const src = escapeHtml(m.previewUrl || m.url || m.dataUrl);
       return `
           <div class="card-media-item" onclick="openMediaViewModal(appData.tactics[${tIndex}].media[${mIdx}])">
             ${m.type === 'video' ? `<video src="${src}"></video><div class="video-badge">▶</div>` : `<img src="${src}">`}
@@ -1172,8 +1182,8 @@ function renderTacticsList() {
     return `
       <div class="tactic-item-card ${isActive ? 'active' : ''}" onclick="loadTacticToForm('${t.id}')">
         <div class="tactic-item-info" style="flex:1;">
-          <h4>${t.title} ${isActive ? '<span style="font-size:0.7rem; color:var(--color-primary); font-weight:normal;">(선택됨)</span>' : ''}</h4>
-          <p style="max-width: 100%; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${t.desc}</p>
+          <h4>${escapeHtml(t.title)} ${isActive ? '<span style="font-size:0.7rem; color:var(--color-primary); font-weight:normal;">(선택됨)</span>' : ''}</h4>
+          <p style="max-width: 100%; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escapeHtml(t.desc)}</p>
           ${mediaGalleryHtml}
         </div>
         <button class="game-btn-icon delete-btn" onclick="deleteTactic(event, '${t.id}')" title="삭제" style="width: 28px; height: 28px; flex-shrink: 0; align-self: flex-start; margin-left: 0.5rem;">
@@ -1331,7 +1341,7 @@ function renderSkillsList() {
       const mediaGalleryHtml = (skill.media && skill.media.length > 0) ? `
         <div class="card-media-gallery" style="margin-top: 0.5rem;">
           ${skill.media.map((m, mIdx) => {
-        const src = m.previewUrl || m.url || m.dataUrl;
+        const src = escapeHtml(m.previewUrl || m.url || m.dataUrl);
         return `
             <div class="card-media-item" onclick="openMediaViewModal(appData.skills[${globalSkillIdx}].media[${mIdx}])">
               ${m.type === 'video' ? `<video src="${src}"></video><div class="video-badge">▶</div>` : `<img src="${src}">`}
@@ -1345,8 +1355,8 @@ function renderSkillsList() {
         <div class="skill-item" style="flex-direction: column; align-items: stretch; gap: 0.5rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div class="skill-details">
-              <span class="skill-name">${skill.name}</span>
-              <span class="skill-desc">${skill.desc || ''}</span>
+              <span class="skill-name">${escapeHtml(skill.name)}</span>
+              <span class="skill-desc">${escapeHtml(skill.desc || '')}</span>
             </div>
             <div class="skill-item-actions">
               <button class="game-btn-icon skill-edit-btn" onclick="editSkill('${skill.id}')" title="항목 수정">
@@ -1371,7 +1381,7 @@ function renderSkillsList() {
     return `
       <div class="skill-category-card">
         <div class="skill-category-header">
-          <span class="skill-category-title">🏀 ${catName}</span>
+          <span class="skill-category-title">🏀 ${escapeHtml(catName)}</span>
         </div>
         <div class="skill-items-container">
           ${skillsHtml}
@@ -1379,14 +1389,6 @@ function renderSkillsList() {
       </div>
     `;
   }).join('');
-}
-
-function toggleSkillCheckbox(id) {
-  const skill = appData.skills.find(s => s.id === id);
-  if (skill) {
-    skill.checked = !skill.checked;
-    saveKey('skills');
-  }
 }
 
 function deleteSkill(id) {
@@ -1507,8 +1509,8 @@ function renderLocalRules() {
   container.innerHTML = appData.rules.map(rule => `
     <div class="local-rule-item">
       <div class="local-rule-info">
-        <h4>📌 ${rule.title}</h4>
-        <p>${rule.desc}</p>
+        <h4>📌 ${escapeHtml(rule.title)}</h4>
+        <p>${escapeHtml(rule.desc)}</p>
       </div>
       <button class="game-btn-icon delete-btn" onclick="deleteLocalRule('${rule.id}')" title="삭제" style="width: 32px; height: 32px;">
         &times;
@@ -1564,8 +1566,8 @@ function renderRosterList() {
     } else {
       lineupsContainer.innerHTML = appData.lineups.map(lineup => `
         <div class="card" style="padding: 1rem; border: 1px solid var(--border-color); box-shadow: none; background: rgba(255, 255, 255, 0.03);">
-          <h4 style="margin-bottom: 0.5rem; color: var(--color-primary);">${lineup.quarter}</h4>
-          <p style="font-size: 0.85rem; line-height: 1.4; color: var(--color-text-secondary);">${lineup.players}</p>
+          <h4 style="margin-bottom: 0.5rem; color: var(--color-primary);">${escapeHtml(lineup.quarter)}</h4>
+          <p style="font-size: 0.85rem; line-height: 1.4; color: var(--color-text-secondary);">${escapeHtml(lineup.players)}</p>
         </div>
       `).join('');
     }
@@ -1584,13 +1586,13 @@ function renderRosterList() {
     const firstImg = player.media && player.media.find(m => m.type === 'image');
     const avatarSrc = firstImg ? (firstImg.previewUrl || firstImg.url || firstImg.dataUrl) : '';
     const avatarHtml = firstImg
-      ? `<div class="roster-avatar-container" onclick="openMediaViewModal(appData.roster[${pIdx}].media[0])" style="cursor:pointer;"><img src="${avatarSrc}" class="roster-avatar-img"></div>`
+      ? `<div class="roster-avatar-container" onclick="openMediaViewModal(appData.roster[${pIdx}].media[0])" style="cursor:pointer;"><img src="${escapeHtml(avatarSrc)}" class="roster-avatar-img"></div>`
       : `<div class="roster-avatar">🏀</div>`;
 
     const mediaGalleryHtml = (player.media && player.media.length > 0) ? `
       <div class="card-media-gallery" style="margin-top: 0.5rem; justify-content: center;">
         ${player.media.map((m, mIdx) => {
-      const src = m.previewUrl || m.url || m.dataUrl;
+      const src = escapeHtml(m.previewUrl || m.url || m.dataUrl);
       return `
           <div class="card-media-item" style="width:40px; height:40px;" onclick="openMediaViewModal(appData.roster[${pIdx}].media[${mIdx}])">
             ${m.type === 'video' ? `<video src="${src}"></video><div class="video-badge" style="width:16px; height:16px; font-size:8px;">▶</div>` : `<img src="${src}">`}
@@ -1602,10 +1604,10 @@ function renderRosterList() {
 
     return `
       <div class="roster-card" style="display:flex; flex-direction:column; align-items:center;">
-        <div class="roster-jersey-num">#${player.number}</div>
+        <div class="roster-jersey-num">#${escapeHtml(player.number)}</div>
         ${avatarHtml}
-        <h3 class="roster-name" style="margin-top:0.35rem;">${player.name}</h3>
-        <span class="roster-pos-badge">${player.position}</span>
+        <h3 class="roster-name" style="margin-top:0.35rem;">${escapeHtml(player.name)}</h3>
+        <span class="roster-pos-badge">${escapeHtml(player.position)}</span>
         ${mediaGalleryHtml}
       </div>
     `;
