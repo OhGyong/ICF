@@ -1,28 +1,36 @@
 /* ================= GLOBAL & VARIABLE CONFIGURATION ================= */
+/* Theme: Premium Light — clean fintech (Toss / Apple) mood */
 :root {
-  --color-bg: #0B0E14;
-  --color-surface: #141A24;
-  --color-surface-hover: #1E2635;
-  --color-border: #242E3F;
+  /* Base surfaces — soft off-white */
+  --color-bg: #F5F6F8;
+  --color-bg-soft: #FFFFFF;
+  --color-surface: #FFFFFF;
+  --color-surface-solid: #FFFFFF;
+  --color-surface-hover: #F2F4F7;
+  --color-border: #ECEEF2;
+  --color-border-strong: #DFE3EA;
   --color-border-focus: #FF6B00;
 
   /* Primary Accent: Basketball Vibrant Orange */
   --color-primary: #FF6B00;
-  --color-primary-hover: #FF8824;
-  --color-primary-light: rgba(255, 107, 0, 0.15);
+  --color-primary-hover: #F25C00;
+  --color-primary-light: rgba(255, 107, 0, 0.10);
+  --gradient-primary: linear-gradient(135deg, #FF8A3D 0%, #FF6B00 100%);
+  --glow-primary: 0 6px 18px rgba(255, 107, 0, 0.28);
 
   /* Secondary Accent: Cyan / Defense Blue */
-  --color-secondary: #00E5FF;
-  --color-secondary-light: rgba(0, 229, 255, 0.15);
+  --color-secondary: #0EA5C4;
+  --color-secondary-light: rgba(14, 165, 196, 0.10);
+  --gradient-secondary: linear-gradient(135deg, #22C3DE 0%, #0EA5C4 100%);
 
   /* Utility Colors */
-  --color-success: #00E676;
-  --color-success-light: rgba(0, 230, 118, 0.1);
-  --color-danger: #FF1744;
-  --color-danger-light: rgba(255, 23, 68, 0.1);
-  --color-text-primary: #F3F4F6;
-  --color-text-secondary: #9CA3AF;
-  --color-text-muted: #6B7280;
+  --color-success: #12B886;
+  --color-success-light: rgba(18, 184, 134, 0.10);
+  --color-danger: #F03E5E;
+  --color-danger-light: rgba(240, 62, 94, 0.10);
+  --color-text-primary: #16191F;
+  --color-text-secondary: #5C636E;
+  --color-text-muted: #9AA1AD;
 
   /* Font Stacks */
   --font-title: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -31,17 +39,18 @@
   /* Animations */
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* Layout */
-  --sidebar-width: 260px;
+  --sidebar-width: 264px;
   --header-height: 80px;
 
-  /* Effects */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
-  --glass-bg: rgba(20, 26, 36, 0.7);
-  --glass-blur: blur(16px);
+  /* Effects — soft, layered light shadows */
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 8px rgba(16, 24, 40, 0.05);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.06), 0 12px 28px rgba(16, 24, 40, 0.08);
+  --shadow-lg: 0 24px 60px rgba(16, 24, 40, 0.16);
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-blur: blur(18px) saturate(140%);
 }
 
 /* Base Resets */
@@ -51,8 +60,16 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--color-bg);
+  background-image:
+    radial-gradient(900px circle at 100% -10%, rgba(255, 107, 0, 0.06), transparent 45%),
+    radial-gradient(800px circle at -10% 110%, rgba(14, 165, 196, 0.05), transparent 45%);
+  background-attachment: fixed;
   color: var(--color-text-primary);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
@@ -114,21 +131,24 @@ textarea {
 
 /* Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-bg);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 4px;
+  background: rgba(16, 24, 40, 0.14);
+  border-radius: 100px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  background: rgba(16, 24, 40, 0.26);
+  background-clip: padding-box;
 }
 
 /* ================= CONTAINER LAYOUT ================= */
@@ -140,7 +160,7 @@ textarea {
 /* Sidebar Styling */
 .sidebar {
   width: var(--sidebar-width);
-  background-color: var(--color-surface);
+  background-color: var(--color-bg-soft);
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
@@ -179,6 +199,7 @@ textarea {
   letter-spacing: -0.5px;
   background: linear-gradient(90deg, var(--color-text-primary), var(--color-primary));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -186,16 +207,17 @@ textarea {
   padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
   flex: 1;
 }
 
 .nav-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 0.85rem 1rem;
-  border-radius: 12px;
+  border-radius: 14px;
   color: var(--color-text-secondary);
   font-weight: 500;
   transition: var(--transition-fast);
@@ -218,6 +240,18 @@ textarea {
   font-weight: 600;
 }
 
+.nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  border-radius: 100px;
+  background: var(--gradient-primary);
+}
+
 .nav-item.active .nav-icon {
   stroke: var(--color-primary);
   transform: scale(1.1);
@@ -226,7 +260,7 @@ textarea {
 .sidebar-footer {
   padding: 1rem;
   border-top: 1px solid var(--color-border);
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--color-bg);
 }
 
 .team-profile {
@@ -239,7 +273,7 @@ textarea {
   font-size: 1.75rem;
   width: 44px;
   height: 44px;
-  background-color: var(--color-border);
+  background-color: var(--color-surface-hover);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -264,7 +298,6 @@ textarea {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(circle at 10% 20%, rgba(20, 26, 36, 0.4) 0%, rgba(11, 14, 20, 0.6) 90%);
 }
 
 .main-header {
@@ -280,8 +313,8 @@ textarea {
 .header-title h1 {
   font-family: var(--font-title);
   font-size: 2.25rem;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
 }
 
 .header-title p {
@@ -305,6 +338,7 @@ textarea {
   border-radius: 100px;
   font-size: 0.9rem;
   font-weight: 500;
+  box-shadow: var(--shadow-sm);
 }
 
 .icon-small {
@@ -320,7 +354,7 @@ textarea {
 
 .tab-content {
   display: none;
-  animation: fadeIn var(--transition-fast) forwards;
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .tab-content.active {
@@ -330,7 +364,7 @@ textarea {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(14px);
   }
 
   to {
@@ -352,39 +386,45 @@ textarea {
   cursor: pointer;
   transition: all var(--transition-fast);
   border: none;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
+  background: var(--gradient-primary);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+  box-shadow: var(--glow-primary);
 }
 
 .btn-primary:hover {
-  background-color: var(--color-primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(255, 107, 0, 0.4);
+  box-shadow: 0 10px 24px rgba(255, 107, 0, 0.34);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-secondary {
-  background-color: var(--color-surface-hover);
+  background-color: var(--color-surface);
   color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-border);
-  color: #fff;
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-text-muted);
 }
 
 .btn-outline {
-  background-color: transparent;
-  border: 1.5px solid var(--color-primary);
+  background-color: #fff;
+  border: 1.5px solid rgba(255, 107, 0, 0.5);
   color: var(--color-primary);
 }
 
 .btn-outline:hover {
   background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
   color: var(--color-primary);
 }
 
@@ -394,7 +434,8 @@ textarea {
 }
 
 .btn-danger:hover {
-  background-color: #ff3d00;
+  background-color: #e02a4a;
+  box-shadow: 0 8px 20px rgba(240, 62, 94, 0.3);
 }
 
 .btn-text {
@@ -429,11 +470,16 @@ textarea {
 .form-group select,
 .form-group textarea {
   background-color: var(--color-bg);
-  border: 1.5px solid var(--color-border);
+  border: 1.5px solid var(--color-border-strong);
   border-radius: 10px;
   padding: 0.75rem 1rem;
   color: var(--color-text-primary);
   transition: all var(--transition-fast);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--color-text-muted);
 }
 
 .form-group input:focus,
@@ -441,7 +487,8 @@ textarea {
 .form-group textarea:focus {
   outline: none;
   border-color: var(--color-border-focus);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+  box-shadow: 0 0 0 4px var(--color-primary-light);
+  background-color: #fff;
 }
 
 .form-row {
@@ -479,18 +526,18 @@ textarea {
   left: 0;
   height: 1.25rem;
   width: 1.25rem;
-  background-color: var(--color-bg);
-  border: 1.5px solid var(--color-border);
+  background-color: #fff;
+  border: 1.5px solid var(--color-border-strong);
   border-radius: 6px;
   transition: all var(--transition-fast);
 }
 
 .checkbox-container:hover input~.checkmark {
-  border-color: var(--color-text-muted);
+  border-color: var(--color-primary);
 }
 
 .checkbox-container input:checked~.checkmark {
-  background-color: var(--color-primary);
+  background: var(--gradient-primary);
   border-color: var(--color-primary);
 }
 
@@ -518,7 +565,7 @@ textarea {
 .card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 20px;
+  border-radius: 22px;
   padding: 1.5rem;
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
@@ -526,7 +573,7 @@ textarea {
 
 .card:hover {
   box-shadow: var(--shadow-md);
-  border-color: rgba(255, 107, 0, 0.15);
+  border-color: var(--color-border-strong);
 }
 
 .card-header {
@@ -544,16 +591,16 @@ textarea {
 }
 
 .border-highlight {
-  border: 1.5px solid var(--color-primary-light);
-  box-shadow: 0 4px 20px rgba(255, 107, 0, 0.05);
+  border: 1.5px solid rgba(255, 107, 0, 0.25);
+  box-shadow: 0 8px 26px rgba(255, 107, 0, 0.08);
 }
 
 /* Badges */
 .badge {
   display: inline-flex;
-  padding: 0.25rem 0.75rem;
+  padding: 0.3rem 0.8rem;
   border-radius: 100px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -592,13 +639,17 @@ textarea {
 
 /* Hero Banner Card */
 .card-hero {
-  background: linear-gradient(135deg, #1C2433 0%, #151922 100%);
-  border: 1.5px solid var(--color-border);
+  background:
+    radial-gradient(600px circle at 88% 15%, rgba(255, 107, 0, 0.12), transparent 55%),
+    radial-gradient(480px circle at 8% 95%, rgba(14, 165, 196, 0.08), transparent 55%),
+    linear-gradient(135deg, #FFFFFF 0%, #FFF7F1 100%);
+  border: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .hero-content {
@@ -613,6 +664,7 @@ textarea {
   font-weight: 800;
   margin: 0.75rem 0;
   line-height: 1.3;
+  letter-spacing: -0.5px;
 }
 
 .hero-content p {
@@ -641,7 +693,7 @@ textarea {
 .hero-svg {
   width: 250px;
   height: 250px;
-  filter: drop-shadow(0 0 20px rgba(255, 107, 0, 0.2));
+  filter: drop-shadow(0 8px 20px rgba(255, 107, 0, 0.18));
 }
 
 /* Stat Cards */
@@ -649,12 +701,18 @@ textarea {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-stat:hover {
+  transform: translateY(-3px);
 }
 
 .card-icon-container {
   width: 60px;
   height: 60px;
-  border-radius: 16px;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -677,7 +735,7 @@ textarea {
 }
 
 .bg-green {
-  background-color: rgba(0, 230, 118, 0.1);
+  background-color: var(--color-success-light);
   color: var(--color-success);
 }
 
@@ -694,7 +752,7 @@ textarea {
 .stat-value {
   font-family: var(--font-title);
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 800;
   margin-top: 0.1rem;
   line-height: 1.2;
 }
@@ -770,9 +828,10 @@ textarea {
 .filter-tabs {
   display: flex;
   background-color: var(--color-surface);
-  padding: 0.25rem;
-  border-radius: 12px;
+  padding: 0.3rem;
+  border-radius: 14px;
   border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .filter-btn {
@@ -787,10 +846,14 @@ textarea {
   transition: all var(--transition-fast);
 }
 
+.filter-btn:hover {
+  color: var(--color-text-primary);
+}
+
 .filter-btn.active {
-  background-color: var(--color-surface-hover);
-  color: var(--color-primary);
-  box-shadow: var(--shadow-sm);
+  background: var(--gradient-primary);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.28);
 }
 
 .schedule-list {
@@ -806,14 +869,16 @@ textarea {
   justify-content: space-between;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-fast);
 }
 
 .game-card:hover {
-  border-color: rgba(255, 107, 0, 0.3);
-  transform: translateX(4px);
+  border-color: rgba(255, 107, 0, 0.35);
+  transform: translateX(5px);
+  box-shadow: -6px 0 0 -2px var(--color-primary), var(--shadow-md);
 }
 
 .game-meta {
@@ -823,10 +888,10 @@ textarea {
 }
 
 .game-date-box {
-  background-color: var(--color-bg);
-  border: 1.5px solid var(--color-border);
+  background: linear-gradient(160deg, rgba(255, 107, 0, 0.08), rgba(255, 107, 0, 0.02));
+  border: 1.5px solid rgba(255, 107, 0, 0.18);
   padding: 0.65rem;
-  border-radius: 12px;
+  border-radius: 14px;
   text-align: center;
   min-width: 75px;
   width: fit-content;
@@ -843,7 +908,7 @@ textarea {
 .game-day {
   font-family: var(--font-title);
   font-size: 1.35rem;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
   color: var(--color-primary);
 }
@@ -900,7 +965,7 @@ textarea {
   align-items: center;
   justify-content: center;
   background-color: var(--color-bg);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
@@ -908,11 +973,12 @@ textarea {
 .game-btn-icon:hover {
   background-color: var(--color-surface-hover);
   color: var(--color-primary);
+  border-color: rgba(255, 107, 0, 0.4);
 }
 
 .game-btn-icon.delete-btn:hover {
   color: var(--color-danger);
-  border-color: rgba(255, 23, 68, 0.3);
+  border-color: rgba(240, 62, 94, 0.4);
 }
 
 /* ================= TACTICS BOARD SPECIFIC ================= */
@@ -949,14 +1015,14 @@ textarea {
   display: flex;
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
-  padding: 0.2rem;
-  border-radius: 8px;
+  padding: 0.25rem;
+  border-radius: 10px;
 }
 
 .segmented-control .control-btn {
   flex: 1;
   padding: 0.5rem;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -967,8 +1033,9 @@ textarea {
 }
 
 .segmented-control .control-btn.active {
-  background-color: var(--color-surface);
-  color: var(--color-primary);
+  background: var(--gradient-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(255, 107, 0, 0.25);
 }
 
 .token-legend {
@@ -1040,7 +1107,7 @@ textarea {
 .tactic-item-card {
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 0.75rem 1rem;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -1050,13 +1117,13 @@ textarea {
 }
 
 .tactic-item-card:hover {
-  border-color: var(--color-primary);
+  border-color: rgba(255, 107, 0, 0.5);
   background-color: var(--color-surface-hover);
 }
 
 .tactic-item-card.active {
   border-color: var(--color-primary);
-  background-color: var(--color-surface-hover);
+  background-color: var(--color-primary-light);
   box-shadow: 0 0 0 1px var(--color-primary);
 }
 
@@ -1081,9 +1148,9 @@ textarea {
 
 .tactics-board-container {
   position: relative;
-  background-color: var(--color-surface);
-  border: 2px solid var(--color-border);
-  border-radius: 20px;
+  background-color: var(--color-surface-solid);
+  border: 2px solid var(--color-border-strong);
+  border-radius: 22px;
   overflow: hidden;
   box-shadow: var(--shadow-md);
   touch-action: none;
@@ -1125,8 +1192,8 @@ textarea {
   height: 100%;
   transform: translate(-50%, -50%);
   background-color: #d6a87c;
-  background-image: 
-    repeating-linear-gradient(90deg, transparent 0px, transparent 20px, rgba(0,0,0,0.04) 20px, rgba(0,0,0,0.04) 40px);
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0px, transparent 20px, rgba(0, 0, 0, 0.04) 20px, rgba(0, 0, 0, 0.04) 40px);
   border-radius: 4px;
   transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
 }
@@ -1178,12 +1245,6 @@ textarea {
 /* Toggle lines visibility based on half/full court */
 .court-board.full-court .court-svg .full-court-line {
   display: block;
-}
-
-.court-board.full-court .court-svg .court-three-point,
-.court-board.full-court .court-svg .court-key,
-.court-board.full-court .court-svg .court-key-semi {
-  /* scale/stretch/display options */
 }
 
 /* Interactive Overlay */
@@ -1277,8 +1338,8 @@ textarea {
 
 .skill-category-card {
   border: 1px solid var(--color-border);
-  background-color: rgba(25, 33, 47, 0.4);
-  border-radius: 14px;
+  background-color: var(--color-bg);
+  border-radius: 16px;
   padding: 1.25rem;
 }
 
@@ -1309,13 +1370,14 @@ textarea {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   padding: 0.75rem 1rem;
-  border-radius: 10px;
+  border-radius: 12px;
   transition: var(--transition-fast);
 }
 
 .skill-item:hover {
   background-color: var(--color-surface-hover);
-  border-color: rgba(255, 107, 0, 0.15);
+  border-color: rgba(255, 107, 0, 0.25);
+  transform: translateX(3px);
 }
 
 .skill-details {
@@ -1408,8 +1470,13 @@ textarea {
 .rule-card {
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 1.25rem;
+  transition: var(--transition-fast);
+}
+
+.rule-card:hover {
+  border-color: rgba(255, 107, 0, 0.25);
 }
 
 .rule-card h4 {
@@ -1450,15 +1517,17 @@ textarea {
   flex: 1;
   min-width: 200px;
   background-color: var(--color-bg);
-  border: 1.5px solid var(--color-border);
+  border: 1.5px solid var(--color-border-strong);
   border-radius: 10px;
   padding: 0.65rem 1rem;
   color: var(--color-text-primary);
+  transition: all var(--transition-fast);
 }
 
 .form-group-row input:focus {
   outline: none;
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-light);
 }
 
 .local-rules-list {
@@ -1473,8 +1542,13 @@ textarea {
   align-items: center;
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 0.85rem 1.25rem;
+  transition: var(--transition-fast);
+}
+
+.local-rule-item:hover {
+  border-color: rgba(255, 107, 0, 0.25);
 }
 
 .local-rule-info h4 {
@@ -1498,19 +1572,38 @@ textarea {
 .roster-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 1.25rem;
   text-align: center;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-fast);
+  overflow: hidden;
+}
+
+.roster-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
 }
 
 .roster-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--color-primary);
+  transform: translateY(-5px);
+  border-color: rgba(255, 107, 0, 0.35);
+  box-shadow: var(--shadow-md);
+}
+
+.roster-card:hover::before {
+  opacity: 1;
 }
 
 .roster-jersey-num {
@@ -1520,7 +1613,7 @@ textarea {
   font-family: var(--font-title);
   font-size: 1.25rem;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(16, 25, 40, 0.10);
   transition: color var(--transition-fast);
 }
 
@@ -1538,7 +1631,7 @@ textarea {
   justify-content: center;
   font-size: 2rem;
   margin-bottom: 0.75rem;
-  border: 2px solid var(--color-border);
+  border: 2px solid var(--color-border-strong);
 }
 
 .roster-name {
@@ -1588,8 +1681,9 @@ textarea {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(16, 24, 40, 0.35);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1605,19 +1699,19 @@ textarea {
 }
 
 .modal-container {
-  background-color: var(--color-surface);
+  background-color: var(--color-surface-solid);
   border: 1px solid var(--color-border);
-  border-radius: 20px;
+  border-radius: 22px;
   width: 90%;
   max-width: 500px;
   box-shadow: var(--shadow-lg);
-  transform: scale(0.9);
-  transition: transform var(--transition-fast) cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: scale(0.92) translateY(10px);
+  transition: transform var(--transition-spring);
   overflow: hidden;
 }
 
 .modal-overlay.active .modal-container {
-  transform: scale(1);
+  transform: scale(1) translateY(0);
 }
 
 .modal-header {
@@ -1626,7 +1720,7 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--color-bg);
 }
 
 .modal-header h3 {
@@ -1642,10 +1736,15 @@ textarea {
   color: var(--color-text-secondary);
   cursor: pointer;
   line-height: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  transition: var(--transition-fast);
 }
 
 .modal-close:hover {
-  color: #fff;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-hover);
 }
 
 .modal-form {
@@ -1708,23 +1807,24 @@ textarea {
 
   .app-container {
     flex-direction: column;
-    padding-bottom: 70px;
+    padding-bottom: 78px;
     /* Space for bottom navigation */
   }
 
   /* Transform left sidebar to bottom mobile nav */
   .sidebar {
     width: 100%;
-    height: 70px;
+    height: 72px;
     top: auto;
     bottom: 0;
     flex-direction: row;
     border-right: none;
-    border-top: 1px solid var(--color-border);
-    background-color: var(--glass-bg);
+    border-top: 1px solid var(--color-border-strong);
+    background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     padding: 0;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 -8px 30px rgba(16, 24, 40, 0.08);
   }
 
   .sidebar-header {
@@ -1757,9 +1857,12 @@ textarea {
     color: var(--color-primary);
   }
 
-  .nav-icon {
-    width: 18px;
-    height: 18px;
+  .nav-item.active::before {
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: 40%;
+    height: 3px;
   }
 
   .sidebar-footer {
@@ -1796,6 +1899,11 @@ textarea {
     gap: 1rem;
   }
 
+  .game-card:hover {
+    transform: none;
+    box-shadow: var(--shadow-md);
+  }
+
   .game-meta {
     width: 100%;
   }
@@ -1820,7 +1928,7 @@ textarea {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--color-border);
   background-color: #000;
@@ -1867,7 +1975,7 @@ textarea {
   position: relative;
   width: 80px;
   height: 80px;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--color-border);
   cursor: pointer;
@@ -1907,7 +2015,7 @@ textarea {
   justify-content: center;
   font-size: 12px;
   pointer-events: none;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 /* Roster Avatar Media Overlay */
@@ -1929,7 +2037,7 @@ textarea {
 .media-view-container {
   max-width: 1400px;
   width: 95%;
-  background-color: var(--color-surface);
+  background-color: var(--color-surface-solid);
 }
 
 .media-view-body {
@@ -1959,7 +2067,7 @@ textarea {
 
 .tactic-large-media-card {
   position: relative;
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
   background-color: #000;
   border: 1px solid var(--color-border);
@@ -2004,5 +2112,204 @@ textarea {
   font-size: 20px;
   pointer-events: none;
   border: 2px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* ================= THEME TOGGLE BUTTON ================= */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 100px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.theme-toggle:hover {
+  color: var(--color-primary);
+  border-color: rgba(255, 107, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.theme-icon-sun {
+  display: none;
+}
+
+.theme-icon-moon {
+  display: block;
+}
+
+[data-theme="dark"] .theme-icon-sun {
+  display: block;
+}
+
+[data-theme="dark"] .theme-icon-moon {
+  display: none;
+}
+
+/* ================= DARK THEME (NEON COURT) ================= */
+[data-theme="dark"] {
+  --color-bg: #07090F;
+  --color-bg-soft: #0B0E16;
+  --color-surface: rgba(20, 26, 38, 0.72);
+  --color-surface-solid: #141A26;
+  --color-surface-hover: rgba(32, 42, 60, 0.85);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.14);
+
+  --color-primary-hover: #FF8A3D;
+  --color-primary-light: rgba(255, 107, 0, 0.15);
+
+  --color-secondary: #22D3EE;
+  --color-secondary-light: rgba(34, 211, 238, 0.14);
+
+  --color-success: #34E29B;
+  --color-success-light: rgba(52, 226, 155, 0.12);
+  --color-danger: #FF4D6D;
+  --color-danger-light: rgba(255, 77, 109, 0.12);
+
+  --color-text-primary: #F4F6FB;
+  --color-text-secondary: #A4ADBE;
+  --color-text-muted: #6B7587;
+
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
+  --glass-bg: rgba(13, 17, 26, 0.65);
+}
+
+[data-theme="dark"] body {
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(900px circle at 12% -5%, rgba(255, 107, 0, 0.18), transparent 45%),
+    radial-gradient(800px circle at 100% 8%, rgba(34, 211, 238, 0.12), transparent 42%),
+    radial-gradient(1000px circle at 50% 110%, rgba(120, 60, 255, 0.10), transparent 50%);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  background-clip: padding-box;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+  background-clip: padding-box;
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .game-card,
+[data-theme="dark"] .roster-card,
+[data-theme="dark"] .date-badge,
+[data-theme="dark"] .filter-tabs {
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+[data-theme="dark"] .sidebar {
+  background: linear-gradient(180deg, rgba(18, 24, 36, 0.85) 0%, rgba(10, 13, 20, 0.85) 100%);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+[data-theme="dark"] .sidebar-footer {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .logo-icon {
+  filter: drop-shadow(0 0 8px rgba(255, 107, 0, 0.45));
+}
+
+[data-theme="dark"] .nav-item.active {
+  background: linear-gradient(100deg, rgba(255, 107, 0, 0.20), rgba(255, 107, 0, 0.04));
+}
+
+[data-theme="dark"] .nav-item.active::before {
+  box-shadow: 0 0 12px rgba(255, 107, 0, 0.7);
+}
+
+[data-theme="dark"] .nav-item.active .nav-icon {
+  filter: drop-shadow(0 0 6px rgba(255, 107, 0, 0.5));
+}
+
+[data-theme="dark"] .text-highlight {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] .card-hero {
+  background:
+    radial-gradient(700px circle at 85% 20%, rgba(255, 107, 0, 0.22), transparent 55%),
+    radial-gradient(500px circle at 10% 90%, rgba(34, 211, 238, 0.12), transparent 50%),
+    linear-gradient(135deg, #1A2233 0%, #11151F 100%);
+  border: 1.5px solid var(--color-border-strong);
+}
+
+[data-theme="dark"] .card-hero::after {
+  content: "";
+  position: absolute;
+  right: -120px;
+  top: -120px;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(255, 107, 0, 0.35), transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .bg-orange {
+  box-shadow: inset 0 0 0 1px rgba(255, 107, 0, 0.25), 0 0 18px rgba(255, 107, 0, 0.15);
+}
+
+[data-theme="dark"] .bg-blue {
+  box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.25), 0 0 18px rgba(34, 211, 238, 0.12);
+}
+
+[data-theme="dark"] .game-date-box {
+  background: linear-gradient(160deg, rgba(255, 107, 0, 0.12), rgba(0, 0, 0, 0.2));
+  border-color: rgba(255, 107, 0, 0.2);
+}
+
+[data-theme="dark"] .roster-jersey-num {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .tactic-item-card.active {
+  background-color: var(--color-surface-hover);
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 18px rgba(255, 107, 0, 0.15);
+}
+
+[data-theme="dark"] .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .modal-header {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Fix light-only hardcoded white surfaces */
+[data-theme="dark"] .btn-outline {
+  background-color: transparent;
+}
+
+[data-theme="dark"] .checkmark {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group select:focus,
+[data-theme="dark"] .form-group textarea:focus {
+  background-color: rgba(0, 0, 0, 0.35);
 }
