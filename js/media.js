@@ -3,11 +3,8 @@ import { escapeHtml } from './utils.js';
 export function processMediaFile(file) {
   return new Promise((resolve, reject) => {
     if (file.type.startsWith('video/')) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert(`'${file.name}' 동영상 파일 크기(${Math.round(file.size / 1024 / 1024)}MB)가 5MB를 초과합니다.`);
-        return resolve(null);
-      }
-      resolve({ type: 'video', file: file, previewUrl: URL.createObjectURL(file), name: file.name });
+      alert(`'${file.name}' 동영상은 업로드할 수 없습니다. 사진만 첨부 가능합니다.`);
+      return resolve(null);
     } else {
       const reader = new FileReader();
       reader.onload = (e) => {
