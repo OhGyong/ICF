@@ -455,8 +455,13 @@ function renderDashboard() {
   } else {
     // Sort by date ascending
     const sortedUpcoming = [...upcomingGames].sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 3);
+    // 카운트다운과 동일하게 자정 기준으로 D-Day 계산 (시간대 오차 방지)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     panelGamesContainer.innerHTML = sortedUpcoming.map(game => {
       const gDate = new Date(game.date);
+      const gDateMidnight = new Date(game.date);
+      gDateMidnight.setHours(0, 0, 0, 0);
       const days = ['일', '월', '화', '수', '목', '금', '토'];
       return `
         <div class="game-card" style="margin-bottom: 0.75rem;">
@@ -472,7 +477,7 @@ function renderDashboard() {
               </span>
             </div>
           </div>
-          <span class="badge badge-accent">D-${Math.ceil((gDate - now) / (1000 * 60 * 60 * 24))}</span>
+          <span class="badge badge-accent">D-${Math.ceil((gDateMidnight - today) / (1000 * 60 * 60 * 24))}</span>
         </div>
       `;
     }).join('');
