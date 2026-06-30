@@ -1195,6 +1195,14 @@ textarea {
   pointer-events: none;
 }
 
+.tactics-board-container.draw-mode {
+  cursor: crosshair;
+}
+
+.tactics-board-container.draw-mode .board-token {
+  pointer-events: none;
+}
+
 .board-token {
   position: absolute;
   width: 32px;

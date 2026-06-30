@@ -790,6 +790,9 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 // ================= TACTICS BOARD DRAG & DROP =================
 let isBoardInitialized = false;
 let currentTokenPositionsState = [];
+let currentRoutesState = [];
+let isDrawMode = false;
+let activeDrawRoute = null;
 
 function initTacticsBoard() {
   const courtContainer = document.getElementById('court-board-container');
@@ -816,6 +819,8 @@ function initTacticsBoard() {
   } else {
     renderTokens();
   }
+  
+  renderRoutes();
 
   if (!isBoardInitialized) {
     setupDragAndDrop();
@@ -855,38 +860,67 @@ function renderTokens() {
   });
 }
 
+function renderRoutes() {
+  const container = document.getElementById('routes-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const isHalf = currentCourtView === 'half';
+  const vbW = isHalf ? 400 : 800;
+  const vbH = 500;
+  
+  const routesSvg = document.getElementById('routes-svg');
+  if (routesSvg) {
+    routesSvg.setAttribute('viewBox', `0 0 ${vbW} ${vbH}`);
+    routesSvg.setAttribute('preserveAspectRatio', 'none');
+  }
+
+  const drawPath = (route, isPreview) => {
+    // If it's old format (startX/endX), convert it for backward compatibility
+    let points = route.points;
+    if (!points && route.startX !== undefined) {
+      points = [{x: route.startX, y: route.startY}, {x: route.endX, y: route.endY}];
+    }
+    
+    if (!points || points.length < 2) return;
+    
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const d = points.map((p, i) => {
+      const sx = (p.x * vbW) / 100;
+      const sy = (p.y * vbH) / 100;
+      return `${i === 0 ? 'M' : 'L'} ${sx} ${sy}`;
+    }).join(' ');
+    
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#08541c');
+    path.setAttribute('stroke-width', '4');
+    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linejoin', 'round');
+    path.setAttribute('marker-end', 'url(#arrowhead)');
+    if (isPreview) {
+      path.setAttribute('opacity', '0.6');
+    }
+    container.appendChild(path);
+  };
+
+  currentRoutesState.forEach(route => drawPath(route, false));
+  if (activeDrawRoute) {
+    drawPath(activeDrawRoute, true);
+  }
+}
+
 // Drag & Drop Physics
 let activeDragToken = null;
 
 function setupDragAndDrop() {
   const container = document.getElementById('court-board-container');
 
-  const startDrag = (e) => {
-    const target = e.target;
-    if (target.classList.contains('board-token')) {
-      activeDragToken = target;
-      e.preventDefault(); // Prevents touch scrolling
-    }
-  };
-
-  const moveDrag = (e) => {
-    if (!activeDragToken) return;
-
-    const rect = container.getBoundingClientRect();
-    let clientX, clientY;
-
-    if (e.type.startsWith('touch')) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-
-    // Convert pixels to relative percentages inside container
+  const getRelativePos = (e, rect) => {
+    let clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+    let clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
     const isPortrait = document.getElementById('court-wrapper').classList.contains('portrait-mode');
     let xPercent, yPercent;
-
     if (isPortrait) {
       xPercent = 100 - ((clientY - rect.top) / rect.height) * 100;
       yPercent = ((clientX - rect.left) / rect.width) * 100;
@@ -894,10 +928,54 @@ function setupDragAndDrop() {
       xPercent = ((clientX - rect.left) / rect.width) * 100;
       yPercent = ((clientY - rect.top) / rect.height) * 100;
     }
+    return {
+      x: Math.max(0, Math.min(100, xPercent)),
+      y: Math.max(0, Math.min(100, yPercent))
+    };
+  };
 
-    // Clamp coordinates [2% - 98%]
-    xPercent = Math.max(2, Math.min(98, xPercent));
-    yPercent = Math.max(2, Math.min(98, yPercent));
+  const startDrag = (e) => {
+    const target = e.target;
+    
+    if (isDrawMode) {
+      e.preventDefault();
+      const rect = container.getBoundingClientRect();
+      const pos = getRelativePos(e, rect);
+      activeDrawRoute = { points: [pos] };
+      renderRoutes();
+      return;
+    }
+
+    if (target.classList.contains('board-token')) {
+      activeDragToken = target;
+      e.preventDefault(); // Prevents touch scrolling
+    }
+  };
+
+  const moveDrag = (e) => {
+    if (activeDrawRoute && isDrawMode) {
+      e.preventDefault();
+      const rect = container.getBoundingClientRect();
+      const pos = getRelativePos(e, rect);
+      const lastPos = activeDrawRoute.points[activeDrawRoute.points.length - 1];
+      const dx = pos.x - lastPos.x;
+      const dy = pos.y - lastPos.y;
+      // Only append if moved a reasonable amount to avoid bloated arrays
+      if (Math.sqrt(dx * dx + dy * dy) > 0.5) {
+        activeDrawRoute.points.push(pos);
+        renderRoutes();
+      }
+      return;
+    }
+
+    if (!activeDragToken) return;
+
+    const rect = container.getBoundingClientRect();
+    const pos = getRelativePos(e, rect);
+    
+    // Clamp coordinates [2% - 98%] for tokens
+    let xPercent = Math.max(2, Math.min(98, pos.x));
+    let yPercent = Math.max(2, Math.min(98, pos.y));
 
     // Update styling
     activeDragToken.style.left = `${xPercent}%`;
@@ -912,7 +990,15 @@ function setupDragAndDrop() {
     }
   };
 
-  const endDrag = () => {
+  const endDrag = (e) => {
+    if (activeDrawRoute && isDrawMode) {
+      if (activeDrawRoute.points.length > 2) {
+        currentRoutesState.push({...activeDrawRoute});
+      }
+      activeDrawRoute = null;
+      renderRoutes();
+      return;
+    }
     activeDragToken = null;
   };
 
@@ -927,6 +1013,25 @@ function setupDragAndDrop() {
 }
 
 // View toggle buttons
+document.getElementById('mode-move').addEventListener('click', () => {
+  isDrawMode = false;
+  document.getElementById('mode-move').classList.add('active');
+  document.getElementById('mode-draw').classList.remove('active');
+  document.getElementById('tactics-board-container').classList.remove('draw-mode');
+});
+
+document.getElementById('mode-draw').addEventListener('click', () => {
+  isDrawMode = true;
+  document.getElementById('mode-draw').classList.add('active');
+  document.getElementById('mode-move').classList.remove('active');
+  document.getElementById('tactics-board-container').classList.add('draw-mode');
+});
+
+document.getElementById('btn-reset-routes').addEventListener('click', () => {
+  currentRoutesState = [];
+  renderRoutes();
+});
+
 document.getElementById('court-half').addEventListener('click', (e) => {
   if (currentCourtView === 'half') return;
   document.getElementById('court-half').classList.add('active');
@@ -935,6 +1040,16 @@ document.getElementById('court-half').addEventListener('click', (e) => {
   if (currentTokenPositionsState.length > 0) {
     currentTokenPositionsState.forEach(token => {
       token.x = Math.min(98, Math.max(2, Math.round(token.x * 2)));
+    });
+  }
+  if (currentRoutesState.length > 0) {
+    currentRoutesState.forEach(route => {
+      if (route.points) {
+        route.points.forEach(p => { p.x = p.x * 2; });
+      } else if (route.startX !== undefined) {
+        route.startX *= 2;
+        route.endX *= 2;
+      }
     });
   }
   initTacticsBoard();
@@ -948,6 +1063,16 @@ document.getElementById('court-full').addEventListener('click', (e) => {
   if (currentTokenPositionsState.length > 0) {
     currentTokenPositionsState.forEach(token => {
       token.x = Math.round(token.x / 2);
+    });
+  }
+  if (currentRoutesState.length > 0) {
+    currentRoutesState.forEach(route => {
+      if (route.points) {
+        route.points.forEach(p => { p.x = p.x / 2; });
+      } else if (route.startX !== undefined) {
+        route.startX /= 2;
+        route.endX /= 2;
+      }
     });
   }
   initTacticsBoard();
@@ -1108,6 +1233,7 @@ document.getElementById('btn-save-tactic').addEventListener('click', async () =>
     appData.tactics[existingIndex].desc = desc;
     appData.tactics[existingIndex].courtView = currentCourtView;
     appData.tactics[existingIndex].tokens = JSON.parse(JSON.stringify(currentTokenPositionsState));
+    appData.tactics[existingIndex].routes = JSON.parse(JSON.stringify(currentRoutesState));
     appData.tactics[existingIndex].media = finalMedia;
     alert(`'${title}' 전술 정보와 토큰 위치가 업데이트되었습니다.`);
   } else {
@@ -1118,6 +1244,7 @@ document.getElementById('btn-save-tactic').addEventListener('click', async () =>
       desc,
       courtView: currentCourtView,
       tokens: JSON.parse(JSON.stringify(currentTokenPositionsState)),
+      routes: JSON.parse(JSON.stringify(currentRoutesState)),
       media: finalMedia
     };
     appData.tactics.push(newTactic);
@@ -1165,6 +1292,7 @@ function loadTacticToForm(id) {
       document.getElementById('court-half').classList.remove('active');
     }
     currentTokenPositionsState = JSON.parse(JSON.stringify(tactic.tokens));
+    currentRoutesState = tactic.routes ? JSON.parse(JSON.stringify(tactic.routes)) : [];
     initTacticsBoard();
   }
 

@@ -236,8 +236,22 @@
                 </div>
 
                 <div class="setting-group" style="margin-top: 10px;">
+                  <label>조작 모드</label>
+                  <div class="segmented-control">
+                    <button class="control-btn active" id="mode-move">토큰 이동</button>
+                    <button class="control-btn" id="mode-draw">경로 그리기</button>
+                  </div>
+                </div>
+
+                <div class="setting-group" style="margin-top: 10px;">
                   <button class="btn btn-secondary w-full" id="btn-reset-board-tokens">
                     토큰 위치 초기화
+                  </button>
+                </div>
+                
+                <div class="setting-group" style="margin-top: 10px;">
+                  <button class="btn btn-secondary w-full" id="btn-reset-routes">
+                    경로 모두 지우기
                   </button>
                 </div>
 
@@ -337,8 +351,18 @@
                         stroke="#262F40" stroke-width="2" fill="none"></path> <!-- 3pt Arc (Right) -->
                     </svg>
 
+                    <!-- Overlay for drawn routes (arrows) -->
+                    <svg id="routes-svg" class="routes-svg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;">
+                      <defs>
+                        <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="2.5" refY="2" orient="auto">
+                          <polygon points="0 0, 4 2, 0 4" fill="#08541c" />
+                        </marker>
+                      </defs>
+                      <g id="routes-container"></g>
+                    </svg>
+
                     <!-- Draggable Token elements will be placed dynamically inside here -->
-                    <div id="tokens-overlay" class="tokens-overlay"></div>
+                    <div id="tokens-overlay" class="tokens-overlay" style="z-index: 20;"></div>
                   </div>
                 </div>
               </div>
