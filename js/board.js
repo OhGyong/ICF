@@ -11,6 +11,9 @@ let isDrawMode = false;
 let activeDrawRoute = null;
 let activeDragToken = null;
 
+let currentDrawTool = 'arrow'; // 'arrow' or 'line'
+let currentDrawColor = '#08541c';
+
 export let currentEditingTacticId = null;
 export const tempTacticMedia = [];
 
@@ -101,24 +104,57 @@ function renderRoutes() {
 
     if (!points || points.length < 2) return;
 
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
     const d = points.map((p, i) => {
       const sx = (p.x * vbW) / 100;
       const sy = (p.y * vbH) / 100;
       return `${i === 0 ? 'M' : 'L'} ${sx} ${sy}`;
     }).join(' ');
 
+    if (!isPreview) {
+      const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      hitPath.setAttribute('d', d);
+      hitPath.setAttribute('fill', 'none');
+      hitPath.setAttribute('stroke', 'transparent');
+      hitPath.setAttribute('stroke-width', '24');
+      hitPath.style.cursor = isDrawMode ? 'default' : 'pointer';
+      hitPath.setAttribute('pointer-events', isDrawMode ? 'none' : 'stroke');
+      
+      hitPath.addEventListener('click', (e) => {
+        if (isDrawMode) return;
+        e.stopPropagation();
+        if (confirm('이 경로를 삭제하시겠습니까?')) {
+          const idx = currentRoutesState.indexOf(route);
+          if (idx !== -1) {
+            currentRoutesState.splice(idx, 1);
+            renderRoutes();
+          }
+        }
+      });
+      group.appendChild(hitPath);
+    }
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('d', d);
     path.setAttribute('fill', 'none');
-    path.setAttribute('stroke', '#08541c');
+    
+    const strokeColor = route.color || '#08541c';
+    const toolType = route.tool || 'arrow';
+    
+    path.setAttribute('stroke', strokeColor);
     path.setAttribute('stroke-width', '4');
     path.setAttribute('stroke-linecap', 'round');
     path.setAttribute('stroke-linejoin', 'round');
-    path.setAttribute('marker-end', 'url(#arrowhead)');
+    if (toolType === 'arrow') {
+      path.setAttribute('marker-end', `url(#arrowhead-${strokeColor})`);
+    }
+    path.setAttribute('pointer-events', 'none');
     if (isPreview) {
       path.setAttribute('opacity', '0.6');
     }
-    container.appendChild(path);
+    group.appendChild(path);
+    container.appendChild(group);
   };
 
   currentRoutesState.forEach(route => drawPath(route, false));
@@ -155,7 +191,11 @@ function setupDragAndDrop() {
     if (isDrawMode) {
       const rect = container.getBoundingClientRect();
       const pos = getRelativePos(e, rect);
-      activeDrawRoute = { points: [pos] };
+      activeDrawRoute = { 
+        points: [pos],
+        tool: currentDrawTool,
+        color: currentDrawColor
+      };
       renderRoutes();
       return;
     }
@@ -173,7 +213,7 @@ function setupDragAndDrop() {
       const lastPos = activeDrawRoute.points[activeDrawRoute.points.length - 1];
       const dx = pos.x - lastPos.x;
       const dy = pos.y - lastPos.y;
-      if (Math.sqrt(dx * dx + dy * dy) > 0.5) {
+      if (Math.sqrt(dx * dx + dy * dy) > 2.5) {
         activeDrawRoute.points.push(pos);
         renderRoutes();
       }
@@ -226,6 +266,9 @@ function setupBoardEventListeners() {
     document.getElementById('mode-move').classList.add('active');
     document.getElementById('mode-draw').classList.remove('active');
     document.getElementById('tactics-board-container').classList.remove('draw-mode');
+    const drawToolbar = document.getElementById('draw-toolbar');
+    if (drawToolbar) drawToolbar.style.display = 'none';
+    renderRoutes();
   });
 
   document.getElementById('mode-draw').addEventListener('click', () => {
@@ -233,7 +276,49 @@ function setupBoardEventListeners() {
     document.getElementById('mode-draw').classList.add('active');
     document.getElementById('mode-move').classList.remove('active');
     document.getElementById('tactics-board-container').classList.add('draw-mode');
+    const drawToolbar = document.getElementById('draw-toolbar');
+    if (drawToolbar) drawToolbar.style.display = 'block';
+    renderRoutes();
   });
+
+  // Draw Tool Selection
+  const btnToolArrow = document.getElementById('tool-arrow');
+  const btnToolLine = document.getElementById('tool-line');
+  if (btnToolArrow && btnToolLine) {
+    btnToolArrow.addEventListener('click', () => {
+      currentDrawTool = 'arrow';
+      btnToolArrow.classList.add('active');
+      btnToolLine.classList.remove('active');
+    });
+    btnToolLine.addEventListener('click', () => {
+      currentDrawTool = 'line';
+      btnToolLine.classList.add('active');
+      btnToolArrow.classList.remove('active');
+    });
+  }
+
+  // Color Palette Selection
+  const colorBtns = document.querySelectorAll('.color-btn');
+  colorBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const selectedColor = e.target.dataset.color;
+      if (selectedColor) {
+        currentDrawColor = selectedColor;
+        colorBtns.forEach(cb => cb.classList.remove('active'));
+        e.target.classList.add('active');
+      }
+    });
+  });
+
+  const btnUndo = document.getElementById('btn-undo-route');
+  if (btnUndo) {
+    btnUndo.addEventListener('click', () => {
+      if (currentRoutesState.length > 0) {
+        currentRoutesState.pop();
+        renderRoutes();
+      }
+    });
+  }
 
   document.getElementById('btn-reset-routes').addEventListener('click', () => {
     currentRoutesState = [];
