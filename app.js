@@ -11,8 +11,10 @@ import {
 import {
   deleteTactic, loadTacticToForm, removeTempTacticMedia, tempTacticMedia
 } from './js/board.js';
+import { appData } from './js/data.js';
 
 // ================= GLOBAL BINDINGS FOR HTML INLINE EVENTS =================
+window.appData = appData;
 window.switchTab = switchTab;
 window.openEditScheduleModal = openEditScheduleModal;
 window.deleteSchedule = deleteSchedule;
@@ -25,6 +27,7 @@ window.removeTempSkillMedia = removeTempSkillMedia;
 window.deleteLocalRule = deleteLocalRule;
 window.removeTempRosterMedia = removeTempRosterMedia;
 window.openMediaViewModal = openMediaViewModal;
+window.appData = appData;
 
 // ================= INITIALIZATION & SETUP =================
 
