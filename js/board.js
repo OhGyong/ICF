@@ -375,26 +375,12 @@ export function renderTacticsList() {
 
   tacticsList.innerHTML = appData.tactics.map((t, tIndex) => {
     const isActive = t.id === currentEditingTacticId;
-    const mediaGalleryHtml = (t.media && t.media.length > 0) ? `
-      <div class="card-media-gallery" onclick="event.stopPropagation();">
-        ${t.media.map((m, mIdx) => {
-      const src = escapeHtml(m.previewUrl || m.url || m.dataUrl);
-      return `
-          <div class="card-media-item" onclick="openMediaViewModal(appData.tactics[${tIndex}].media[${mIdx}])">
-            ${m.type === 'video' ? `<video src="${src}"></video><div class="video-badge">▶</div>` : `<img src="${src}">`}
-          </div>
-          `;
-    }).join('')}
-      </div>
-    ` : '';
 
     return `
       <div class="tactic-item-card ${isActive ? 'active' : ''}" onclick="loadTacticToForm('${t.id}')">
         <div class="tactic-item-info" style="flex:1;">
           <h4>${escapeHtml(t.title)} ${isActive ? '<span style="font-size:0.7rem; color:var(--color-primary); font-weight:normal;">(선택됨)</span>' : ''}</h4>
           <p style="max-width: 100%; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escapeHtml(t.desc)}</p>
-          ${(t.links && t.links.length > 0) ? t.links.map(l => `<a href="${escapeHtml(l)}" target="_blank" onclick="event.stopPropagation();" style="display:block; margin-top:0.25rem; font-size:0.85rem; color:var(--color-primary); text-decoration:underline;">🔗 참고 링크 보러가기</a>`).join('') : (t.link ? `<a href="${escapeHtml(t.link)}" target="_blank" onclick="event.stopPropagation();" style="display:block; margin-top:0.25rem; font-size:0.85rem; color:var(--color-primary); text-decoration:underline;">🔗 참고 링크 보러가기</a>` : '')}
-          ${mediaGalleryHtml}
         </div>
         <button class="game-btn-icon delete-btn" onclick="deleteTactic(event, '${t.id}')" title="삭제" style="width: 28px; height: 28px; flex-shrink: 0; align-self: flex-start; margin-left: 0.5rem;">
           &times;
