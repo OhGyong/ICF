@@ -313,6 +313,15 @@
                   <label for="tactic-desc">설명 및 지시사항</label>
                   <textarea id="tactic-desc" rows="4" placeholder="작전 내용과 선수들의 움직임을 기록하세요..."></textarea>
                 </div>
+                <div class="form-group" id="tactic-links-group">
+                  <label>참고 링크 (유튜브 등)</label>
+                  <div id="tactic-links-container">
+                    <div class="link-input-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                      <input type="url" class="tactic-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
+                      <button type="button" class="btn btn-outline" onclick="addTacticLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
+                    </div>
+                  </div>
+                </div>
                 <div class="form-group">
                   <label>사진 첨부</label>
                   <input type="file" id="tactic-media-input" accept="image/*" multiple style="display: none;">

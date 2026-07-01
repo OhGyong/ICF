@@ -9,7 +9,7 @@ import {
   setupUIEventListeners
 } from './js/ui.js';
 import {
-  deleteTactic, loadTacticToForm, removeTempTacticMedia, tempTacticMedia
+  deleteTactic, loadTacticToForm, removeTempTacticMedia, tempTacticMedia, addTacticLinkInput, removeTacticLinkInput
 } from './js/board.js';
 import { appData } from './js/data.js';
 
@@ -21,6 +21,8 @@ window.deleteSchedule = deleteSchedule;
 window.loadTacticToForm = loadTacticToForm;
 window.deleteTactic = deleteTactic;
 window.removeTempTacticMedia = removeTempTacticMedia;
+window.addTacticLinkInput = addTacticLinkInput;
+window.removeTacticLinkInput = removeTacticLinkInput;
 window.editSkill = editSkill;
 window.deleteSkill = deleteSkill;
 window.removeTempSkillMedia = removeTempSkillMedia;

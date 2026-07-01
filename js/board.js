@@ -349,6 +349,15 @@ export function resetTacticsSelection() {
   const cancelBtn = document.getElementById('btn-cancel-tactic-edit');
   if (titleInput) titleInput.value = '';
   if (descInput) descInput.value = '';
+  const linksContainer = document.getElementById('tactic-links-container');
+  if (linksContainer) {
+    linksContainer.innerHTML = `
+      <div class="link-input-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+        <input type="url" class="tactic-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
+        <button type="button" class="btn btn-outline" onclick="addTacticLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
+      </div>
+    `;
+  }
   if (saveBtn) saveBtn.innerText = '전술 저장';
   if (cancelBtn) cancelBtn.style.display = 'none';
   if (document.getElementById('saved-tactics-list')) {
@@ -384,6 +393,7 @@ export function renderTacticsList() {
         <div class="tactic-item-info" style="flex:1;">
           <h4>${escapeHtml(t.title)} ${isActive ? '<span style="font-size:0.7rem; color:var(--color-primary); font-weight:normal;">(선택됨)</span>' : ''}</h4>
           <p style="max-width: 100%; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escapeHtml(t.desc)}</p>
+          ${(t.links && t.links.length > 0) ? t.links.map(l => `<a href="${escapeHtml(l)}" target="_blank" onclick="event.stopPropagation();" style="display:block; margin-top:0.25rem; font-size:0.85rem; color:var(--color-primary); text-decoration:underline;">🔗 참고 링크 보러가기</a>`).join('') : (t.link ? `<a href="${escapeHtml(t.link)}" target="_blank" onclick="event.stopPropagation();" style="display:block; margin-top:0.25rem; font-size:0.85rem; color:var(--color-primary); text-decoration:underline;">🔗 참고 링크 보러가기</a>` : '')}
           ${mediaGalleryHtml}
         </div>
         <button class="game-btn-icon delete-btn" onclick="deleteTactic(event, '${t.id}')" title="삭제" style="width: 28px; height: 28px; flex-shrink: 0; align-self: flex-start; margin-left: 0.5rem;">
@@ -397,9 +407,11 @@ export function renderTacticsList() {
 async function handleSaveTactic() {
   const titleInput = document.getElementById('tactic-title');
   const descInput = document.getElementById('tactic-desc');
+  const linkInputs = document.querySelectorAll('.tactic-link-input');
 
   const title = titleInput.value.trim();
   const desc = descInput.value.trim();
+  const links = Array.from(linkInputs).map(inp => inp.value.trim()).filter(val => val);
 
   if (!title) {
     alert('전술 이름을 입력해주세요.');
@@ -438,6 +450,7 @@ async function handleSaveTactic() {
   if (existingIndex !== -1) {
     appData.tactics[existingIndex].title = title;
     appData.tactics[existingIndex].desc = desc;
+    appData.tactics[existingIndex].links = links;
     appData.tactics[existingIndex].courtView = currentCourtView;
     appData.tactics[existingIndex].tokens = JSON.parse(JSON.stringify(currentTokenPositionsState));
     appData.tactics[existingIndex].routes = JSON.parse(JSON.stringify(currentRoutesState));
@@ -448,6 +461,7 @@ async function handleSaveTactic() {
       id: 't_' + Date.now(),
       title,
       desc,
+      links,
       courtView: currentCourtView,
       tokens: JSON.parse(JSON.stringify(currentTokenPositionsState)),
       routes: JSON.parse(JSON.stringify(currentRoutesState)),
@@ -473,6 +487,40 @@ export function loadTacticToForm(id) {
   currentEditingTacticId = id;
   document.getElementById('tactic-title').value = tactic.title;
   document.getElementById('tactic-desc').value = tactic.desc;
+  
+  const linksContainer = document.getElementById('tactic-links-container');
+  if (linksContainer) {
+    linksContainer.innerHTML = '';
+    let tacticLinks = tactic.links || [];
+    if (tactic.link && tacticLinks.length === 0) {
+      tacticLinks = [tactic.link];
+    }
+    
+    if (tacticLinks.length > 0) {
+      tacticLinks.forEach((l) => {
+        const row = document.createElement('div');
+        row.className = 'link-input-row';
+        row.style.cssText = 'display: flex; gap: 0.5rem; margin-bottom: 0.5rem;';
+        row.innerHTML = `
+          <a href="${escapeHtml(l)}" target="_blank" class="tactic-link-btn" style="flex: 1; min-width: 0; box-sizing: border-box; display: block; background-color: var(--color-bg); border: 1.5px solid var(--color-border-strong); border-radius: 10px; padding: 0.75rem 1rem; color: var(--color-primary); font-size: 0.95rem; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(l)}">
+            🔗 ${escapeHtml(l)}
+          </a>
+          <input type="hidden" class="tactic-link-input" value="${escapeHtml(l)}">
+          <button type="button" class="btn btn-outline" onclick="removeTacticLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 삭제">-</button>
+        `;
+        linksContainer.appendChild(row);
+      });
+    }
+    
+    const emptyRow = document.createElement('div');
+    emptyRow.className = 'link-input-row';
+    emptyRow.style.cssText = 'display: flex; gap: 0.5rem; margin-bottom: 0.5rem;';
+    emptyRow.innerHTML = `
+      <input type="url" class="tactic-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
+      <button type="button" class="btn btn-outline" onclick="addTacticLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
+    `;
+    linksContainer.appendChild(emptyRow);
+  }
   document.getElementById('btn-save-tactic').innerText = '전술 업데이트';
 
   tempTacticMedia.length = 0;
@@ -518,4 +566,40 @@ export function deleteTactic(event, id) {
 export function removeTempTacticMedia(index) {
   tempTacticMedia.splice(index, 1);
   renderMediaPreviewGrid('tactic-media-preview', tempTacticMedia, 'removeTempTacticMedia');
+}
+
+export function addTacticLinkInput(btn) {
+  const row = btn.closest('.link-input-row');
+  const input = row.querySelector('input');
+  const val = input.value.trim();
+  
+  if (!val) {
+    alert('링크 주소를 먼저 입력해주세요.');
+    input.focus();
+    return;
+  }
+  
+  row.innerHTML = `
+    <a href="${escapeHtml(val)}" target="_blank" class="tactic-link-btn" style="flex: 1; min-width: 0; box-sizing: border-box; display: block; background-color: var(--color-bg); border: 1.5px solid var(--color-border-strong); border-radius: 10px; padding: 0.75rem 1rem; color: var(--color-primary); font-size: 0.95rem; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(val)}">
+      🔗 ${escapeHtml(val)}
+    </a>
+    <input type="hidden" class="tactic-link-input" value="${escapeHtml(val)}">
+    <button type="button" class="btn btn-outline" onclick="removeTacticLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 삭제">-</button>
+  `;
+
+  const container = document.getElementById('tactic-links-container');
+  if (!container) return;
+  const newRow = document.createElement('div');
+  newRow.className = 'link-input-row';
+  newRow.style.cssText = 'display: flex; gap: 0.5rem; margin-bottom: 0.5rem;';
+  newRow.innerHTML = `
+    <input type="url" class="tactic-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
+    <button type="button" class="btn btn-outline" onclick="addTacticLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
+  `;
+  container.appendChild(newRow);
+}
+
+export function removeTacticLinkInput(btn) {
+  const row = btn.closest('.link-input-row');
+  if (row) row.remove();
 }
