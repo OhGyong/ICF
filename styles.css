@@ -2357,3 +2357,11 @@ textarea {
   border-color: var(--color-surface);
   box-shadow: 0 0 0 2px var(--color-primary), 0 2px 6px rgba(0,0,0,0.15);
 }
+
+.tactics-board-container.erase-mode {
+  cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMCAyMEg3TDMgMTZDMi40IDE1LjQgMi40IDE0LjYgMyAxNEwxMyA0QzEzLjYgMy40IDE0LjQgMy40IDE1IDRMMjAgOUMyMC42IDkuNiAyMC42IDEwLjQgMjAgMTFMMTEgMjBIMjBaIi8+PGxpbmUgeDE9IjE4IiB5MT0iMTMiIHgyPSIxMSIgeTI9IjIwIi8+PC9zdmc+") 0 24, crosshair !important;
+}
+.tactics-board-container.erase-mode * {
+  cursor: inherit !important;
+}
+

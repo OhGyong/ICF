@@ -8,6 +8,7 @@ let isBoardInitialized = false;
 let currentTokenPositionsState = [];
 let currentRoutesState = [];
 let isDrawMode = false;
+let isEraseMode = false;
 let activeDrawRoute = null;
 let activeDragToken = null;
 
@@ -118,18 +119,16 @@ function renderRoutes() {
       hitPath.setAttribute('fill', 'none');
       hitPath.setAttribute('stroke', 'transparent');
       hitPath.setAttribute('stroke-width', '24');
-      hitPath.style.cursor = isDrawMode ? 'default' : 'pointer';
-      hitPath.setAttribute('pointer-events', isDrawMode ? 'none' : 'stroke');
+      hitPath.style.cursor = isEraseMode ? 'url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMCAyMEg3TDMgMTZDMi40IDE1LjQgMi40IDE0LjYgMyAxNEwxMyA0QzEzLjYgMy40IDE0LjQgMy40IDE1IDRMMjAgOUMyMC42IDkuNiAyMC42IDEwLjQgMjAgMTFMMTEgMjBIMjBaIi8+PGxpbmUgeDE9IjE4IiB5MT0iMTMiIHgyPSIxMSIgeTI9IjIwIi8+PC9zdmc+"), crosshair' : 'default';
+      hitPath.setAttribute('pointer-events', isEraseMode ? 'stroke' : 'none');
       
       hitPath.addEventListener('click', (e) => {
-        if (isDrawMode) return;
+        if (!isEraseMode) return;
         e.stopPropagation();
-        if (confirm('이 경로를 삭제하시겠습니까?')) {
-          const idx = currentRoutesState.indexOf(route);
-          if (idx !== -1) {
-            currentRoutesState.splice(idx, 1);
-            renderRoutes();
-          }
+        const idx = currentRoutesState.indexOf(route);
+        if (idx !== -1) {
+          currentRoutesState.splice(idx, 1);
+          renderRoutes();
         }
       });
       group.appendChild(hitPath);
@@ -187,6 +186,8 @@ function setupDragAndDrop() {
   const startDrag = (e) => {
     e.preventDefault();
     const target = e.target;
+    
+    if (isEraseMode) return;
     
     if (isDrawMode) {
       const rect = container.getBoundingClientRect();
@@ -263,8 +264,10 @@ function setupDragAndDrop() {
 function setupBoardEventListeners() {
   document.getElementById('mode-move').addEventListener('click', () => {
     isDrawMode = false;
+    isEraseMode = false;
     document.getElementById('mode-move').classList.add('active');
     document.getElementById('mode-draw').classList.remove('active');
+    document.getElementById('mode-erase').classList.remove('active');
     document.getElementById('tactics-board-container').classList.remove('draw-mode');
     const drawToolbar = document.getElementById('draw-toolbar');
     if (drawToolbar) drawToolbar.style.display = 'none';
@@ -273,11 +276,25 @@ function setupBoardEventListeners() {
 
   document.getElementById('mode-draw').addEventListener('click', () => {
     isDrawMode = true;
+    isEraseMode = false;
     document.getElementById('mode-draw').classList.add('active');
     document.getElementById('mode-move').classList.remove('active');
+    document.getElementById('mode-erase').classList.remove('active');
     document.getElementById('tactics-board-container').classList.add('draw-mode');
     const drawToolbar = document.getElementById('draw-toolbar');
     if (drawToolbar) drawToolbar.style.display = 'block';
+    renderRoutes();
+  });
+
+  document.getElementById('mode-erase').addEventListener('click', () => {
+    isDrawMode = false;
+    isEraseMode = true;
+    document.getElementById('mode-erase').classList.add('active');
+    document.getElementById('mode-move').classList.remove('active');
+    document.getElementById('mode-draw').classList.remove('active');
+    document.getElementById('tactics-board-container').classList.remove('draw-mode');
+    const drawToolbar = document.getElementById('draw-toolbar');
+    if (drawToolbar) drawToolbar.style.display = 'none';
     renderRoutes();
   });
 
@@ -309,16 +326,6 @@ function setupBoardEventListeners() {
       }
     });
   });
-
-  const btnUndo = document.getElementById('btn-undo-route');
-  if (btnUndo) {
-    btnUndo.addEventListener('click', () => {
-      if (currentRoutesState.length > 0) {
-        currentRoutesState.pop();
-        renderRoutes();
-      }
-    });
-  }
 
   document.getElementById('btn-reset-routes').addEventListener('click', () => {
     currentRoutesState = [];
