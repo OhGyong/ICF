@@ -1224,6 +1224,7 @@ textarea {
     repeating-linear-gradient(90deg, transparent 0px, transparent 20px, rgba(0, 0, 0, 0.04) 20px, rgba(0, 0, 0, 0.04) 40px);
   border-radius: 4px;
   transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
+  container-type: inline-size;
 }
 
 .court-board-wrapper.portrait-mode .court-board {
@@ -1295,14 +1296,14 @@ textarea {
 
 .board-token {
   position: absolute;
-  width: 32px;
-  height: 32px;
+  width: 4cqw;
+  height: 4cqw;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-title);
-  font-size: 0.75rem;
+  font-size: 1.5cqw;
   font-weight: 700;
   color: #fff;
   cursor: grab;
@@ -1345,10 +1346,22 @@ textarea {
 .board-token.token-ball {
   background-color: #ff9800;
   border: 2px solid #5d4037;
-  width: 24px;
-  height: 24px;
-  font-size: 12px;
+  width: 3cqw;
+  height: 3cqw;
+  font-size: 1.25cqw;
   z-index: 20;
+}
+
+.court-board-wrapper.half-court .board-token {
+  width: 8cqw;
+  height: 8cqw;
+  font-size: 3cqw;
+}
+
+.court-board-wrapper.half-court .board-token.token-ball {
+  width: 6cqw;
+  height: 6cqw;
+  font-size: 2.5cqw;
 }
 
 /* ================= SKILLS TAB SPECIFIC ================= */

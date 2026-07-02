@@ -229,14 +229,14 @@ function setupDragAndDrop() {
     let xPercent = Math.max(2, Math.min(98, pos.x));
     let yPercent = Math.max(2, Math.min(98, pos.y));
 
-    activeDragToken.style.left = `${xPercent}%`;
-    activeDragToken.style.top = `${yPercent}%`;
+    activeDragToken.style.left = `${xPercent.toFixed(2)}%`;
+    activeDragToken.style.top = `${yPercent.toFixed(2)}%`;
 
     const tokenId = activeDragToken.dataset.id;
     const tokenObj = currentTokenPositionsState.find(t => t.id === tokenId);
     if (tokenObj) {
-      tokenObj.x = Math.round(xPercent);
-      tokenObj.y = Math.round(yPercent);
+      tokenObj.x = parseFloat(xPercent.toFixed(2));
+      tokenObj.y = parseFloat(yPercent.toFixed(2));
     }
   };
 
@@ -339,7 +339,7 @@ function setupBoardEventListeners() {
     currentCourtView = 'half';
     if (currentTokenPositionsState.length > 0) {
       currentTokenPositionsState.forEach(token => {
-        token.x = Math.min(98, Math.max(2, Math.round(token.x * 2)));
+        token.x = Math.min(98, Math.max(2, parseFloat((token.x * 2).toFixed(2))));
       });
     }
     if (currentRoutesState.length > 0) {
@@ -362,7 +362,7 @@ function setupBoardEventListeners() {
     currentCourtView = 'full';
     if (currentTokenPositionsState.length > 0) {
       currentTokenPositionsState.forEach(token => {
-        token.x = Math.round(token.x / 2);
+        token.x = parseFloat((token.x / 2).toFixed(2));
       });
     }
     if (currentRoutesState.length > 0) {
