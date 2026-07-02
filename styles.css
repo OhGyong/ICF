@@ -1017,7 +1017,7 @@ textarea {
   gap: 1.15rem;
 }
 
-.setting-group > label {
+.setting-group>label {
   display: block;
   font-size: 0.72rem;
   font-weight: 700;
@@ -1504,7 +1504,7 @@ textarea {
 
 .rules-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 1.25rem;
 }
 
@@ -1584,23 +1584,36 @@ textarea {
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  padding: 0.85rem 1.25rem;
+  padding: 1rem 1.25rem;
   transition: var(--transition-fast);
+  gap: 1rem;
 }
 
 .local-rule-item:hover {
   border-color: rgba(255, 107, 0, 0.25);
 }
 
+.local-rule-info {
+  flex: 1;
+}
+
 .local-rule-info h4 {
   font-size: 0.95rem;
   font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 0.25rem 0;
 }
 
 .local-rule-info p {
   font-size: 0.85rem;
   color: var(--color-text-secondary);
-  margin-top: 0.15rem;
+  margin: 0;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.local-rule-item .delete-btn {
+  flex-shrink: 0;
 }
 
 /* ================= TEAM ROSTER SPECIFIC ================= */
@@ -2365,6 +2378,7 @@ textarea {
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2386,7 +2400,7 @@ textarea {
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   padding: 0;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
 .color-btn:hover {
@@ -2396,12 +2410,13 @@ textarea {
 .color-btn.active {
   transform: scale(1.2);
   border-color: var(--color-surface);
-  box-shadow: 0 0 0 2px var(--color-primary), 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 0 0 2px var(--color-primary), 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .tactics-board-container.erase-mode {
   cursor: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMCAyMEg3TDMgMTZDMi40IDE1LjQgMi40IDE0LjYgMyAxNEwxMyA0QzEzLjYgMy40IDE0LjQgMy40IDE1IDRMMjAgOUMyMC42IDkuNiAyMC42IDEwLjQgMjAgMTFMMTEgMjBIMjBaIi8+PGxpbmUgeDE9IjE4IiB5MT0iMTMiIHgyPSIxMSIgeTI9IjIwIi8+PC9zdmc+") 0 24, crosshair !important;
 }
+
 .tactics-board-container.erase-mode * {
   cursor: inherit !important;
 }
@@ -2446,4 +2461,3 @@ textarea {
   color: var(--color-text-muted);
   font-style: italic;
 }
-
