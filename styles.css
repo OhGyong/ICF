@@ -1424,7 +1424,9 @@ textarea {
 .skill-details {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.25rem;
+  flex: 1;
+  padding-right: 1rem;
 }
 
 .skill-name {
@@ -1433,8 +1435,10 @@ textarea {
 }
 
 .skill-desc {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--color-text-secondary);
+  line-height: 1.4;
+  word-break: keep-all;
 }
 
 .skill-item-actions {
