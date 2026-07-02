@@ -117,9 +117,12 @@ function renderDashboard() {
         return `
           <div class="game-card" style="margin-bottom: 0.75rem;">
             <div class="game-meta">
-              <div class="game-date-box" style="padding: 0.35rem 0.5rem; min-width: 65px; width: fit-content;">
-                <div class="game-month" style="font-size: 0.65rem;">${gDate.getMonth() + 1}월</div>
-                <div class="game-day" style="font-size: 1.15rem;">${gDate.getDate()}(${days[gDate.getDay()]})</div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                <div class="game-date-box" style="padding: 0.35rem 0.5rem; min-width: 65px; width: fit-content;">
+                  <div class="game-month" style="font-size: 0.65rem;">${gDate.getMonth() + 1}월</div>
+                  <div class="game-day" style="font-size: 1.15rem;">${gDate.getDate()}(${days[gDate.getDay()]})</div>
+                </div>
+                <span class="badge badge-accent">D-${Math.ceil((gDateMidnight - today) / (1000 * 60 * 60 * 24))}</span>
               </div>
               <div class="game-details-info">
                 <span class="font-bold text-sm">${escapeHtml(game.opponent)}</span>
@@ -128,7 +131,6 @@ function renderDashboard() {
                 </span>
               </div>
             </div>
-            <span class="badge badge-accent">D-${Math.ceil((gDateMidnight - today) / (1000 * 60 * 60 * 24))}</span>
           </div>
         `;
       }).join('');

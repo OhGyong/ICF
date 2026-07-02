@@ -885,6 +885,8 @@ textarea {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .game-date-box {
@@ -917,19 +919,25 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .game-opponent {
   font-size: 1.15rem;
   font-weight: 700;
+  word-break: keep-all;
 }
 
 .game-venue-time {
   font-size: 0.85rem;
   color: var(--color-text-secondary);
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  line-height: 1.4;
+  word-break: keep-all;
 }
 
 .game-score-display {
