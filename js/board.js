@@ -397,6 +397,30 @@ function setupBoardEventListeners() {
   }
 }
 
+function renderBoardTacticNotes(tactic) {
+  const container = document.getElementById('tactic-board-notes-container');
+  const titleEl = document.getElementById('tactic-board-notes-title');
+  const descEl = document.getElementById('tactic-board-notes-desc');
+  if (!container || !titleEl || !descEl) return;
+
+  if (!tactic) {
+    container.style.display = 'none';
+    descEl.innerText = '';
+    return;
+  }
+
+  titleEl.innerText = tactic.title || '전술';
+  const desc = (tactic.desc || '').trim();
+  if (desc) {
+    descEl.innerText = desc;
+    descEl.classList.remove('is-empty');
+  } else {
+    descEl.innerText = '작성된 설명 및 지시사항이 없습니다.';
+    descEl.classList.add('is-empty');
+  }
+  container.style.display = 'block';
+}
+
 function renderBoardTacticMedia(tactic) {
   const container = document.getElementById('tactic-board-media-container');
   const grid = document.getElementById('tactic-large-media-grid');
@@ -431,6 +455,7 @@ export function resetTacticsSelection() {
   tempTacticMedia.length = 0; // mutate array to clear it
   renderMediaPreviewGrid('tactic-media-preview', tempTacticMedia, 'removeTempTacticMedia');
   renderBoardTacticMedia(null);
+  renderBoardTacticNotes(null);
 
   const mediaInput = document.getElementById('tactic-media-input');
   if (mediaInput) mediaInput.value = '';
@@ -607,6 +632,7 @@ export function loadTacticToForm(id) {
   }
   renderMediaPreviewGrid('tactic-media-preview', tempTacticMedia, 'removeTempTacticMedia');
   renderBoardTacticMedia(tactic);
+  renderBoardTacticNotes(tactic);
 
   const cancelBtn = document.getElementById('btn-cancel-tactic-edit');
   if (cancelBtn) cancelBtn.style.display = 'inline-block';
