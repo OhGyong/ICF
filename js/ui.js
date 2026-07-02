@@ -80,7 +80,7 @@ export function refreshActiveTab() {
 function renderDashboard() {
   const totalRoster = appData.roster.length;
   const statRosterCount = document.getElementById('stat-roster-count');
-  if(statRosterCount) statRosterCount.innerText = totalRoster;
+  if (statRosterCount) statRosterCount.innerText = totalRoster;
 
   const now = new Date();
   const upcomingGames = appData.schedule.filter(game => {
@@ -91,13 +91,13 @@ function renderDashboard() {
 
   const statUpcoming = document.getElementById('stat-upcoming-games');
   const statTotal = document.getElementById('stat-total-games');
-  if(statUpcoming) statUpcoming.innerText = upcomingGames.length;
-  if(statTotal) statTotal.innerText = appData.schedule.length;
+  if (statUpcoming) statUpcoming.innerText = upcomingGames.length;
+  if (statTotal) statTotal.innerText = appData.schedule.length;
 
   updateHeroCountdown();
 
   const panelGamesContainer = document.getElementById('dashboard-schedule-list');
-  if(panelGamesContainer) {
+  if (panelGamesContainer) {
     if (upcomingGames.length === 0) {
       panelGamesContainer.innerHTML = `
         <div class="empty-state">
@@ -136,7 +136,7 @@ function renderDashboard() {
   }
 
   const panelTacticsContainer = document.getElementById('dashboard-tactics-list');
-  if(panelTacticsContainer) {
+  if (panelTacticsContainer) {
     if (appData.tactics.length === 0) {
       panelTacticsContainer.innerHTML = `
         <div class="empty-state">
@@ -191,7 +191,7 @@ export function updateHeroCountdown() {
 
     if (diffDays === 0) {
       countdownTimer.innerText = "D-Day";
-      heroTitle.innerHTML = `오늘 바로 <span class="text-highlight">${escapeHtml(nextGame.opponent)} 전</span>이 있습니다!`;
+      heroTitle.innerHTML = `오늘 바로 <span class="text-highlight">${escapeHtml(nextGame.opponent)}</span>이 있습니다!`;
       heroSubtitle.innerText = `장소: ${nextGame.location} | 시간: ${nextGame.time} | 참가자: ${nextGame.participants || '미정'}`;
       if (sidebarDDay) sidebarDDay.innerText = 'Day';
     } else {
@@ -209,7 +209,7 @@ let activeScheduleFilter = 'all';
 
 export function renderScheduleList() {
   const container = document.getElementById('schedule-list-container');
-  if(!container) return;
+  if (!container) return;
   let filteredList = [...appData.schedule];
 
   const now = new Date();
@@ -371,7 +371,7 @@ export function openEditScheduleModal(id) {
 export function deleteSchedule(id) {
   if (confirm('이 경기 일정을 정말 삭제하시겠습니까?')) {
     const idx = appData.schedule.findIndex(s => s.id === id);
-    if(idx !== -1) appData.schedule.splice(idx, 1);
+    if (idx !== -1) appData.schedule.splice(idx, 1);
     saveKey('schedule');
     renderScheduleList();
     updateHeroCountdown();
@@ -381,7 +381,7 @@ export function deleteSchedule(id) {
 // ================= SKILLS CHECKLIST CONTROL =================
 export function renderSkillsList() {
   const container = document.getElementById('skills-list-container');
-  if(!container) return;
+  if (!container) return;
 
   const categories = {};
   appData.skills.forEach(skill => {
@@ -450,7 +450,7 @@ export function renderSkillsList() {
 export function deleteSkill(id) {
   if (confirm('이 스킬 항목을 삭제하시겠습니까?')) {
     const idx = appData.skills.findIndex(s => s.id === id);
-    if(idx !== -1) appData.skills.splice(idx, 1);
+    if (idx !== -1) appData.skills.splice(idx, 1);
     saveKey('skills');
     renderSkillsList();
   }
@@ -483,7 +483,7 @@ export function removeTempSkillMedia(index) {
 // ================= LOCAL TOURNAMENT RULES =================
 export function renderLocalRules() {
   const container = document.getElementById('local-rules-container');
-  if(!container) return;
+  if (!container) return;
   if (appData.rules.length === 0) {
     container.innerHTML = `
       <div class="card text-center" style="padding: 2rem 1rem;">
@@ -509,7 +509,7 @@ export function renderLocalRules() {
 export function deleteLocalRule(id) {
   if (confirm('이 규칙을 리스트에서 삭제하시겠습니까?')) {
     const idx = appData.rules.findIndex(r => r.id === id);
-    if(idx !== -1) appData.rules.splice(idx, 1);
+    if (idx !== -1) appData.rules.splice(idx, 1);
     saveKey('rules');
     renderLocalRules();
   }
@@ -533,7 +533,7 @@ export function renderRosterList() {
     }
   }
 
-  if(!container) return;
+  if (!container) return;
   if (appData.roster.length === 0) {
     container.innerHTML = `
       <div class="card text-center span-all-cols" style="padding: 3rem 1rem;">
@@ -609,7 +609,7 @@ export function setupUIEventListeners() {
   document.getElementById('btn-close-schedule-modal').addEventListener('click', closeScheduleModal);
   document.getElementById('btn-cancel-schedule-modal').addEventListener('click', closeScheduleModal);
 
-  if(finishedCheckbox) {
+  if (finishedCheckbox) {
     finishedCheckbox.addEventListener('change', (e) => {
       if (e.target.checked) {
         scoreInputsContainer.style.display = 'grid';
@@ -619,7 +619,7 @@ export function setupUIEventListeners() {
     });
   }
 
-  if(scheduleForm) {
+  if (scheduleForm) {
     scheduleForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
@@ -675,7 +675,7 @@ export function setupUIEventListeners() {
   document.getElementById('btn-close-skill-modal').addEventListener('click', closeSkillModal);
   document.getElementById('btn-cancel-skill-modal').addEventListener('click', closeSkillModal);
 
-  if(skillForm) {
+  if (skillForm) {
     skillForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -779,7 +779,7 @@ export function setupUIEventListeners() {
   document.getElementById('btn-close-roster-modal').addEventListener('click', closeRosterModal);
   document.getElementById('btn-cancel-roster-modal').addEventListener('click', closeRosterModal);
 
-  if(rosterForm) {
+  if (rosterForm) {
     rosterForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
