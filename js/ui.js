@@ -152,7 +152,7 @@ function renderDashboard() {
             <h4 style="font-size: 0.85rem;">${escapeHtml(tactic.title)}</h4>
             <p style="font-size: 0.75rem; max-width: 250px;">${escapeHtml(tactic.desc)}</p>
           </div>
-          <span class="btn-text" style="font-size: 0.75rem;">전술보드 &rarr;</span>
+          <span class="btn-text" style="font-size: 0.75rem; white-space: nowrap; flex-shrink: 0;">전술보드 &rarr;</span>
         </div>
       `).join('');
     }
