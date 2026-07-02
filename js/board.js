@@ -395,6 +395,23 @@ function setupBoardEventListeners() {
   if (cancelTacticBtn) {
     cancelTacticBtn.addEventListener('click', resetTacticsSelection);
   }
+
+  const showFormBtn = document.getElementById('btn-show-tactic-form');
+  if (showFormBtn) {
+    showFormBtn.addEventListener('click', () => {
+      document.getElementById('tactic-input-form').style.display = 'block';
+      showFormBtn.style.display = 'none';
+    });
+  }
+
+  const hideFormBtn = document.getElementById('btn-hide-tactic-form');
+  if (hideFormBtn) {
+    hideFormBtn.addEventListener('click', () => {
+      document.getElementById('tactic-input-form').style.display = 'none';
+      if (showFormBtn) showFormBtn.style.display = 'flex';
+      resetTacticsSelection();
+    });
+  }
 }
 
 function renderBoardTacticNotes(tactic) {
@@ -451,6 +468,11 @@ function renderBoardTacticMedia(tactic) {
 }
 
 export function resetTacticsSelection() {
+  const tacticForm = document.getElementById('tactic-input-form');
+  if (tacticForm) tacticForm.style.display = 'none';
+  const showFormBtn = document.getElementById('btn-show-tactic-form');
+  if (showFormBtn) showFormBtn.style.display = 'flex';
+
   currentEditingTacticId = null;
   tempTacticMedia.length = 0; // mutate array to clear it
   renderMediaPreviewGrid('tactic-media-preview', tempTacticMedia, 'removeTempTacticMedia');
@@ -579,8 +601,13 @@ async function handleSaveTactic() {
 }
 
 export function loadTacticToForm(id) {
+  const tacticForm = document.getElementById('tactic-input-form');
+  if (tacticForm) tacticForm.style.display = 'block';
+  const showFormBtn = document.getElementById('btn-show-tactic-form');
+  if (showFormBtn) showFormBtn.style.display = 'none';
+
   if (currentEditingTacticId === id) {
-    resetTacticsSelection();
+    // If it's already selected, just return (the form is already shown now)
     return;
   }
 

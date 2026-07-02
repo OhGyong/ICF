@@ -245,8 +245,9 @@
 
         <!-- ================= TACTICS BOARD TAB ================= -->
         <section id="tactics" class="tab-content">
-          <div class="tactics-container">
-            <!-- Board Controls & Legend -->
+          <div class="tactics-top-section">
+            <div class="tactics-container">
+              <!-- Board Controls & Legend -->
             <div class="card border-highlight tactics-settings-card">
               <div class="card-header">
                 <h3>전술보드</h3>
@@ -314,49 +315,6 @@
                   <div class="legend-item"><span class="token-dot token-defense"></span> 수비 (1 ~ 5)</div>
                   <div class="legend-item"><span class="token-dot token-ball">🏀</span> 볼</div>
                 </div>
-              </div>
-            </div>
-
-            <!-- Save / Load Tactics List -->
-            <div class="card tactics-list-card">
-              <div class="card-header">
-                <h3>전술 저장 및 목록</h3>
-              </div>
-              <div class="form-container">
-                <div class="form-group">
-                  <label for="tactic-title">전술 이름</label>
-                  <input type="text" id="tactic-title" placeholder="예: 2-3 지역방어 돌파 작전">
-                </div>
-                <div class="form-group">
-                  <label for="tactic-desc">설명 및 지시사항</label>
-                  <textarea id="tactic-desc" rows="4" placeholder="작전 내용과 선수들의 움직임을 기록하세요..."></textarea>
-                </div>
-                <div class="form-group" id="tactic-links-group">
-                  <label>참고 링크 (유튜브 등)</label>
-                  <div id="tactic-links-container">
-                    <div class="link-input-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                      <input type="url" class="tactic-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
-                      <button type="button" class="btn btn-outline" onclick="addTacticLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
-                    </div>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label>사진 첨부</label>
-                  <input type="file" id="tactic-media-input" accept="image/*" multiple style="display: none;">
-                  <button type="button" class="btn btn-outline w-full"
-                    onclick="document.getElementById('tactic-media-input').click()">
-                    📁 파일 선택 (사진)
-                  </button>
-                  <div id="tactic-media-preview" class="media-preview-grid"></div>
-                </div>
-                <div style="display: flex; gap: 0.5rem;">
-                  <button class="btn btn-primary" id="btn-save-tactic" style="flex: 1;">전술 저장</button>
-                  <button class="btn btn-secondary" id="btn-cancel-tactic-edit" style="display: none;">선택 해제</button>
-                </div>
-              </div>
-              <div class="tactic-list-divider"></div>
-              <div class="saved-tactics" id="saved-tactics-list">
-                <!-- Dynamically populated -->
               </div>
             </div>
 
@@ -439,27 +397,85 @@
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
 
-              <!-- Selected Tactic Notes: description & instructions shown beside the board -->
-              <div class="card margin-top-md tactic-notes-card" id="tactic-board-notes-container" style="display: none;">
-                <div class="tactic-notes-header">
-                  <span class="tactic-notes-eyebrow">📋 작전 노트</span>
-                  <h3 id="tactic-board-notes-title">전술 이름</h3>
-                </div>
-                <p class="tactic-notes-desc" id="tactic-board-notes-desc"></p>
+          <!-- Tactic Notes & Media (Full Width) -->
+          <div class="tactics-middle-section">
+            <!-- Selected Tactic Notes: description & instructions shown beside the board -->
+            <div class="card margin-top-md tactic-notes-card" id="tactic-board-notes-container" style="display: none;">
+              <div class="tactic-notes-header">
+                <span class="tactic-notes-eyebrow">📋 작전 노트</span>
+                <h3 id="tactic-board-notes-title">전술 이름</h3>
               </div>
+              <p class="tactic-notes-desc" id="tactic-board-notes-desc"></p>
+            </div>
 
-              <!-- Large Tactic Media Display Board (Below Court) -->
-              <div class="card margin-top-md" id="tactic-board-media-container" style="display: none;">
-                <div class="card-header"
-                  style="padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                  <div>
-                    <h3 id="tactic-board-media-title">📺 참고</h3>
+            <!-- Large Tactic Media Display Board (Below Court) -->
+            <div class="card margin-top-md" id="tactic-board-media-container" style="display: none;">
+              <div class="card-header"
+                style="padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <h3 id="tactic-board-media-title">📺 참고</h3>
+                </div>
+              </div>
+              <div class="tactic-large-media-grid" id="tactic-large-media-grid">
+                <!-- Dynamically Populated -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Section: Tactics List -->
+          <div class="tactics-bottom-section margin-top-md">
+            <div class="card tactics-list-card">
+              <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>전술 목록</h3>
+                <button class="btn btn-primary" id="btn-show-tactic-form">
+                  <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  전술 추가
+                </button>
+              </div>
+              
+              <div class="form-container" id="tactic-input-form" style="display: none; padding: 1.25rem; background: var(--color-surface-hover); border-radius: 12px; margin-top: 1rem; border: 1px solid var(--color-border);">
+                <h4 style="margin-bottom: 1rem;">전술 정보 입력</h4>
+                <div class="form-group">
+                  <label for="tactic-title">전술 이름</label>
+                  <input type="text" id="tactic-title" placeholder="예: 2-3 지역방어 돌파 작전">
+                </div>
+                <div class="form-group">
+                  <label for="tactic-desc">설명 및 지시사항</label>
+                  <textarea id="tactic-desc" rows="4" placeholder="작전 내용과 선수들의 움직임을 기록하세요..."></textarea>
+                </div>
+                <div class="form-group" id="tactic-links-group">
+                  <label>참고 링크 (유튜브 등)</label>
+                  <div id="tactic-links-container">
+                    <div class="link-input-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                      <input type="url" class="tactic-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
+                      <button type="button" class="btn btn-outline" onclick="addTacticLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
+                    </div>
                   </div>
                 </div>
-                <div class="tactic-large-media-grid" id="tactic-large-media-grid">
-                  <!-- Dynamically Populated -->
+                <div class="form-group">
+                  <label>사진 첨부</label>
+                  <input type="file" id="tactic-media-input" accept="image/*" multiple style="display: none;">
+                  <button type="button" class="btn btn-outline w-full"
+                    onclick="document.getElementById('tactic-media-input').click()">
+                    📁 파일 선택 (사진)
+                  </button>
+                  <div id="tactic-media-preview" class="media-preview-grid"></div>
                 </div>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button class="btn btn-primary" id="btn-save-tactic" style="flex: 1;">전술 저장</button>
+                  <button class="btn btn-secondary" id="btn-cancel-tactic-edit" style="display: none;">선택 해제</button>
+                  <button class="btn btn-secondary" id="btn-hide-tactic-form">닫기</button>
+                </div>
+              </div>
+              <div class="tactic-list-divider"></div>
+              <div class="saved-tactics" id="saved-tactics-list">
+                <!-- Dynamically populated -->
               </div>
             </div>
           </div>

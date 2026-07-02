@@ -1005,16 +1005,13 @@ textarea {
 }
 
 .tactics-list-card {
-  grid-column: 1;
-  grid-row: 2;
-  margin-top: 1.25rem;
   width: 100%;
   box-sizing: border-box;
 }
 
 .tactics-board-wrapper {
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 1;
   width: 100%;
   box-sizing: border-box;
 }
@@ -1132,11 +1129,9 @@ textarea {
 }
 
 .saved-tactics {
-  max-height: 250px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
   padding-bottom: 0.5rem;
 }
 
@@ -1144,7 +1139,7 @@ textarea {
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  padding: 0.75rem 1rem;
+  padding: 1rem 1.25rem;
   cursor: pointer;
   transition: all var(--transition-fast);
   display: flex;
@@ -1155,6 +1150,7 @@ textarea {
 .tactic-item-card:hover {
   border-color: rgba(255, 107, 0, 0.5);
   background-color: var(--color-surface-hover);
+  transform: translateX(3px);
 }
 
 .tactic-item-card.active {
@@ -1164,17 +1160,16 @@ textarea {
 }
 
 .tactic-item-info h4 {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
+  margin-bottom: 0.25rem;
 }
 
 .tactic-item-info p {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--color-text-secondary);
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 180px;
 }
 
 /* Court Board Layout */
