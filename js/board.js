@@ -399,6 +399,14 @@ function setupBoardEventListeners() {
   const showFormBtn = document.getElementById('btn-show-tactic-form');
   if (showFormBtn) {
     showFormBtn.addEventListener('click', () => {
+      // Clear previous selection and form inputs
+      resetTacticsSelection();
+      // Clear board state
+      resetTokenPositions();
+      currentRoutesState.length = 0;
+      renderRoutes();
+
+      // Show the form for a new tactic
       document.getElementById('tactic-input-form').style.display = 'block';
       showFormBtn.style.display = 'none';
     });
