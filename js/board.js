@@ -343,16 +343,18 @@ function setupBoardEventListeners() {
     currentCourtView = 'half';
     if (currentTokenPositionsState.length > 0) {
       currentTokenPositionsState.forEach(token => {
-        token.x = Math.min(98, Math.max(2, parseFloat((token.x * 2).toFixed(2))));
+        // 클램핑 없이 순수 배수 변환 → 역변환(/2)으로 완전히 복원 가능
+        // (풀코트 오른쪽 토큰은 하프코트에서 화면 밖이지만 데이터는 보존됨)
+        token.x = parseFloat((token.x * 2).toFixed(2));
       });
     }
     if (currentRoutesState.length > 0) {
       currentRoutesState.forEach(route => {
         if (route.points) {
-          route.points.forEach(p => { p.x = p.x * 2; });
+          route.points.forEach(p => { p.x = parseFloat((p.x * 2).toFixed(2)); });
         } else if (route.startX !== undefined) {
-          route.startX *= 2;
-          route.endX *= 2;
+          route.startX = parseFloat((route.startX * 2).toFixed(2));
+          route.endX = parseFloat((route.endX * 2).toFixed(2));
         }
       });
     }
@@ -372,10 +374,10 @@ function setupBoardEventListeners() {
     if (currentRoutesState.length > 0) {
       currentRoutesState.forEach(route => {
         if (route.points) {
-          route.points.forEach(p => { p.x = p.x / 2; });
+          route.points.forEach(p => { p.x = parseFloat((p.x / 2).toFixed(2)); });
         } else if (route.startX !== undefined) {
-          route.startX /= 2;
-          route.endX /= 2;
+          route.startX = parseFloat((route.startX / 2).toFixed(2));
+          route.endX = parseFloat((route.endX / 2).toFixed(2));
         }
       });
     }
