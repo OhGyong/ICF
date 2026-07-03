@@ -1,4 +1,4 @@
-import { loadCache, loadState, resetAllData } from './js/firebase-service.js';
+import { loadCache, initFirebase, loadState, resetAllData } from './js/firebase-service.js';
 import { processMediaFile, renderMediaPreviewGrid, openMediaViewModal } from './js/media.js';
 import {
   switchTab, openEditScheduleModal, deleteSchedule,
@@ -141,7 +141,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.error('initApp 오류:', e);
   }
   try {
-    await loadState();
+    await initFirebase();   // dynamic import — CDN 실패 시 내부 catch 처리, db=null 유지
+    await loadState();      // db=null 이면 throw → 아래 catch에서 처리
   } catch (e) {
     console.error('Firebase 연결 실패 — 로컬 캐시로만 동작합니다.', e);
   }
