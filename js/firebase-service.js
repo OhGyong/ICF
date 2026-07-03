@@ -26,10 +26,19 @@ export function loadCache() {
   });
 }
 
+// 키별 onSnapshot 구독 해제 함수 보관
+const _unsubscribers = {};
+
 export async function loadState() {
   const { db, doc, getDoc, setDoc, onSnapshot } = window.fb;
 
   for (const key of DATA_KEYS) {
+    // 기존 리스너가 있으면 먼저 해제하여 중복 등록 방지
+    if (_unsubscribers[key]) {
+      _unsubscribers[key]();
+      _unsubscribers[key] = null;
+    }
+
     const ref = doc(db, 'icf-data', key);
 
     try {
@@ -45,7 +54,8 @@ export async function loadState() {
       console.error(`'${key}' 불러오기 실패:`, e);
     }
 
-    onSnapshot(ref, (d) => {
+    // 반환된 unsubscribe 함수를 저장
+    _unsubscribers[key] = onSnapshot(ref, (d) => {
       if (!d.exists()) return;
       appData[key] = d.data().items || [];
       localStorage.setItem(`hoop_${key}`, JSON.stringify(appData[key]));
