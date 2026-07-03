@@ -66,12 +66,33 @@ export async function loadState() {
   refreshActiveTab();
 }
 
+/**
+ * Firestore 저장 전 미디어 항목을 정리합니다.
+ * - dataUrl(base64), previewUrl(blob URL), file(Blob) 은 제거
+ * - Firebase Storage URL(url)이 있는 항목만 유지
+ * → Firestore 문서 1MB 제한 초과 방지
+ */
+function sanitizeForFirestore(items) {
+  return items.map(item => {
+    if (!item.media || item.media.length === 0) return item;
+    return {
+      ...item,
+      media: item.media
+        .filter(m => m.url)                          // Storage URL 없는 항목 제외
+        .map(({ type, url, name }) => ({ type, url, name })) // 필요 필드만 보존
+    };
+  });
+}
+
 export function saveKey(key) {
   appData[key] = appData[key] || [];
+  // localStorage: 현재 세션 표시용으로 원본 그대로 저장 (previewUrl 포함)
   localStorage.setItem(`hoop_${key}`, JSON.stringify(appData[key]));
   if (!window.fb) return;
   const { db, doc, setDoc } = window.fb;
-  setDoc(doc(db, 'icf-data', key), { items: appData[key] })
+  // Firestore: dataUrl/previewUrl/file 제거 후 저장
+  const firestoreItems = sanitizeForFirestore(appData[key]);
+  setDoc(doc(db, 'icf-data', key), { items: firestoreItems })
     .catch(e => {
       console.error(`'${key}' 저장 실패:`, e);
       alert(`'${key}' 데이터 공유 저장에 실패했습니다. (첨부된 이미지/동영상 용량이 데이터베이스 제한을 초과했을 수 있습니다.)`);
