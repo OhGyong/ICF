@@ -572,13 +572,11 @@ async function handleSaveTactic() {
     document.body.style.cursor = 'default';
   }
 
-  let existingIndex = -1;
-  if (currentEditingTacticId) {
-    existingIndex = appData.tactics.findIndex(t => t.id === currentEditingTacticId);
-  }
-  if (existingIndex === -1) {
-    existingIndex = appData.tactics.findIndex(t => t.title.toLowerCase() === title.toLowerCase());
-  }
+  // currentEditingTacticId가 있을 때만 수정, 없으면 항상 신규 추가
+  // (제목 기반 매칭은 동명 전술을 의도치 않게 덮어쓸 수 있어 제거)
+  const existingIndex = currentEditingTacticId
+    ? appData.tactics.findIndex(t => t.id === currentEditingTacticId)
+    : -1;
 
   if (existingIndex !== -1) {
     appData.tactics[existingIndex].title = title;
