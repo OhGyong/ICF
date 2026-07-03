@@ -572,6 +572,20 @@ export function renderRosterList() {
         <h3 class="roster-name" style="margin-top:0.35rem;">${escapeHtml(player.name)}</h3>
         <span class="roster-pos-badge">${escapeHtml(player.position)}</span>
         ${mediaGalleryHtml}
+        <div class="skill-item-actions" style="margin-top: 0.75rem;">
+          <button class="game-btn-icon" onclick="editRoster('${player.id}')" title="선수 정보 수정">
+            <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
+          <button class="game-btn-icon delete-btn" onclick="deleteRoster('${player.id}')" title="선수 삭제">
+            <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     `;
   }).join('');
@@ -580,6 +594,40 @@ export function renderRosterList() {
 export function removeTempRosterMedia(index) {
   tempRosterMedia.splice(index, 1);
   renderMediaPreviewGrid('roster-media-preview', tempRosterMedia, 'removeTempRosterMedia');
+}
+
+export function editRoster(id) {
+  const player = appData.roster.find(r => r.id === id);
+  if (!player) return;
+
+  const rosterModal = document.getElementById('roster-modal');
+  const rosterForm = document.getElementById('roster-form');
+
+  document.getElementById('roster-modal-title').innerText = '선수 정보 수정';
+  document.getElementById('form-roster-id').value = player.id;
+  document.getElementById('form-roster-name').value = player.name;
+  document.getElementById('form-roster-number').value = player.number;
+  document.getElementById('form-roster-position').value = player.position;
+
+  tempRosterMedia.length = 0;
+  if (player.media) {
+    tempRosterMedia.push(...JSON.parse(JSON.stringify(player.media)));
+  }
+  renderMediaPreviewGrid('roster-media-preview', tempRosterMedia, 'removeTempRosterMedia');
+
+  const mediaInput = document.getElementById('form-roster-media');
+  if (mediaInput) mediaInput.value = '';
+
+  rosterModal.classList.add('active');
+}
+
+export function deleteRoster(id) {
+  if (confirm('이 선수를 로스터에서 삭제하시겠습니까?')) {
+    const idx = appData.roster.findIndex(r => r.id === id);
+    if (idx !== -1) appData.roster.splice(idx, 1);
+    saveKey('roster');
+    renderRosterList();
+  }
 }
 
 export function setupUIEventListeners() {
@@ -785,6 +833,7 @@ export function setupUIEventListeners() {
     rosterForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      const id = document.getElementById('form-roster-id').value;
       const name = document.getElementById('form-roster-name').value;
       const number = document.getElementById('form-roster-number').value;
       const position = document.getElementById('form-roster-position').value;
@@ -806,12 +855,25 @@ export function setupUIEventListeners() {
         document.body.style.cursor = 'default';
       }
 
-      const newPlayer = {
-        id: 'r_' + Date.now(),
-        name, number, position, height: '', strengths: '',
-        media: finalMedia
-      };
-      appData.roster.push(newPlayer);
+      if (id) {
+        // 기존 선수 수정
+        const index = appData.roster.findIndex(r => r.id === id);
+        if (index !== -1) {
+          appData.roster[index] = {
+            ...appData.roster[index],
+            name, number, position,
+            media: finalMedia
+          };
+        }
+      } else {
+        // 신규 선수 등록
+        const newPlayer = {
+          id: 'r_' + Date.now(),
+          name, number, position, height: '', strengths: '',
+          media: finalMedia
+        };
+        appData.roster.push(newPlayer);
+      }
 
       saveKey('roster');
       closeRosterModal();

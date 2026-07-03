@@ -4,7 +4,7 @@ import {
   switchTab, openEditScheduleModal, deleteSchedule,
   editSkill, deleteSkill, removeTempSkillMedia, tempSkillMedia,
   deleteLocalRule,
-  removeTempRosterMedia, tempRosterMedia,
+  removeTempRosterMedia, tempRosterMedia, editRoster, deleteRoster,
   updateHeroCountdown,
   setupUIEventListeners
 } from './js/ui.js';
@@ -28,6 +28,8 @@ window.deleteSkill = deleteSkill;
 window.removeTempSkillMedia = removeTempSkillMedia;
 window.deleteLocalRule = deleteLocalRule;
 window.removeTempRosterMedia = removeTempRosterMedia;
+window.editRoster = editRoster;
+window.deleteRoster = deleteRoster;
 window.openMediaViewModal = openMediaViewModal;
 window.appData = appData;
 
