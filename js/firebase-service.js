@@ -1,22 +1,40 @@
+// Firebase SDK를 모듈에서 직접 import → window.fb 전역 브릿지 및 waitForFirebase() 폴링 불필요
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import {
+  getFirestore, doc, getDoc, setDoc, onSnapshot
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import {
+  getStorage, ref as storageRef, uploadBytes, getDownloadURL
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
+
 import { appData, DATA_KEYS, DATA_DEFAULTS } from './data.js';
 import { refreshActiveTab } from './ui.js';
 
-export function waitForFirebase() {
-  return new Promise((resolve, reject) => {
-    if (window.fb) return resolve();
-    let waited = 0;
-    const timer = setInterval(() => {
-      if (window.fb) {
-        clearInterval(timer);
-        resolve();
-      } else if ((waited += 50) >= 10000) {
-        clearInterval(timer);
-        reject(new Error('Firebase 로드 실패'));
-      }
-    }, 50);
-  });
+// ================= FIREBASE 초기화 =================
+const firebaseConfig = {
+  apiKey: 'AIzaSyBGqADhFYbr_7KI590WHmt1MHGXexOa79E',
+  authDomain: 'icf-inchangfriend.firebaseapp.com',
+  databaseURL: 'https://icf-inchangfriend-default-rtdb.firebaseio.com',
+  projectId: 'icf-inchangfriend',
+  storageBucket: 'icf-inchangfriend.firebasestorage.app',
+  messagingSenderId: '680680923499',
+  appId: '1:680680923499:web:84f36425015960c9ff2c2e',
+  measurementId: 'G-QFS6X2EF5X'
+};
+
+let db = null;
+export let storage = null;
+export { storageRef, uploadBytes, getDownloadURL };
+
+try {
+  const app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  storage = getStorage(app);
+} catch (e) {
+  console.error('Firebase 초기화 실패 — 로컬 캐시로만 동작합니다.', e);
 }
 
+// ================= 캐시 로드 =================
 export function loadCache() {
   DATA_KEYS.forEach(key => {
     const cached = localStorage.getItem(`hoop_${key}`);
@@ -26,11 +44,12 @@ export function loadCache() {
   });
 }
 
+// ================= FIRESTORE 실시간 동기화 =================
 // 키별 onSnapshot 구독 해제 함수 보관
 const _unsubscribers = {};
 
 export async function loadState() {
-  const { db, doc, getDoc, setDoc, onSnapshot } = window.fb;
+  if (!db) throw new Error('Firebase DB가 초기화되지 않았습니다.');
 
   for (const key of DATA_KEYS) {
     // 기존 리스너가 있으면 먼저 해제하여 중복 등록 방지
@@ -39,15 +58,15 @@ export async function loadState() {
       _unsubscribers[key] = null;
     }
 
-    const ref = doc(db, 'icf-data', key);
+    const docRef = doc(db, 'icf-data', key);
 
     try {
-      const snap = await getDoc(ref);
+      const snap = await getDoc(docRef);
       if (snap.exists()) {
         appData[key] = snap.data().items || [];
       } else {
         appData[key] = DATA_DEFAULTS[key];
-        await setDoc(ref, { items: DATA_DEFAULTS[key] });
+        await setDoc(docRef, { items: DATA_DEFAULTS[key] });
       }
       localStorage.setItem(`hoop_${key}`, JSON.stringify(appData[key]));
     } catch (e) {
@@ -55,7 +74,7 @@ export async function loadState() {
     }
 
     // 반환된 unsubscribe 함수를 저장
-    _unsubscribers[key] = onSnapshot(ref, (d) => {
+    _unsubscribers[key] = onSnapshot(docRef, (d) => {
       if (!d.exists()) return;
       appData[key] = d.data().items || [];
       localStorage.setItem(`hoop_${key}`, JSON.stringify(appData[key]));
@@ -66,6 +85,7 @@ export async function loadState() {
   refreshActiveTab();
 }
 
+// ================= FIRESTORE 저장 =================
 /**
  * Firestore 저장 전 미디어 항목을 정리합니다.
  * - dataUrl(base64), previewUrl(blob URL), file(Blob) 은 제거
@@ -78,8 +98,8 @@ function sanitizeForFirestore(items) {
     return {
       ...item,
       media: item.media
-        .filter(m => m.url)                          // Storage URL 없는 항목 제외
-        .map(({ type, url, name }) => ({ type, url, name })) // 필요 필드만 보존
+        .filter(m => m.url)
+        .map(({ type, url, name }) => ({ type, url, name }))
     };
   });
 }
@@ -88,8 +108,7 @@ export function saveKey(key) {
   appData[key] = appData[key] || [];
   // localStorage: 현재 세션 표시용으로 원본 그대로 저장 (previewUrl 포함)
   localStorage.setItem(`hoop_${key}`, JSON.stringify(appData[key]));
-  if (!window.fb) return;
-  const { db, doc, setDoc } = window.fb;
+  if (!db) return;
   // Firestore: dataUrl/previewUrl/file 제거 후 저장
   const firestoreItems = sanitizeForFirestore(appData[key]);
   setDoc(doc(db, 'icf-data', key), { items: firestoreItems })

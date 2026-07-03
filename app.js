@@ -1,4 +1,4 @@
-import { loadCache, loadState, waitForFirebase, resetAllData } from './js/firebase-service.js';
+import { loadCache, loadState, resetAllData } from './js/firebase-service.js';
 import { processMediaFile, renderMediaPreviewGrid, openMediaViewModal } from './js/media.js';
 import {
   switchTab, openEditScheduleModal, deleteSchedule,
@@ -141,7 +141,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.error('initApp 오류:', e);
   }
   try {
-    await waitForFirebase();
     await loadState();
   } catch (e) {
     console.error('Firebase 연결 실패 — 로컬 캐시로만 동작합니다.', e);

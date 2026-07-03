@@ -1,4 +1,5 @@
 import { escapeHtml } from './utils.js';
+import { storage, storageRef, uploadBytes, getDownloadURL } from './firebase-service.js';
 
 export function processMediaFile(file) {
   return new Promise((resolve, reject) => {
@@ -48,8 +49,7 @@ export function processMediaFile(file) {
 }
 
 export async function uploadMediaFiles(tempMediaArray, folderName) {
-  if (!window.fb || !window.fb.storage) return tempMediaArray;
-  const { storage, ref, uploadBytes, getDownloadURL } = window.fb;
+  if (!storage) return tempMediaArray;
 
   const uploadedMedia = [];
   for (const item of tempMediaArray) {
@@ -57,13 +57,13 @@ export async function uploadMediaFiles(tempMediaArray, folderName) {
       try {
         const fileExt = item.name.split('.').pop() || 'tmp';
         const fileName = `${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
-        const storageRef = ref(storage, `image/${fileName}`);
+        const sRef = storageRef(storage, `image/${fileName}`);
 
-        await uploadBytes(storageRef, item.file);
-        const url = await getDownloadURL(storageRef);
+        await uploadBytes(sRef, item.file);
+        const url = await getDownloadURL(sRef);
         uploadedMedia.push({ type: item.type, url: url, name: item.name });
       } catch (err) {
-        console.error("Upload error:", err);
+        console.error('Upload error:', err);
         alert(`'${item.name}' 파일 업로드 중 오류가 발생했습니다.`);
       }
     } else {
