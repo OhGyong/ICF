@@ -31,7 +31,6 @@ window.removeTempRosterMedia = removeTempRosterMedia;
 window.editRoster = editRoster;
 window.deleteRoster = deleteRoster;
 window.openMediaViewModal = openMediaViewModal;
-window.appData = appData;
 
 // ================= INITIALIZATION & SETUP =================
 
