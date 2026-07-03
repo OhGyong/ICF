@@ -166,8 +166,12 @@ function setupDragAndDrop() {
   const container = document.getElementById('court-board-container');
 
   const getRelativePos = (e, rect) => {
-    let clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-    let clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+    // touchend 시점에는 e.touches가 빈 배열이므로 e.changedTouches를 폴백으로 사용
+    const touch = e.type.startsWith('touch')
+      ? (e.touches.length > 0 ? e.touches[0] : e.changedTouches[0])
+      : null;
+    const clientX = touch ? touch.clientX : e.clientX;
+    const clientY = touch ? touch.clientY : e.clientY;
     const isPortrait = document.getElementById('court-wrapper').classList.contains('portrait-mode');
     let xPercent, yPercent;
     if (isPortrait) {
