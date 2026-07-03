@@ -209,16 +209,51 @@ export function updateHeroCountdown() {
 // ================= SCHEDULE TAB CONTROL =================
 let activeScheduleFilter = 'all';
 
+/**
+ * 날짜가 지난 경기를 자동으로 종료(finished=true) 처리합니다.
+ * 변경이 발생한 경우 Firebase/localStorage에 저장하고 히어로 카운트다운을 갱신합니다.
+ */
+function autoFinishPastGames() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let changed = false;
+
+  appData.schedule.forEach(game => {
+    if (!game.finished) {
+      const gameDate = new Date(game.date);
+      gameDate.setHours(23, 59, 59, 999);
+      if (gameDate < today) {
+        game.finished = true;
+        changed = true;
+      }
+    }
+  });
+
+  if (changed) {
+    saveKey('schedule');
+    updateHeroCountdown();
+  }
+}
+
 export function renderScheduleList() {
   const container = document.getElementById('schedule-list-container');
   if (!container) return;
+
+  // 날짜가 지난 경기 자동 종료 처리
+  autoFinishPastGames();
+
   let filteredList = [...appData.schedule];
 
   const now = new Date();
   now.setHours(0, 0, 0, 0);
 
   if (activeScheduleFilter === 'upcoming') {
-    filteredList = filteredList.filter(game => !game.finished);
+    // 대시보드와 동일한 로직: finished가 아니고 당일 포함 미래 경기만 표시
+    filteredList = filteredList.filter(game => {
+      const gameDate = new Date(game.date);
+      gameDate.setHours(23, 59, 59, 999);
+      return !game.finished && gameDate >= now;
+    });
   } else if (activeScheduleFilter === 'finished') {
     filteredList = filteredList.filter(game => game.finished);
   }
