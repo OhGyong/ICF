@@ -735,6 +735,15 @@
           <label for="form-skill-desc">상세 설명</label>
           <input type="text" id="form-skill-desc" placeholder="예: 드리블 돌파 중 멈춰서 빠르고 안정적인 점퍼 쏘기">
         </div>
+        <div class="form-group" id="skill-links-group">
+          <label>참고 링크 (유튜브 등)</label>
+          <div id="skill-links-container">
+            <div class="link-input-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <input type="url" class="skill-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
+              <button type="button" class="btn btn-outline" onclick="addSkillLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
+            </div>
+          </div>
+        </div>
         <div class="form-group">
           <label>참고 사진 첨부</label>
           <input type="file" id="form-skill-media" accept="image/*" multiple style="display: none;">

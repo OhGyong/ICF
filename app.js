@@ -6,7 +6,8 @@ import {
   deleteLocalRule,
   removeTempRosterMedia, tempRosterMedia, editRoster, deleteRoster,
   updateHeroCountdown,
-  setupUIEventListeners
+  setupUIEventListeners,
+  addSkillLinkInput, removeSkillLinkInput
 } from './js/ui.js';
 import {
   deleteTactic, loadTacticToForm, removeTempTacticMedia, tempTacticMedia, addTacticLinkInput, removeTacticLinkInput
@@ -26,6 +27,8 @@ window.removeTacticLinkInput = removeTacticLinkInput;
 window.editSkill = editSkill;
 window.deleteSkill = deleteSkill;
 window.removeTempSkillMedia = removeTempSkillMedia;
+window.addSkillLinkInput = addSkillLinkInput;
+window.removeSkillLinkInput = removeSkillLinkInput;
 window.deleteLocalRule = deleteLocalRule;
 window.removeTempRosterMedia = removeTempRosterMedia;
 window.editRoster = editRoster;

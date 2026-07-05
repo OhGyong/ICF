@@ -444,6 +444,16 @@ export function renderSkillsList() {
         </div>
       ` : '';
 
+      const linksHtml = (skill.links && skill.links.length > 0) ? `
+        <div class="skill-links" style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+          ${skill.links.map(link => `
+            <a href="${escapeHtml(link)}" target="_blank" class="skill-link-btn" style="display: block; background-color: var(--color-bg); border: 1.5px solid var(--color-border-strong); border-radius: 10px; padding: 0.75rem 1rem; color: var(--color-primary); font-size: 0.95rem; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(link)}">
+              🔗 ${escapeHtml(link)}
+            </a>
+          `).join('')}
+        </div>
+      ` : '';
+
       return `
         <div class="skill-item" style="flex-direction: column; align-items: stretch; gap: 0.5rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -466,6 +476,7 @@ export function renderSkillsList() {
               </button>
             </div>
           </div>
+          ${linksHtml}
           ${mediaGalleryHtml}
         </div>
       `;
@@ -503,6 +514,35 @@ export function editSkill(id) {
   document.getElementById('form-skill-name').value = skill.name;
   document.getElementById('form-skill-desc').value = skill.desc || '';
 
+  const linksContainer = document.getElementById('skill-links-container');
+  if (linksContainer) {
+    linksContainer.innerHTML = '';
+    const skillLinks = skill.links || [];
+    
+    if (skillLinks.length === 0) {
+      linksContainer.innerHTML = `
+        <div class="link-input-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <input type="url" class="skill-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
+          <button type="button" class="btn btn-outline" onclick="addSkillLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
+        </div>
+      `;
+    } else {
+      skillLinks.forEach((link, idx) => {
+        const isLast = idx === skillLinks.length - 1;
+        const rowHtml = `
+          <div class="link-input-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <a href="${escapeHtml(link)}" target="_blank" class="skill-link-btn" style="flex: 1; min-width: 0; box-sizing: border-box; display: block; background-color: var(--color-bg); border: 1.5px solid var(--color-border-strong); border-radius: 10px; padding: 0.75rem 1rem; color: var(--color-primary); font-size: 0.95rem; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(link)}">
+              🔗 ${escapeHtml(link)}
+            </a>
+            <input type="hidden" class="skill-link-input-saved" value="${escapeHtml(link)}">
+            <button type="button" class="btn btn-outline" onclick="${isLast ? 'addSkillLinkInput(this)' : 'removeSkillLinkInput(this)'}" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="${isLast ? '링크 추가' : '링크 삭제'}">${isLast ? '+' : '-'}</button>
+          </div>
+        `;
+        linksContainer.insertAdjacentHTML('beforeend', rowHtml);
+      });
+    }
+  }
+
   tempSkillMedia.length = 0;
   if (skill.media) {
     tempSkillMedia.push(...JSON.parse(JSON.stringify(skill.media)));
@@ -515,6 +555,42 @@ export function editSkill(id) {
 export function removeTempSkillMedia(index) {
   tempSkillMedia.splice(index, 1);
   renderMediaPreviewGrid('skill-media-preview', tempSkillMedia, 'removeTempSkillMedia');
+}
+
+export function addSkillLinkInput(btn) {
+  const row = btn.closest('.link-input-row');
+  const input = row.querySelector('input');
+  const val = input.value.trim();
+  
+  if (!val) {
+    alert('링크 주소를 먼저 입력해주세요.');
+    input.focus();
+    return;
+  }
+  
+  row.innerHTML = `
+    <a href="${escapeHtml(val)}" target="_blank" class="skill-link-btn" style="flex: 1; min-width: 0; box-sizing: border-box; display: block; background-color: var(--color-bg); border: 1.5px solid var(--color-border-strong); border-radius: 10px; padding: 0.75rem 1rem; color: var(--color-primary); font-size: 0.95rem; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(val)}">
+      🔗 ${escapeHtml(val)}
+    </a>
+    <input type="hidden" class="skill-link-input-saved" value="${escapeHtml(val)}">
+    <button type="button" class="btn btn-outline" onclick="removeSkillLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 삭제">-</button>
+  `;
+
+  const container = document.getElementById('skill-links-container');
+  if (!container) return;
+  const newRow = document.createElement('div');
+  newRow.className = 'link-input-row';
+  newRow.style.cssText = 'display: flex; gap: 0.5rem; margin-bottom: 0.5rem;';
+  newRow.innerHTML = `
+    <input type="url" class="skill-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
+    <button type="button" class="btn btn-outline" onclick="addSkillLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
+  `;
+  container.appendChild(newRow);
+}
+
+export function removeSkillLinkInput(btn) {
+  const row = btn.closest('.link-input-row');
+  if (row) row.remove();
 }
 
 // ================= LOCAL TOURNAMENT RULES =================
@@ -746,6 +822,17 @@ export function setupUIEventListeners() {
   document.getElementById('btn-open-skill-modal').addEventListener('click', () => {
     document.getElementById('skill-modal-title').innerText = '새로운 스킬 추가';
     document.getElementById('form-skill-id').value = '';
+    
+    const linksContainer = document.getElementById('skill-links-container');
+    if (linksContainer) {
+      linksContainer.innerHTML = `
+        <div class="link-input-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <input type="url" class="skill-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
+          <button type="button" class="btn btn-outline" onclick="addSkillLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
+        </div>
+      `;
+    }
+
     tempSkillMedia.length = 0;
     renderMediaPreviewGrid('skill-media-preview', tempSkillMedia, 'removeTempSkillMedia');
     const mediaInput = document.getElementById('form-skill-media');
@@ -773,6 +860,10 @@ export function setupUIEventListeners() {
       const name = nameInput.value.trim();
       const desc = descInput.value.trim();
 
+      const links = Array.from(skillForm.querySelectorAll('.skill-link-input-saved, .skill-link-input'))
+        .map(input => input.value.trim())
+        .filter(val => val);
+
       const submitBtn = skillForm.querySelector('button[type="submit"]');
       const originalBtnText = submitBtn.innerText;
       submitBtn.innerText = '업로드 중...';
@@ -795,7 +886,7 @@ export function setupUIEventListeners() {
         if (index !== -1) {
           appData.skills[index] = {
             ...appData.skills[index],
-            category, name, desc,
+            category, name, desc, links,
             media: finalMedia
           };
         }
@@ -805,6 +896,7 @@ export function setupUIEventListeners() {
           category,
           name,
           desc,
+          links,
           checked: false,
           media: finalMedia
         };
