@@ -1368,6 +1368,13 @@ body.board-fullscreen-open {
   aspect-ratio: auto;
 }
 
+/* 전체화면·세로 보기: 90° 회전된 코트가 화면을 정확히 채우도록 뷰포트 값으로 직접 지정.
+   (회전 전 width가 화면 높이 → 회전 후 세로, 회전 전 height가 화면 폭 → 회전 후 가로가 됨) */
+.tactics-board-container.board-fullscreen .court-board-wrapper.portrait-mode .court-board {
+  width: calc(100dvh - 56px);
+  height: 100vw;
+}
+
 .court-board-wrapper {
   position: relative;
   width: 100%;
