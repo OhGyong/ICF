@@ -245,6 +245,15 @@
 
         <!-- ================= TACTICS BOARD TAB ================= -->
         <section id="tactics" class="tab-content">
+          <!-- Selected Tactic Notes: shown above the board when a tactic is selected -->
+          <div class="card tactic-notes-card" id="tactic-board-notes-container" style="display: none; margin-bottom: 1rem;">
+            <div class="tactic-notes-header">
+              <span class="tactic-notes-eyebrow">📋 작전 노트</span>
+              <h3 id="tactic-board-notes-title">전술 이름</h3>
+            </div>
+            <p class="tactic-notes-desc" id="tactic-board-notes-desc"></p>
+          </div>
+
           <div class="tactics-top-section">
             <div class="tactics-container">
               <!-- Board Controls & Legend -->
@@ -400,17 +409,8 @@
             </div>
           </div>
 
-          <!-- Tactic Notes & Media (Full Width) -->
+          <!-- Tactic Media (Full Width) -->
           <div class="tactics-middle-section">
-            <!-- Selected Tactic Notes: description & instructions shown beside the board -->
-            <div class="card margin-top-md tactic-notes-card" id="tactic-board-notes-container" style="display: none;">
-              <div class="tactic-notes-header">
-                <span class="tactic-notes-eyebrow">📋 작전 노트</span>
-                <h3 id="tactic-board-notes-title">전술 이름</h3>
-              </div>
-              <p class="tactic-notes-desc" id="tactic-board-notes-desc"></p>
-            </div>
-
             <!-- Large Tactic Media Display Board (Below Court) -->
             <div class="card margin-top-md" id="tactic-board-media-container" style="display: none;">
               <div class="card-header"

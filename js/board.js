@@ -613,6 +613,8 @@ async function handleSaveTactic() {
 }
 
 export function loadTacticToForm(id) {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
   const tacticForm = document.getElementById('tactic-input-form');
   if (tacticForm) tacticForm.style.display = 'block';
   const showFormBtn = document.getElementById('btn-show-tactic-form');
