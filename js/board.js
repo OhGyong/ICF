@@ -286,7 +286,7 @@ function setupBoardEventListeners() {
     document.getElementById('mode-erase').classList.remove('active');
     document.getElementById('tactics-board-container').classList.add('draw-mode');
     const drawToolbar = document.getElementById('draw-toolbar');
-    if (drawToolbar) drawToolbar.style.display = 'block';
+    if (drawToolbar) drawToolbar.style.display = 'flex';
     renderRoutes();
   });
 
@@ -395,6 +395,54 @@ function setupBoardEventListeners() {
       e.target.innerText = '세로 보기 전환';
     }
   });
+
+  // 뷰 설정 패널 토글 (⚙️)
+  const settingsToggle = document.getElementById('btn-board-settings-toggle');
+  const settingsPanel = document.getElementById('board-settings-panel');
+  if (settingsToggle && settingsPanel) {
+    settingsToggle.addEventListener('click', () => {
+      const willOpen = settingsPanel.hasAttribute('hidden');
+      if (willOpen) {
+        settingsPanel.removeAttribute('hidden');
+      } else {
+        settingsPanel.setAttribute('hidden', '');
+      }
+      settingsToggle.classList.toggle('active', willOpen);
+      settingsToggle.setAttribute('aria-expanded', String(willOpen));
+    });
+  }
+
+  // 전체화면(집중 모드) 토글 (⛶)
+  const fullscreenBtn = document.getElementById('btn-board-fullscreen');
+  const boardContainer = document.getElementById('tactics-board-container');
+  if (fullscreenBtn && boardContainer) {
+    let fsPlaceholder = null;
+    const setFullscreen = (on) => {
+      if (on && !fsPlaceholder) {
+        // .tab-content 조상에 걸린 transform 때문에 position:fixed가 뷰포트 기준이 되지 않으므로
+        // 전체화면 동안에는 보드를 body 직속으로 옮겨 뷰포트 전체를 덮게 한다.
+        fsPlaceholder = document.createComment('board-fullscreen-placeholder');
+        boardContainer.parentNode.insertBefore(fsPlaceholder, boardContainer);
+        document.body.appendChild(boardContainer);
+      } else if (!on && fsPlaceholder) {
+        fsPlaceholder.parentNode.insertBefore(boardContainer, fsPlaceholder);
+        fsPlaceholder.remove();
+        fsPlaceholder = null;
+      }
+      boardContainer.classList.toggle('board-fullscreen', on);
+      document.body.classList.toggle('board-fullscreen-open', on);
+      fullscreenBtn.innerText = on ? '✕' : '⛶';
+      fullscreenBtn.title = on ? '전체화면 종료' : '전체화면';
+    };
+    fullscreenBtn.addEventListener('click', () => {
+      setFullscreen(!boardContainer.classList.contains('board-fullscreen'));
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && boardContainer.classList.contains('board-fullscreen')) {
+        setFullscreen(false);
+      }
+    });
+  }
 
   document.getElementById('btn-save-tactic').addEventListener('click', handleSaveTactic);
   const cancelTacticBtn = document.getElementById('btn-cancel-tactic-edit');

@@ -257,79 +257,75 @@
           <div class="tactics-top-section">
             <div class="tactics-container">
               <!-- Board Controls & Legend -->
-            <div class="card border-highlight tactics-settings-card">
-              <div class="card-header">
-                <h3>전술보드</h3>
-                <p class="text-muted">선수 및 볼 토큰을 드래그하여 배치해보세요.</p>
-              </div>
-
-              <div class="board-settings">
-                <div class="setting-group">
-                  <label>코트 뷰 설정</label>
-                  <div class="segmented-control">
-                    <button class="control-btn active" id="court-half">하프 코트</button>
-                    <button class="control-btn" id="court-full">풀 코트</button>
-                  </div>
-                </div>
-
-                <div class="setting-group">
-                  <label>조작 모드</label>
-                  <div class="segmented-control">
-                    <button class="control-btn active" id="mode-move">토큰 이동</button>
-                    <button class="control-btn" id="mode-draw">경로 그리기</button>
-                    <button class="control-btn" id="mode-erase">경로 지우개</button>
-                  </div>
-                </div>
-
-                <!-- 그리기 도구 툴바 (그리기 모드일 때만 활성화/표시) -->
-                <div class="setting-group draw-toolbar" id="draw-toolbar" style="display: none; padding: 12px; background: var(--color-surface-hover); border-radius: 8px; border: 1px solid var(--color-border);">
-                  <label>선 종류</label>
-                  <div class="segmented-control" style="margin-bottom: 12px;">
-                    <button class="control-btn active" id="tool-arrow">화살표</button>
-                    <button class="control-btn" id="tool-line">일반 선</button>
-                  </div>
-                  <label>색상</label>
-                  <div class="color-palette" style="display: flex; gap: 10px;">
-                    <button class="color-btn active" data-color="#08541c" style="background: #08541c;" title="초록색"></button>
-                    <button class="color-btn" data-color="#d32f2f" style="background: #d32f2f;" title="빨간색"></button>
-                    <button class="color-btn" data-color="#1976d2" style="background: #1976d2;" title="파란색"></button>
-                    <button class="color-btn" data-color="#f57c00" style="background: #f57c00;" title="주황색"></button>
-                    <button class="color-btn" data-color="#262F40" style="background: #262F40;" title="검정색"></button>
-                  </div>
-                </div>
-
-                <div class="setting-group">
-                  <button class="btn btn-secondary w-full" id="btn-reset-board-tokens">
-                    토큰 위치 초기화
-                  </button>
-                </div>
-
-                <div class="setting-group">
-                  <button class="btn btn-secondary w-full" id="btn-reset-routes" style="padding: 0.5rem; font-size: 0.9rem;" title="모든 경로를 지웁니다">
-                    모든 경로 지우기
-                  </button>
-                </div>
-
-                <div class="setting-group">
-                  <button class="btn btn-primary w-full" id="btn-toggle-rotation">
-                    세로 보기 전환
-                  </button>
-                </div>
-              </div>
-
-              <div class="token-legend">
-                <h4>토큰 목록</h4>
-                <div class="legend-items">
-                  <div class="legend-item"><span class="token-dot token-offense"></span> 공격 (1 ~ 5)</div>
-                  <div class="legend-item"><span class="token-dot token-defense"></span> 수비 (1 ~ 5)</div>
-                  <div class="legend-item"><span class="token-dot token-ball">🏀</span> 볼</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right Side: Interactive Board -->
+            <!-- Interactive Board (full width, controls overlaid on the board) -->
             <div class="tactics-board-wrapper">
               <div class="tactics-board-container" id="tactics-board-container">
+
+                <!-- 항상 보이는 상단 플로팅 툴바: 조작 모드 + 뷰 설정/전체화면 -->
+                <div class="board-float-toolbar" id="board-float-toolbar">
+                  <div class="segmented-control board-mode-control">
+                    <button class="control-btn active" id="mode-move">이동</button>
+                    <button class="control-btn" id="mode-draw">그리기</button>
+                    <button class="control-btn" id="mode-erase">지우개</button>
+                  </div>
+                  <div class="board-toolbar-actions">
+                    <button class="board-icon-btn" id="btn-board-settings-toggle" title="뷰 설정" aria-expanded="false">⚙️</button>
+                    <button class="board-icon-btn" id="btn-board-fullscreen" title="전체화면">⛶</button>
+                  </div>
+                </div>
+
+                <!-- 그리기 도구 툴바 (그리기 모드일 때만 board.js가 표시) -->
+                <div class="board-draw-toolbar draw-toolbar" id="draw-toolbar" style="display: none;">
+                  <div class="draw-toolbar-row">
+                    <span class="draw-toolbar-label">선</span>
+                    <div class="segmented-control">
+                      <button class="control-btn active" id="tool-arrow">화살표</button>
+                      <button class="control-btn" id="tool-line">일반</button>
+                    </div>
+                  </div>
+                  <div class="draw-toolbar-row">
+                    <span class="draw-toolbar-label">색</span>
+                    <div class="color-palette">
+                      <button class="color-btn active" data-color="#08541c" style="background: #08541c;" title="초록색"></button>
+                      <button class="color-btn" data-color="#d32f2f" style="background: #d32f2f;" title="빨간색"></button>
+                      <button class="color-btn" data-color="#1976d2" style="background: #1976d2;" title="파란색"></button>
+                      <button class="color-btn" data-color="#f57c00" style="background: #f57c00;" title="주황색"></button>
+                      <button class="color-btn" data-color="#262F40" style="background: #262F40;" title="검정색"></button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 뷰 설정 패널 (⚙️ 토글): 기본 숨김 -->
+                <div class="board-settings-panel" id="board-settings-panel" hidden>
+                  <div class="setting-group">
+                    <label>코트 뷰</label>
+                    <div class="segmented-control">
+                      <button class="control-btn active" id="court-half">하프 코트</button>
+                      <button class="control-btn" id="court-full">풀 코트</button>
+                    </div>
+                  </div>
+
+                  <div class="setting-group">
+                    <button class="btn btn-secondary w-full" id="btn-toggle-rotation">
+                      세로 보기 전환
+                    </button>
+                  </div>
+
+                  <div class="board-settings-panel-actions">
+                    <button class="btn btn-secondary" id="btn-reset-board-tokens">토큰 초기화</button>
+                    <button class="btn btn-secondary" id="btn-reset-routes" title="모든 경로를 지웁니다">경로 지우기</button>
+                  </div>
+
+                  <div class="token-legend">
+                    <h4>토큰 목록</h4>
+                    <div class="legend-items">
+                      <div class="legend-item"><span class="token-dot token-offense"></span> 공격 (1 ~ 5)</div>
+                      <div class="legend-item"><span class="token-dot token-defense"></span> 수비 (1 ~ 5)</div>
+                      <div class="legend-item"><span class="token-dot token-ball">🏀</span> 볼</div>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- SVG Interactive Court Board Wrapper for aspect ratio -->
                 <div class="court-board-wrapper" id="court-wrapper">
                   <div class="court-board" id="court-board-container">

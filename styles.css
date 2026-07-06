@@ -991,17 +991,7 @@ textarea {
 
 /* ================= TACTICS BOARD SPECIFIC ================= */
 .tactics-container {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 1.5rem;
-  align-items: start;
-}
-
-.tactics-settings-card {
-  grid-column: 1;
-  grid-row: 1;
-  width: 100%;
-  box-sizing: border-box;
+  display: block;
 }
 
 .tactics-list-card {
@@ -1010,9 +1000,9 @@ textarea {
 }
 
 .tactics-board-wrapper {
-  grid-column: 2;
-  grid-row: 1;
   width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
   box-sizing: border-box;
 }
 
@@ -1185,6 +1175,189 @@ textarea {
   overflow: hidden;
   box-shadow: var(--shadow-md);
   touch-action: none;
+  /* 상단 플로팅 툴바가 코트를 가리지 않도록 여백 확보 */
+  padding-top: 56px;
+}
+
+/* ===== 보드 위 오버레이 컨트롤 ===== */
+.board-float-toolbar {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 5px;
+  background: color-mix(in srgb, var(--color-surface-solid) 90%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-md);
+  max-width: calc(100% - 20px);
+}
+
+.board-mode-control {
+  border: none;
+  background: transparent;
+  padding: 0;
+  gap: 0.2rem;
+}
+
+.board-mode-control .control-btn {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.board-toolbar-actions {
+  display: flex;
+  gap: 0.25rem;
+  padding-left: 0.4rem;
+  border-left: 1px solid var(--color-border);
+}
+
+.board-icon-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  border-radius: 9px;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  transition: all var(--transition-fast);
+}
+
+.board-icon-btn:hover {
+  background: var(--color-surface-hover);
+}
+
+.board-icon-btn.active {
+  background: var(--gradient-primary);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* 그리기 도구 서브 툴바 (그리기 모드에서만 표시) */
+.board-draw-toolbar {
+  position: absolute;
+  top: 58px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--color-surface-solid) 94%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+}
+
+.draw-toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.draw-toolbar-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  width: 1.1rem;
+  flex-shrink: 0;
+}
+
+.board-draw-toolbar .segmented-control {
+  padding: 0.2rem;
+}
+
+.board-draw-toolbar .control-btn {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  min-width: 3.6rem;
+  text-align: center;
+}
+
+.board-draw-toolbar .color-palette {
+  display: flex;
+  gap: 10px;
+}
+
+/* 뷰 설정 패널 (⚙️ 토글) */
+.board-settings-panel {
+  position: absolute;
+  top: 54px;
+  right: 10px;
+  z-index: 50;
+  width: 240px;
+  max-width: calc(100% - 20px);
+  max-height: calc(100% - 68px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--color-surface-solid);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+}
+
+.board-settings-panel[hidden] {
+  display: none;
+}
+
+.board-settings-panel-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.board-settings-panel-actions .btn {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.board-settings-panel .token-legend {
+  margin-top: 0;
+  padding-top: 1rem;
+}
+
+/* 전체화면(집중 모드) */
+.tactics-board-container.board-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px 16px;
+}
+
+body.board-fullscreen-open {
+  overflow: hidden;
+}
+
+.tactics-board-container.board-fullscreen .court-board-wrapper {
+  width: auto;
+  height: calc(100vh - 96px);
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 96px);
+  margin: 0;
 }
 
 .court-board-wrapper {
