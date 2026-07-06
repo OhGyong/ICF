@@ -1337,43 +1337,35 @@ textarea {
 .tactics-board-container.board-fullscreen {
   position: fixed;
   inset: 0;
+  /* 모바일 주소창을 제외한 실제 보이는 높이에 맞춤 (top+height가 bottom:0을 대체) */
+  height: 100dvh;
   z-index: 2000;
   margin: 0;
   border: none;
   border-radius: 0;
   background: var(--color-bg);
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
-  padding: 64px 16px 16px;
+  /* 상단은 옵션(툴바) 영역만 남기고, 하단은 기기 맨 바닥까지 */
+  padding: 56px 0 0;
 }
 
 body.board-fullscreen-open {
   overflow: hidden;
 }
 
-/* 전체화면: 코트 비율(aspect-ratio)을 유지한 채 화면에 맞춰 최대로 확대.
-   너비는 "가로 여유" 와 "세로 여유 × 비율" 중 작은 값으로 잡아 두 축 모두 넘치지 않게 한다.
-   높이는 aspect-ratio가 자동 계산하므로 auto. */
+/* 전체화면: 옵션(툴바) 영역 아래부터 기기 바닥까지 화면 전체를 채운다.
+   코트 SVG(preserveAspectRatio=none)·토큰·경로가 모두 같은 박스에 맞춰 늘어나므로
+   비율이 달라져도 서로 어긋나지 않는다. */
 .tactics-board-container.board-fullscreen .court-board-wrapper {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   margin: 0;
-  height: auto;
+  width: 100%;
+  height: 100%;
   max-width: none;
   max-height: none;
-  width: min(calc(100vw - 32px), calc((100vh - 96px) * 8 / 5));
-}
-
-.tactics-board-container.board-fullscreen .court-board-wrapper.half-court {
-  width: min(calc(100vw - 32px), calc((100vh - 96px) * 4 / 5));
-}
-
-.tactics-board-container.board-fullscreen .court-board-wrapper.portrait-mode {
-  width: min(calc(100vw - 32px), calc((100vh - 96px) * 5 / 8));
-}
-
-.tactics-board-container.board-fullscreen .court-board-wrapper.portrait-mode.half-court {
-  width: min(calc(100vw - 32px), calc((100vh - 96px) * 5 / 4));
+  aspect-ratio: auto;
 }
 
 .court-board-wrapper {
