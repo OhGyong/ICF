@@ -1352,12 +1352,28 @@ body.board-fullscreen-open {
   overflow: hidden;
 }
 
+/* 전체화면: 코트 비율(aspect-ratio)을 유지한 채 화면에 맞춰 최대로 확대.
+   너비는 "가로 여유" 와 "세로 여유 × 비율" 중 작은 값으로 잡아 두 축 모두 넘치지 않게 한다.
+   높이는 aspect-ratio가 자동 계산하므로 auto. */
 .tactics-board-container.board-fullscreen .court-board-wrapper {
-  width: auto;
-  height: calc(100vh - 96px);
-  max-width: calc(100vw - 32px);
-  max-height: calc(100vh - 96px);
+  flex: 0 0 auto;
   margin: 0;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  width: min(calc(100vw - 32px), calc((100vh - 96px) * 8 / 5));
+}
+
+.tactics-board-container.board-fullscreen .court-board-wrapper.half-court {
+  width: min(calc(100vw - 32px), calc((100vh - 96px) * 4 / 5));
+}
+
+.tactics-board-container.board-fullscreen .court-board-wrapper.portrait-mode {
+  width: min(calc(100vw - 32px), calc((100vh - 96px) * 5 / 8));
+}
+
+.tactics-board-container.board-fullscreen .court-board-wrapper.portrait-mode.half-court {
+  width: min(calc(100vw - 32px), calc((100vh - 96px) * 5 / 4));
 }
 
 .court-board-wrapper {
