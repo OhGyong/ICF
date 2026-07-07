@@ -647,6 +647,9 @@ export function renderRosterList() {
   }
 
   if (!container) return;
+  
+  appData.roster.sort((a, b) => a.name.localeCompare(b.name));
+
   if (appData.roster.length === 0) {
     container.innerHTML = `
       <div class="card text-center span-all-cols" style="padding: 3rem 1rem;">
