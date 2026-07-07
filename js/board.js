@@ -410,6 +410,15 @@ function setupBoardEventListeners() {
       settingsToggle.classList.toggle('active', willOpen);
       settingsToggle.setAttribute('aria-expanded', String(willOpen));
     });
+
+    const closeBtn = document.getElementById('btn-close-board-settings');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        settingsPanel.setAttribute('hidden', '');
+        settingsToggle.classList.remove('active');
+        settingsToggle.setAttribute('aria-expanded', 'false');
+      });
+    }
   }
 
   // 전체화면(집중 모드) 토글 (⛶)
