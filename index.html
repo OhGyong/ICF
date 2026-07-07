@@ -246,7 +246,8 @@
         <!-- ================= TACTICS BOARD TAB ================= -->
         <section id="tactics" class="tab-content">
           <!-- Selected Tactic Notes: shown above the board when a tactic is selected -->
-          <div class="card tactic-notes-card" id="tactic-board-notes-container" style="display: none; margin-bottom: 1rem;">
+          <div class="card tactic-notes-card" id="tactic-board-notes-container"
+            style="display: none; margin-bottom: 1rem;">
             <div class="tactic-notes-header">
               <span class="tactic-notes-eyebrow">📋 작전 노트</span>
               <h3 id="tactic-board-notes-title">전술 이름</h3>
@@ -257,228 +258,259 @@
           <div class="tactics-top-section">
             <div class="tactics-container">
               <!-- Board Controls & Legend -->
-            <!-- Interactive Board (full width, controls overlaid on the board) -->
-            <div class="tactics-board-wrapper">
-              <div class="tactics-board-container" id="tactics-board-container">
-
-                <!-- 항상 보이는 상단 플로팅 툴바: 조작 모드 + 뷰 설정/전체화면 -->
-                <div class="board-float-toolbar" id="board-float-toolbar">
-                  <div class="segmented-control board-mode-control">
-                    <button class="control-btn active" id="mode-move">이동</button>
-                    <button class="control-btn" id="mode-draw">그리기</button>
-                    <button class="control-btn" id="mode-erase">지우개</button>
+              <!-- Interactive Board (full width, controls overlaid on the board) -->
+              <div class="tactics-board-wrapper">
+                <!-- 코트 구역 명칭 서랍: 보드 컨테이너 밖(옆)에 펼쳐짐 -->
+                <aside class="board-zones-drawer" id="board-zones-drawer" hidden aria-label="코트 구역 명칭">
+                  <div class="board-zones-drawer-header">
+                    <h4>🗺️ 코트 구역 명칭</h4>
                   </div>
-                  <div class="board-toolbar-actions">
-                    <button class="board-icon-btn" id="btn-board-settings-toggle" title="뷰 설정" aria-expanded="false">⚙️</button>
-                    <button class="board-icon-btn" id="btn-board-fullscreen" title="전체화면">⛶</button>
-                  </div>
-                </div>
+                  <img src="court-zones.png" alt="코트 구역 명칭 안내" class="board-zones-img">
+                </aside>
 
-                <!-- 그리기 도구 툴바 (그리기 모드일 때만 board.js가 표시) -->
-                <div class="board-draw-toolbar draw-toolbar" id="draw-toolbar" style="display: none;">
-                  <div class="draw-toolbar-row">
-                    <span class="draw-toolbar-label">선</span>
-                    <div class="segmented-control">
-                      <button class="control-btn active" id="tool-arrow">화살표</button>
-                      <button class="control-btn" id="tool-line">일반</button>
+                <div class="tactics-board-container" id="tactics-board-container">
+
+                  <!-- 서랍 여닫기 핸들 (컨테이너 왼쪽 가장자리) -->
+                  <button class="board-zones-handle" id="btn-board-zones-toggle" title="코트 구역 명칭 보기"
+                    aria-expanded="false" aria-controls="board-zones-drawer">«</button>
+
+                  <!-- 항상 보이는 상단 플로팅 툴바: 조작 모드 + 뷰 설정/전체화면 -->
+                  <div class="board-float-toolbar" id="board-float-toolbar">
+                    <div class="segmented-control board-mode-control">
+                      <button class="control-btn active" id="mode-move">이동</button>
+                      <button class="control-btn" id="mode-draw">그리기</button>
+                      <button class="control-btn" id="mode-erase">지우개</button>
                     </div>
-                  </div>
-                  <div class="draw-toolbar-row">
-                    <span class="draw-toolbar-label">색</span>
-                    <div class="color-palette">
-                      <button class="color-btn active" data-color="#08541c" style="background: #08541c;" title="초록색"></button>
-                      <button class="color-btn" data-color="#d32f2f" style="background: #d32f2f;" title="빨간색"></button>
-                      <button class="color-btn" data-color="#1976d2" style="background: #1976d2;" title="파란색"></button>
-                      <button class="color-btn" data-color="#f57c00" style="background: #f57c00;" title="주황색"></button>
-                      <button class="color-btn" data-color="#262F40" style="background: #262F40;" title="검정색"></button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 뷰 설정 패널 (⚙️ 토글): 기본 숨김 -->
-                <div class="board-settings-panel" id="board-settings-panel" hidden>
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h4 style="margin: 0; font-size: 1rem; color: var(--color-text);">뷰 설정</h4>
-                    <button id="btn-close-board-settings" style="background: none; border: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--color-text-muted); padding: 0 0.25rem;">&times;</button>
-                  </div>
-                  <div class="setting-group">
-                    <label>코트 뷰</label>
-                    <div class="segmented-control">
-                      <button class="control-btn active" id="court-half">하프 코트</button>
-                      <button class="control-btn" id="court-full">풀 코트</button>
+                    <div class="board-toolbar-actions">
+                      <button class="board-icon-btn" id="btn-board-settings-toggle" title="뷰 설정"
+                        aria-expanded="false">⚙️</button>
+                      <button class="board-icon-btn" id="btn-board-fullscreen" title="전체화면">⛶</button>
                     </div>
                   </div>
 
-                  <div class="setting-group">
-                    <button class="btn btn-secondary w-full" id="btn-toggle-rotation">
-                      세로 보기 전환
-                    </button>
-                  </div>
-
-                  <div class="board-settings-panel-actions">
-                    <button class="btn btn-secondary" id="btn-reset-board-tokens">토큰 초기화</button>
-                    <button class="btn btn-secondary" id="btn-reset-routes" title="모든 경로를 지웁니다">경로 지우기</button>
-                  </div>
-
-                  <div class="token-legend">
-                    <h4>토큰 목록</h4>
-                    <div class="legend-items">
-                      <div class="legend-item"><span class="token-dot token-offense"></span> 공격 (1 ~ 5)</div>
-                      <div class="legend-item"><span class="token-dot token-defense"></span> 수비 (1 ~ 5)</div>
-                      <div class="legend-item"><span class="token-dot token-ball">🏀</span> 볼</div>
+                  <!-- 그리기 도구 툴바 (그리기 모드일 때만 board.js가 표시) -->
+                  <div class="board-draw-toolbar draw-toolbar" id="draw-toolbar" style="display: none;">
+                    <div class="draw-toolbar-row">
+                      <span class="draw-toolbar-label">선</span>
+                      <div class="segmented-control">
+                        <button class="control-btn active" id="tool-arrow">화살표</button>
+                        <button class="control-btn" id="tool-line">일반</button>
+                      </div>
+                    </div>
+                    <div class="draw-toolbar-row">
+                      <span class="draw-toolbar-label">색</span>
+                      <div class="color-palette">
+                        <button class="color-btn active" data-color="#08541c" style="background: #08541c;"
+                          title="초록색"></button>
+                        <button class="color-btn" data-color="#d32f2f" style="background: #d32f2f;"
+                          title="빨간색"></button>
+                        <button class="color-btn" data-color="#1976d2" style="background: #1976d2;"
+                          title="파란색"></button>
+                        <button class="color-btn" data-color="#f57c00" style="background: #f57c00;"
+                          title="주황색"></button>
+                        <button class="color-btn" data-color="#262F40" style="background: #262F40;"
+                          title="검정색"></button>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <!-- SVG Interactive Court Board Wrapper for aspect ratio -->
-                <div class="court-board-wrapper" id="court-wrapper">
-                  <div class="court-board" id="court-board-container">
-                    <!-- The SVG Court Lines will be styled in CSS. SVG is used for responsive court markings -->
-                    <svg id="court-svg" class="court-svg" viewBox="0 0 800 500" preserveAspectRatio="none">
-                      <!-- Base court background is handled by CSS, lines here -->
-                      <rect x="0" y="0" width="800" height="500" fill="none" class="court-border-line" stroke="#262F40"
-                        stroke-width="4"></rect>
+                  <!-- 뷰 설정 패널 (⚙️ 토글): 기본 숨김 -->
+                  <div class="board-settings-panel" id="board-settings-panel" hidden>
+                    <div
+                      style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                      <h4 style="margin: 0; font-size: 1rem; color: var(--color-text);">뷰 설정</h4>
+                      <button id="btn-close-board-settings"
+                        style="background: none; border: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--color-text-muted); padding: 0 0.25rem;">&times;</button>
+                    </div>
+                    <div class="setting-group">
+                      <label>코트 뷰</label>
+                      <div class="segmented-control">
+                        <button class="control-btn active" id="court-half">하프 코트</button>
+                        <button class="control-btn" id="court-full">풀 코트</button>
+                      </div>
+                    </div>
 
-                      <line x1="400" y1="0" x2="400" y2="190" class="full-court-line" stroke="#262F40" stroke-width="2">
-                      </line>
-                      <line x1="400" y1="310" x2="400" y2="500" class="full-court-line" stroke="#262F40"
-                        stroke-width="2"></line>
-                      <circle cx="400" cy="250" r="60" class="full-court-line" stroke="#262F40" stroke-width="2"
-                        fill="none"></circle>
+                    <div class="setting-group">
+                      <button class="btn btn-secondary w-full" id="btn-toggle-rotation">
+                        세로 보기 전환
+                      </button>
+                    </div>
 
-                      <!-- Left Basket & Key -->
-                      <path d="M 0 185 L 170 185 L 170 315 L 0 315" class="court-key" stroke="#262F40" stroke-width="2"
-                        fill="none"></path>
-                      <path d="M 170 200 A 50 50 0 0 1 170 300" class="court-key-semi" stroke="#262F40" stroke-width="2"
-                        fill="none"></path>
-                      <path d="M 170 200 A 50 50 0 0 0 170 300" class="court-key-semi" stroke="#262F40" stroke-width="2"
-                        fill="none" stroke-dasharray="4,4"></path>
-                      <line x1="5" y1="225" x2="5" y2="275" stroke="#262F40" stroke-width="4"></line> <!-- Backboard -->
-                      <circle cx="15" cy="250" r="8" stroke="#FF6B00" stroke-width="2" fill="none"></circle>
-                      <!-- Rim -->
-                      <path d="M 0 30 L 52 30 A 225 225 0 0 1 52 470 L 0 470" class="court-three-point" stroke="#262F40"
-                        stroke-width="2" fill="none"></path> <!-- 3pt Arc (Left) -->
+                    <div class="board-settings-panel-actions">
+                      <button class="btn btn-secondary" id="btn-reset-board-tokens">토큰 초기화</button>
+                      <button class="btn btn-secondary" id="btn-reset-routes" title="모든 경로를 지웁니다">경로 지우기</button>
+                    </div>
 
-                      <!-- Right Basket & Key -->
-                      <path d="M 800 185 L 630 185 L 630 315 L 800 315" class="court-key" stroke="#262F40"
-                        stroke-width="2" fill="none"></path>
-                      <path d="M 630 200 A 50 50 0 0 0 630 300" class="court-key-semi" stroke="#262F40" stroke-width="2"
-                        fill="none"></path>
-                      <path d="M 630 200 A 50 50 0 0 1 630 300" class="court-key-semi" stroke="#262F40" stroke-width="2"
-                        fill="none" stroke-dasharray="4,4"></path>
-                      <line x1="795" y1="225" x2="795" y2="275" stroke="#262F40" stroke-width="4"></line>
-                      <!-- Backboard -->
-                      <circle cx="785" cy="250" r="8" stroke="#FF6B00" stroke-width="2" fill="none"></circle>
-                      <!-- Rim -->
-                      <path d="M 800 30 L 748 30 A 225 225 0 0 0 748 470 L 800 470" class="court-three-point"
-                        stroke="#262F40" stroke-width="2" fill="none"></path> <!-- 3pt Arc (Right) -->
-                    </svg>
+                    <div class="token-legend">
+                      <h4>토큰 목록</h4>
+                      <div class="legend-items">
+                        <div class="legend-item"><span class="token-dot token-offense"></span> 공격 (1 ~ 5)</div>
+                        <div class="legend-item"><span class="token-dot token-defense"></span> 수비 (1 ~ 5)</div>
+                        <div class="legend-item"><span class="token-dot token-ball">🏀</span> 볼</div>
+                      </div>
+                    </div>
+                  </div>
 
-                    <!-- Overlay for drawn routes (arrows) -->
-                    <svg id="routes-svg" class="routes-svg"
-                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;">
-                      <defs>
-                        <marker id="arrowhead-#08541c" markerWidth="4" markerHeight="4" refX="2.5" refY="2" orient="auto">
-                          <polygon points="0 0, 4 2, 0 4" fill="#08541c" />
-                        </marker>
-                        <marker id="arrowhead-#d32f2f" markerWidth="4" markerHeight="4" refX="2.5" refY="2" orient="auto">
-                          <polygon points="0 0, 4 2, 0 4" fill="#d32f2f" />
-                        </marker>
-                        <marker id="arrowhead-#1976d2" markerWidth="4" markerHeight="4" refX="2.5" refY="2" orient="auto">
-                          <polygon points="0 0, 4 2, 0 4" fill="#1976d2" />
-                        </marker>
-                        <marker id="arrowhead-#f57c00" markerWidth="4" markerHeight="4" refX="2.5" refY="2" orient="auto">
-                          <polygon points="0 0, 4 2, 0 4" fill="#f57c00" />
-                        </marker>
-                        <marker id="arrowhead-#262F40" markerWidth="4" markerHeight="4" refX="2.5" refY="2" orient="auto">
-                          <polygon points="0 0, 4 2, 0 4" fill="#262F40" />
-                        </marker>
-                        <!-- Fallback for old routes -->
-                        <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="2.5" refY="2" orient="auto">
-                          <polygon points="0 0, 4 2, 0 4" fill="#08541c" />
-                        </marker>
-                      </defs>
-                      <g id="routes-container"></g>
-                    </svg>
+                  <!-- SVG Interactive Court Board Wrapper for aspect ratio -->
+                  <div class="court-board-wrapper" id="court-wrapper">
+                    <div class="court-board" id="court-board-container">
+                      <!-- The SVG Court Lines will be styled in CSS. SVG is used for responsive court markings -->
+                      <svg id="court-svg" class="court-svg" viewBox="0 0 800 500" preserveAspectRatio="none">
+                        <!-- Base court background is handled by CSS, lines here -->
+                        <rect x="0" y="0" width="800" height="500" fill="none" class="court-border-line"
+                          stroke="#262F40" stroke-width="4"></rect>
 
-                    <!-- Draggable Token elements will be placed dynamically inside here -->
-                    <div id="tokens-overlay" class="tokens-overlay" style="z-index: 20;"></div>
+                        <line x1="400" y1="0" x2="400" y2="190" class="full-court-line" stroke="#262F40"
+                          stroke-width="2">
+                        </line>
+                        <line x1="400" y1="310" x2="400" y2="500" class="full-court-line" stroke="#262F40"
+                          stroke-width="2"></line>
+                        <circle cx="400" cy="250" r="60" class="full-court-line" stroke="#262F40" stroke-width="2"
+                          fill="none"></circle>
+
+                        <!-- Left Basket & Key -->
+                        <path d="M 0 185 L 170 185 L 170 315 L 0 315" class="court-key" stroke="#262F40"
+                          stroke-width="2" fill="none"></path>
+                        <path d="M 170 200 A 50 50 0 0 1 170 300" class="court-key-semi" stroke="#262F40"
+                          stroke-width="2" fill="none"></path>
+                        <path d="M 170 200 A 50 50 0 0 0 170 300" class="court-key-semi" stroke="#262F40"
+                          stroke-width="2" fill="none" stroke-dasharray="4,4"></path>
+                        <line x1="5" y1="225" x2="5" y2="275" stroke="#262F40" stroke-width="4"></line>
+                        <!-- Backboard -->
+                        <circle cx="15" cy="250" r="8" stroke="#FF6B00" stroke-width="2" fill="none"></circle>
+                        <!-- Rim -->
+                        <path d="M 0 30 L 52 30 A 225 225 0 0 1 52 470 L 0 470" class="court-three-point"
+                          stroke="#262F40" stroke-width="2" fill="none"></path> <!-- 3pt Arc (Left) -->
+
+                        <!-- Right Basket & Key -->
+                        <path d="M 800 185 L 630 185 L 630 315 L 800 315" class="court-key" stroke="#262F40"
+                          stroke-width="2" fill="none"></path>
+                        <path d="M 630 200 A 50 50 0 0 0 630 300" class="court-key-semi" stroke="#262F40"
+                          stroke-width="2" fill="none"></path>
+                        <path d="M 630 200 A 50 50 0 0 1 630 300" class="court-key-semi" stroke="#262F40"
+                          stroke-width="2" fill="none" stroke-dasharray="4,4"></path>
+                        <line x1="795" y1="225" x2="795" y2="275" stroke="#262F40" stroke-width="4"></line>
+                        <!-- Backboard -->
+                        <circle cx="785" cy="250" r="8" stroke="#FF6B00" stroke-width="2" fill="none"></circle>
+                        <!-- Rim -->
+                        <path d="M 800 30 L 748 30 A 225 225 0 0 0 748 470 L 800 470" class="court-three-point"
+                          stroke="#262F40" stroke-width="2" fill="none"></path> <!-- 3pt Arc (Right) -->
+                      </svg>
+
+                      <!-- Overlay for drawn routes (arrows) -->
+                      <svg id="routes-svg" class="routes-svg"
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;">
+                        <defs>
+                          <marker id="arrowhead-#08541c" markerWidth="4" markerHeight="4" refX="2.5" refY="2"
+                            orient="auto">
+                            <polygon points="0 0, 4 2, 0 4" fill="#08541c" />
+                          </marker>
+                          <marker id="arrowhead-#d32f2f" markerWidth="4" markerHeight="4" refX="2.5" refY="2"
+                            orient="auto">
+                            <polygon points="0 0, 4 2, 0 4" fill="#d32f2f" />
+                          </marker>
+                          <marker id="arrowhead-#1976d2" markerWidth="4" markerHeight="4" refX="2.5" refY="2"
+                            orient="auto">
+                            <polygon points="0 0, 4 2, 0 4" fill="#1976d2" />
+                          </marker>
+                          <marker id="arrowhead-#f57c00" markerWidth="4" markerHeight="4" refX="2.5" refY="2"
+                            orient="auto">
+                            <polygon points="0 0, 4 2, 0 4" fill="#f57c00" />
+                          </marker>
+                          <marker id="arrowhead-#262F40" markerWidth="4" markerHeight="4" refX="2.5" refY="2"
+                            orient="auto">
+                            <polygon points="0 0, 4 2, 0 4" fill="#262F40" />
+                          </marker>
+                          <!-- Fallback for old routes -->
+                          <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="2.5" refY="2" orient="auto">
+                            <polygon points="0 0, 4 2, 0 4" fill="#08541c" />
+                          </marker>
+                        </defs>
+                        <g id="routes-container"></g>
+                      </svg>
+
+                      <!-- Draggable Token elements will be placed dynamically inside here -->
+                      <div id="tokens-overlay" class="tokens-overlay" style="z-index: 20;"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Tactic Media (Full Width) -->
-          <div class="tactics-middle-section">
-            <!-- Large Tactic Media Display Board (Below Court) -->
-            <div class="card margin-top-md" id="tactic-board-media-container" style="display: none;">
-              <div class="card-header"
-                style="padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                  <h3 id="tactic-board-media-title">📺 참고</h3>
-                </div>
-              </div>
-              <div class="tactic-large-media-grid" id="tactic-large-media-grid">
-                <!-- Dynamically Populated -->
-              </div>
-            </div>
-          </div>
-
-          <!-- Bottom Section: Tactics List -->
-          <div class="tactics-bottom-section margin-top-md">
-            <div class="card tactics-list-card">
-              <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>전술 목록</h3>
-                <button class="btn btn-primary" id="btn-show-tactic-form">
-                  <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                  전술 추가
-                </button>
-              </div>
-              
-              <div class="form-container" id="tactic-input-form" style="display: none; padding: 1.25rem; background: var(--color-surface-hover); border-radius: 12px; margin-top: 1rem; border: 1px solid var(--color-border);">
-                <h4 style="margin-bottom: 1rem;">전술 정보 입력</h4>
-                <div class="form-group">
-                  <label for="tactic-title">전술 이름</label>
-                  <input type="text" id="tactic-title" placeholder="예: 2-3 지역방어 돌파 작전">
-                </div>
-                <div class="form-group">
-                  <label for="tactic-desc">설명 및 지시사항</label>
-                  <textarea id="tactic-desc" rows="4" placeholder="작전 내용과 선수들의 움직임을 기록하세요..."></textarea>
-                </div>
-                <div class="form-group" id="tactic-links-group">
-                  <label>참고 링크 (유튜브 등)</label>
-                  <div id="tactic-links-container">
-                    <div class="link-input-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                      <input type="url" class="tactic-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
-                      <button type="button" class="btn btn-outline" onclick="addTacticLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
-                    </div>
+            <!-- Tactic Media (Full Width) -->
+            <div class="tactics-middle-section">
+              <!-- Large Tactic Media Display Board (Below Court) -->
+              <div class="card margin-top-md" id="tactic-board-media-container" style="display: none;">
+                <div class="card-header"
+                  style="padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <h3 id="tactic-board-media-title">📺 참고</h3>
                   </div>
                 </div>
-                <div class="form-group">
-                  <label>사진 첨부</label>
-                  <input type="file" id="tactic-media-input" accept="image/*" multiple style="display: none;">
-                  <button type="button" class="btn btn-outline w-full"
-                    onclick="document.getElementById('tactic-media-input').click()">
-                    📁 파일 선택 (사진)
+                <div class="tactic-large-media-grid" id="tactic-large-media-grid">
+                  <!-- Dynamically Populated -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Section: Tactics List -->
+            <div class="tactics-bottom-section margin-top-md">
+              <div class="card tactics-list-card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                  <h3>전술 목록</h3>
+                  <button class="btn btn-primary" id="btn-show-tactic-form">
+                    <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    전술 추가
                   </button>
-                  <div id="tactic-media-preview" class="media-preview-grid"></div>
                 </div>
-                <div style="display: flex; gap: 0.5rem;">
-                  <button class="btn btn-primary" id="btn-save-tactic" style="flex: 1;">전술 저장</button>
-                  <button class="btn btn-secondary" id="btn-cancel-tactic-edit" style="display: none;">선택 해제</button>
-                  <button class="btn btn-secondary" id="btn-hide-tactic-form">닫기</button>
+
+                <div class="form-container" id="tactic-input-form"
+                  style="display: none; padding: 1.25rem; background: var(--color-surface-hover); border-radius: 12px; margin-top: 1rem; border: 1px solid var(--color-border);">
+                  <h4 style="margin-bottom: 1rem;">전술 정보 입력</h4>
+                  <div class="form-group">
+                    <label for="tactic-title">전술 이름</label>
+                    <input type="text" id="tactic-title" placeholder="예: 2-3 지역방어 돌파 작전">
+                  </div>
+                  <div class="form-group">
+                    <label for="tactic-desc">설명 및 지시사항</label>
+                    <textarea id="tactic-desc" rows="4" placeholder="작전 내용과 선수들의 움직임을 기록하세요..."></textarea>
+                  </div>
+                  <div class="form-group" id="tactic-links-group">
+                    <label>참고 링크 (유튜브 등)</label>
+                    <div id="tactic-links-container">
+                      <div class="link-input-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <input type="url" class="tactic-link-input" placeholder="예: https://youtube.com/watch?v=..."
+                          style="flex: 1; min-width: 0;">
+                        <button type="button" class="btn btn-outline" onclick="addTacticLinkInput(this)"
+                          style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;"
+                          title="링크 추가">+</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>사진 첨부</label>
+                    <input type="file" id="tactic-media-input" accept="image/*" multiple style="display: none;">
+                    <button type="button" class="btn btn-outline w-full"
+                      onclick="document.getElementById('tactic-media-input').click()">
+                      📁 파일 선택 (사진)
+                    </button>
+                    <div id="tactic-media-preview" class="media-preview-grid"></div>
+                  </div>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-primary" id="btn-save-tactic" style="flex: 1;">전술 저장</button>
+                    <button class="btn btn-secondary" id="btn-cancel-tactic-edit" style="display: none;">선택 해제</button>
+                    <button class="btn btn-secondary" id="btn-hide-tactic-form">닫기</button>
+                  </div>
                 </div>
-              </div>
-              <div class="tactic-list-divider"></div>
-              <div class="saved-tactics" id="saved-tactics-list">
-                <!-- Dynamically populated -->
+                <div class="tactic-list-divider"></div>
+                <div class="saved-tactics" id="saved-tactics-list">
+                  <!-- Dynamically populated -->
+                </div>
               </div>
             </div>
-          </div>
         </section>
 
         <!-- ================= SKILLS TAB ================= -->
@@ -739,8 +771,11 @@
           <label>참고 링크 (유튜브 등)</label>
           <div id="skill-links-container">
             <div class="link-input-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-              <input type="url" class="skill-link-input" placeholder="예: https://youtube.com/watch?v=..." style="flex: 1; min-width: 0;">
-              <button type="button" class="btn btn-outline" onclick="addSkillLinkInput(this)" style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;" title="링크 추가">+</button>
+              <input type="url" class="skill-link-input" placeholder="예: https://youtube.com/watch?v=..."
+                style="flex: 1; min-width: 0;">
+              <button type="button" class="btn btn-outline" onclick="addSkillLinkInput(this)"
+                style="flex-shrink: 0; width: 44px; padding: 0; display: flex; align-items: center; justify-content: center;"
+                title="링크 추가">+</button>
             </div>
           </div>
         </div>

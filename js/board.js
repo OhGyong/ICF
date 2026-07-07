@@ -421,6 +421,23 @@ function setupBoardEventListeners() {
     }
   }
 
+  // 코트 구역 명칭 서랍 토글 («/» 핸들)
+  const zonesToggle = document.getElementById('btn-board-zones-toggle');
+  const zonesDrawer = document.getElementById('board-zones-drawer');
+  if (zonesToggle && zonesDrawer) {
+    zonesToggle.addEventListener('click', () => {
+      const willOpen = zonesDrawer.hasAttribute('hidden');
+      if (willOpen) {
+        zonesDrawer.removeAttribute('hidden');
+      } else {
+        zonesDrawer.setAttribute('hidden', '');
+      }
+      zonesToggle.classList.toggle('active', willOpen);
+      zonesToggle.setAttribute('aria-expanded', String(willOpen));
+      zonesToggle.textContent = willOpen ? '»' : '«';
+    });
+  }
+
   // 전체화면(집중 모드) 토글 (⛶)
   const fullscreenBtn = document.getElementById('btn-board-fullscreen');
   const boardContainer = document.getElementById('tactics-board-container');

@@ -1333,6 +1333,105 @@ textarea {
   padding-top: 1rem;
 }
 
+/* 코트 구역 명칭 서랍(drawer): 보드 컨테이너 밖(옆)에 나란히 펼쳐짐 */
+.tactics-board-wrapper {
+  display: flex;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.tactics-board-wrapper > .tactics-board-container {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.board-zones-drawer {
+  flex: 0 0 440px;
+  width: 440px;
+  align-self: stretch;
+  /* 보드 컨테이너 높이에 맞춤 */
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.85rem;
+  background: var(--color-surface-solid);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.board-zones-drawer[hidden] {
+  display: none;
+}
+
+.board-zones-drawer-header {
+  flex: 0 0 auto;
+}
+
+.board-zones-drawer-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.board-zones-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+/* PC: 이미지를 서랍(=보드) 높이만큼 채워 크게 표시 (상단 정렬) */
+@media (min-width: 993px) {
+  .board-zones-img {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+/* 서랍 여닫기 핸들 (보드 컨테이너 상단 좌측 — 코트/골대를 가리지 않도록) */
+.board-zones-handle {
+  position: absolute;
+  left: 10px;
+  top: 11px;
+  z-index: 45;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--color-surface-solid) 90%, transparent);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text-primary);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.board-zones-handle:hover {
+  background: var(--color-surface-hover);
+}
+
+.board-zones-handle.active {
+  background: var(--gradient-primary);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* 전체화면(집중 모드)에서는 서랍/핸들 숨김 */
+.tactics-board-container.board-fullscreen .board-zones-handle {
+  display: none;
+}
+
 /* 전체화면(집중 모드) */
 .tactics-board-container.board-fullscreen {
   position: fixed;
@@ -2042,6 +2141,17 @@ body.board-fullscreen-open {
     grid-column: auto;
     grid-row: auto;
     margin-top: 0;
+  }
+
+  /* 좁은 화면: 서랍을 보드 위에 세로로 쌓아서 표시 */
+  .tactics-board-wrapper {
+    flex-direction: column;
+  }
+
+  .board-zones-drawer {
+    flex: 0 0 auto;
+    width: 100%;
+    align-self: stretch;
   }
 
   .skills-grid {
