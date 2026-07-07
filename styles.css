@@ -1262,6 +1262,42 @@ textarea {
   box-shadow: var(--shadow-md);
 }
 
+.draw-toolbar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.draw-toolbar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.board-draw-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.board-draw-close:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
 .draw-toolbar-row {
   display: flex;
   align-items: center;

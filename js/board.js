@@ -281,6 +281,7 @@ function setupBoardEventListeners() {
   });
 
   document.getElementById('mode-draw').addEventListener('click', () => {
+    const alreadyDrawing = isDrawMode;
     isDrawMode = true;
     isEraseMode = false;
     document.getElementById('mode-draw').classList.add('active');
@@ -288,9 +289,22 @@ function setupBoardEventListeners() {
     document.getElementById('mode-erase').classList.remove('active');
     document.getElementById('tactics-board-container').classList.add('draw-mode');
     const drawToolbar = document.getElementById('draw-toolbar');
-    if (drawToolbar) drawToolbar.style.display = 'flex';
+    if (drawToolbar) {
+      // 이미 그리기 모드면 옵션 툴바 표시를 토글(닫아둔 옵션을 다시 열기), 아니면 표시
+      drawToolbar.style.display =
+        alreadyDrawing && drawToolbar.style.display !== 'none' ? 'none' : 'flex';
+    }
     renderRoutes();
   });
+
+  // 그리기 옵션 툴바 닫기: 그리기 모드는 유지하고 보드 공간만 확보(툴바만 숨김)
+  const btnCloseDrawToolbar = document.getElementById('btn-close-draw-toolbar');
+  if (btnCloseDrawToolbar) {
+    btnCloseDrawToolbar.addEventListener('click', () => {
+      const drawToolbar = document.getElementById('draw-toolbar');
+      if (drawToolbar) drawToolbar.style.display = 'none';
+    });
+  }
 
   document.getElementById('mode-erase').addEventListener('click', () => {
     isDrawMode = false;
