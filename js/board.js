@@ -121,16 +121,8 @@ function renderRoutes() {
       hitPath.setAttribute('stroke-width', '24');
       hitPath.style.cursor = isEraseMode ? 'url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMCAyMEg3TDMgMTZDMi40IDE1LjQgMi40IDE0LjYgMyAxNEwxMyA0QzEzLjYgMy40IDE0LjQgMy40IDE1IDRMMjAgOUMyMC42IDkuNiAyMC42IDEwLjQgMjAgMTFMMTEgMjBIMjBaIi8+PGxpbmUgeDE9IjE4IiB5MT0iMTMiIHgyPSIxMSIgeTI9IjIwIi8+PC9zdmc+"), crosshair' : 'default';
       hitPath.setAttribute('pointer-events', isEraseMode ? 'stroke' : 'none');
-      
-      hitPath.addEventListener('click', (e) => {
-        if (!isEraseMode) return;
-        e.stopPropagation();
-        const idx = currentRoutesState.indexOf(route);
-        if (idx !== -1) {
-          currentRoutesState.splice(idx, 1);
-          renderRoutes();
-        }
-      });
+      // startDrag(터치/마우스 공용)에서 지우기 처리를 위해 경로 참조를 보관
+      hitPath.__routeRef = route;
       group.appendChild(hitPath);
     }
 
@@ -190,8 +182,18 @@ function setupDragAndDrop() {
   const startDrag = (e) => {
     e.preventDefault();
     const target = e.target;
-    
-    if (isEraseMode) return;
+
+    if (isEraseMode) {
+      // 터치에서는 preventDefault로 click이 생성되지 않으므로 여기서 직접 지운다
+      if (target && target.__routeRef) {
+        const idx = currentRoutesState.indexOf(target.__routeRef);
+        if (idx !== -1) {
+          currentRoutesState.splice(idx, 1);
+          renderRoutes();
+        }
+      }
+      return;
+    }
     
     if (isDrawMode) {
       const rect = container.getBoundingClientRect();
