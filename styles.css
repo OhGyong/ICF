@@ -1703,6 +1703,10 @@ body.board-fullscreen-open {
   padding: 0.75rem 1rem;
   border-radius: 12px;
   transition: var(--transition-fast);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .skill-item:hover {
@@ -1717,11 +1721,14 @@ body.board-fullscreen-open {
   gap: 0.25rem;
   flex: 1;
   padding-right: 1rem;
+  min-width: 0;
 }
 
 .skill-name {
   font-size: 0.95rem;
   font-weight: 600;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .skill-desc {
@@ -1729,6 +1736,7 @@ body.board-fullscreen-open {
   color: var(--color-text-secondary);
   line-height: 1.4;
   word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .skill-item-actions {
@@ -2316,6 +2324,24 @@ body.board-fullscreen-open {
   .roster-actions button {
     font-size: 0.7rem;
     padding: 0.3rem;
+  }
+
+  /* Skills Mobile Grid Adjustments */
+  .skill-item .skill-edit-btn,
+  .skill-item .skill-delete-btn {
+    opacity: 1;
+  }
+
+  .card-panel {
+    padding: 1rem;
+  }
+
+  .skill-category-card {
+    padding: 0.85rem;
+  }
+
+  .skill-item {
+    padding: 0.65rem 0.75rem;
   }
 }
 
