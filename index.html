@@ -256,7 +256,16 @@
           </div>
 
           <div class="tactics-top-section">
-            <div class="tactics-container">
+            <!-- 전술 보드 카드: 제목(=토글)과 보드를 한 컨테이너에 담는다 -->
+            <div class="card tactics-board-card">
+            <!-- 제목 줄 전체가 접기/펼치기 토글 -->
+            <button type="button" class="tactics-board-toggle" id="btn-toggle-board-collapse"
+              aria-expanded="true" aria-controls="tactics-container" title="전술 보드 접기">
+              <span class="tactics-board-toggle-title">🏀 전술 보드</span>
+              <span class="board-collapse-label">접기</span>
+            </button>
+
+            <div class="tactics-container" id="tactics-container">
               <!-- Board Controls & Legend -->
               <!-- Interactive Board (full width, controls overlaid on the board) -->
               <div class="tactics-board-wrapper">
@@ -441,6 +450,7 @@
                 </div>
               </div>
             </div>
+            </div><!-- /.tactics-board-card -->
 
             <!-- Tactic Media (Full Width) -->
             <div class="tactics-middle-section">

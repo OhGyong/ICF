@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -nE \"^\\(let|const|var|function|//\\\\s*={2,}|/\\\\*\\)\" js/board.js)",
+      "Bash(node --input-type=module --check)",
+      "Bash(node -e \"console.log\\('node', process.version\\)\")"
+    ]
+  }
+}

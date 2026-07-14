@@ -486,6 +486,14 @@ function setupBoardEventListeners() {
     });
   }
 
+  // 전술 보드 접기/펼치기 (헤더 버튼)
+  const collapseBtn = document.getElementById('btn-toggle-board-collapse');
+  if (collapseBtn) {
+    collapseBtn.addEventListener('click', () => {
+      setBoardCollapsed(!document.getElementById('tactics-container').hasAttribute('hidden'));
+    });
+  }
+
   document.getElementById('btn-save-tactic').addEventListener('click', handleSaveTactic);
   const cancelTacticBtn = document.getElementById('btn-cancel-tactic-edit');
   if (cancelTacticBtn) {
@@ -516,6 +524,23 @@ function setupBoardEventListeners() {
       resetTacticsSelection();
     });
   }
+}
+
+// 코트 보드 영역을 접거나 편다. 접힘 상태는 DOM(hidden 속성)에만 두고 따로 저장하지 않는다.
+function setBoardCollapsed(collapsed) {
+  const container = document.getElementById('tactics-container');
+  const btn = document.getElementById('btn-toggle-board-collapse');
+  if (!container || !btn) return;
+
+  if (collapsed) {
+    container.setAttribute('hidden', '');
+  } else {
+    container.removeAttribute('hidden');
+  }
+  btn.classList.toggle('is-collapsed', collapsed);
+  btn.setAttribute('aria-expanded', String(!collapsed));
+  btn.title = collapsed ? '전술 보드 펼치기' : '전술 보드 접기';
+  btn.querySelector('.board-collapse-label').textContent = collapsed ? '펼치기' : '접기';
 }
 
 function renderBoardTacticNotes(tactic) {
@@ -704,6 +729,9 @@ async function handleSaveTactic() {
 
 export function loadTacticToForm(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // 접힌 상태에서 전술을 고르면 보드에 반영돼도 보이지 않으므로 함께 펼친다.
+  setBoardCollapsed(false);
 
   const tacticForm = document.getElementById('tactic-input-form');
   if (tacticForm) tacticForm.style.display = 'block';
